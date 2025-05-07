@@ -1,0 +1,61 @@
+name: sloopify_mobile
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  dio: ^5.8.0+1
+  dartz: ^0.10.1
+  equatable: ^2.0.7
+  easy_localization: ^3.0.7+1
+  internet_connection_checker: ^3.0.1
+  smooth_page_indicator: ^1.2.1
+  flutter_svg: ^2.1.0
+  flutter_screenutil: ^5.9.3
+  shared_preferences: ^2.5.3
+  yaml: ^3.1.3
+  get_it: ^8.0.3
+  easy_splash_screen: ^1.0.4
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+     - assets/
+     - assets/images/
+     - assets/icons/start_up/
+     - assets/locales/
+     - pubspec.yaml
+
+  # example:
+  fonts:
+     - family: Poppins
+       fonts:
+         - asset: assets/fonts/Poppins-Medium.ttf
+         - asset: assets/fonts/Poppins-Regular.ttf
+         - asset: assets/fonts/Poppins-Bold.ttf
+
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
