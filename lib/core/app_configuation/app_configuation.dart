@@ -14,7 +14,7 @@ class AppConfiguration{
     await EasyLocalization.ensureInitialized();
     await sl.setupLocator();
     HttpOverrides.global = MyHttpOverrides();
-   await getAppVersion();
+  // await getAppVersion();
 
 
   }

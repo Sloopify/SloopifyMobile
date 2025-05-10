@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sloopify_mobile/core/app_configuation/app_configuation.dart';
+import 'package:sloopify_mobile/core/managers/route_manager.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/on_boarding_screen.dart';
 
 import 'core/local_storage/preferene_utils.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
       //my emulator Nexus 6 width and height
       designSize: const Size(411.42857142857144, 683.4285714285714),
       builder:
-          (_, child) => MaterialApp(
+          (context, child) => MaterialApp(
             debugShowCheckedModeBanner: false,
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: LanguagesManager.languages.values.toList(),
@@ -44,22 +45,12 @@ class MyApp extends StatelessWidget {
             theme: AppTheme.getApplicationThemeData(context),
             navigatorKey: navigatorKey,
             home: SplashScreen(
-              navigator:navigationPage(context),
             ),
+         onGenerateRoute: AppRouter().onGenerateRoute,
           ),
     );
   }
 
-   navigationPage(BuildContext context) {
-    bool? firstTime = PreferenceUtils.getbool('firstTime');
-    if (firstTime == true) {
-     // Navigator.pushReplacementNamed(context, AppWrapper.routeName);
-    } else {
-      Navigator.of(context).pushReplacementNamed(
-        OnBoardingScreen.routeName,
-      );
 
-    }
-  }
 
 }

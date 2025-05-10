@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
-import '';
   const poppinsFontFamily = 'Poppins';
 class AppTheme {
   AppTheme._();
@@ -72,13 +71,13 @@ class AppTheme {
       // // app bar theme
       appBarTheme: AppBarTheme(
         iconTheme: const IconThemeData(
-          color: Colors.white,
+          color: Colors.black,
         ),
         systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: ColorManager.black,
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.dark),
-        foregroundColor: Colors.white,
+            statusBarColor: ColorManager.white,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light),
+        foregroundColor: Colors.black,
         toolbarTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white),
         centerTitle: false,
@@ -95,7 +94,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
             padding: EdgeInsets.all(8),
-            backgroundColor: ColorManager.black,
+            backgroundColor: ColorManager.primaryColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -113,7 +112,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: TextButton.styleFrom(
           padding: EdgeInsets.all(8),
-          foregroundColor: ColorManager.black,
+          foregroundColor: ColorManager.primaryColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -147,13 +146,6 @@ class AppTheme {
         contentPadding: const EdgeInsets.symmetric(
           vertical: 4,
           horizontal: 8,
-        ),
-
-        hintStyle: TextStyle(
-          fontSize: 14,
-        ),
-        labelStyle: TextStyle(
-          fontSize: 14,
         ),
         floatingLabelStyle: TextStyle(
             color: ColorManager.primaryColor,
@@ -251,8 +243,8 @@ class AppTheme {
       color: ColorManager.black);
 
   static TextStyle get headline2 => TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
+      fontSize: 18,
+      fontWeight: FontWeight.w500,
       fontFamily: poppinsFontFamily,
       color: ColorManager.black);
 

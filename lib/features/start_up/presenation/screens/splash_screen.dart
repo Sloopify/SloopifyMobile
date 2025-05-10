@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
+import 'package:sloopify_mobile/features/start_up/presenation/screens/on_boarding_screen.dart';
 
 import '../../../../core/local_storage/preferene_utils.dart';
 
@@ -22,11 +23,11 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   startTime() async {
     var duration = const Duration(seconds: 2);
-    return Timer(duration, widget.navigator);
+    return Timer(duration, navigationPage);
   }
 @override
   void initState() {
-    startTime();
+   startTime();
     super.initState();
   }
   @override
@@ -42,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
       showLoader: false,
       loaderColor: ColorManager.white,
       loadingText: Text(
-        'V ${PreferenceUtils.getString('versionNumberKey')}',
+        'V 1.0.0',
         style: AppTheme.headline3.copyWith(
           color: ColorManager.primaryColor,
           fontWeight: FontWeight.w400,
@@ -50,5 +51,15 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
       // futureNavigator: getFirstScreen(),
     );
+  }
+  void navigationPage() {
+    if (false) {
+     // Navigator.pushReplacementNamed(context, AppWrapper.routeName);
+    } else {
+      Navigator.of(context).pushReplacementNamed(
+        OnBoardingScreen.routeName,
+      );
+
+    }
   }
 }

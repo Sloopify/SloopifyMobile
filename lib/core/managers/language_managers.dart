@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 class LanguagesManager {
-  static const Arabic = 'en';
-  static const English = 'ar';
+  static const Arabic = 'ar';
+  static const English = 'en';
 
   static const appLanguages = [English, Arabic];
 
