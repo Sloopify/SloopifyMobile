@@ -14,7 +14,7 @@ PreferredSizeWidget getCustomAppBar({
   withActions = true,
   Color titleColor = Colors.black,
   Color arrowBackColor = Colors.black,
-  Alignment alignment = Alignment.centerLeft,
+  bool centerTitle=false,
   final Function()? onArrowBack,
   final List<Widget>? actions
 }) {
@@ -46,15 +46,12 @@ PreferredSizeWidget getCustomAppBar({
     actions: withActions
         ? actions
         : [],
-    centerTitle: false,
-    title: Align(
-      alignment: alignment,
-      child: Text(
-        title,
-        style: AppTheme.headline2.copyWith(color: titleColor),
-        textAlign: TextAlign.right,
-        textDirection: TextDirection.rtl,
-      ),
+    centerTitle: centerTitle,
+    title: Text(
+      title,
+      style: AppTheme.headline2.copyWith(color: titleColor),
+      textAlign: TextAlign.right,
+      textDirection: TextDirection.rtl,
     ),
   );
 }

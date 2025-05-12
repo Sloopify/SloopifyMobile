@@ -13,6 +13,7 @@ import 'package:sloopify_mobile/core/ui/widgets/custom_elevated_button.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_text_field.dart';
 import 'package:sloopify_mobile/core/utils/helper/toast_utils.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/signup_cubit/sign_up_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/screens/signin_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/verify_account_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/widgets/phone_number.dart';
 import 'package:sloopify_mobile/features/auth/presentation/widgets/policy_terms.dart';
@@ -33,9 +34,6 @@ class SignupScreen extends StatelessWidget {
       child: Scaffold(
         appBar: getCustomAppBar(
           context: context,
-          onArrowBack: () {
-            exit(0);
-          },
         ),
         body: BlocConsumer<SignUpCubit, SignUpState>(
           listener: (context, state) {
@@ -199,7 +197,7 @@ class SignupScreen extends StatelessWidget {
                                             () =>
                                                 Navigator.pushReplacementNamed(
                                                   context,
-                                                  SignupScreen.routeName,
+                                                  SignInScreen.routeName,
                                                 ),
                                 ),
                               ],

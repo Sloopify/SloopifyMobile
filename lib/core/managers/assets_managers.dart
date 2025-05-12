@@ -15,6 +15,7 @@ class AssetsManager{
   static const String verifyAccount = '${baseStartUpImagesURI}verify_account.png';
   static const String otpCode = '${baseStartUpImagesURI}otp.png';
   static const String writeOtpCode = '${baseStartUpImagesURI}write_otp.png';
+  static const String referredBy = '${baseStartUpImagesURI}referred_by.png';
 
   //////////*********auth*************///////////////
   static const String authIcons = '${baseIconsURI}auth/';
@@ -26,6 +27,19 @@ class AssetsManager{
   static const String arrowForward = '${baseAuthIcons}arrow_forward.svg';
   static const String sms = '${baseAuthIcons}sms.svg';
   static const String otp = '${baseAuthIcons}otp.svg';
+//////////*********profile info*************///////////////
+
+  static const String profileInfoIcons = '${baseIconsURI}profile_info/';
+  static const String male = '${profileInfoIcons}male.svg';
+  static const String female = '${profileInfoIcons}female.svg';
+  static const String birthday = '${profileInfoIcons}birthday.svg';
+  static const String user = '${profileInfoIcons}user.svg';
+  static const String edit = '${profileInfoIcons}edit.svg';
+  //////////////****lotties *********///////////
+
+  static const String baseLottieURI = 'assets/lottie/';
+  static const String success = '${baseLottieURI}success.json';
+  static const String loading = '${baseLottieURI}loading.json';
 
 
 }
