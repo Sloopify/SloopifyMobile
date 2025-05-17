@@ -129,7 +129,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       });
                     },
                     child: Text(
-                      'show',
+                   !isSeen?   'Show':"Hide",
                       style: AppTheme.bodyText3.copyWith(
                         color: ColorManager.disActive,
                       ),

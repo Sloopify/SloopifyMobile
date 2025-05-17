@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
   const poppinsFontFamily = 'Poppins';
+  const kavoonFontFamily = 'Kavoon';
+  const kanitFonFamily = 'Kanit';
 class AppTheme {
   AppTheme._();
 
@@ -274,4 +276,9 @@ class AppTheme {
       fontWeight: FontWeight.normal,
       fontFamily: poppinsFontFamily,
       color: ColorManager.primaryColor);
+  static TextStyle get header => TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      fontFamily: kavoonFontFamily,
+      color: ColorManager.black);
 }

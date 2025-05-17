@@ -37,7 +37,7 @@ class LoginWithOtpCode extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.6,
+                    width: MediaQuery.of(context).size.width * 0.7,
                     child: Text(
                       'login_with_otp_code'.tr(),
                       style: AppTheme.headline1.copyWith(

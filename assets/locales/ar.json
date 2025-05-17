@@ -80,6 +80,9 @@
   "location2": "Location",
   "referred_by": "Referred by",
   "referred_by2": "referred by",
-  "referred_by_hint": "lorem ipsum dolor anet slorem ipsum dolor anet lorem ipsum dolor anet (optional)"
+  "referred_by_hint": "lorem ipsum dolor anet slorem ipsum dolor anet lorem ipsum dolor anet (optional)",
+  "read_more": "Read more",
+  "read_less": "Read less"
+
 
 }

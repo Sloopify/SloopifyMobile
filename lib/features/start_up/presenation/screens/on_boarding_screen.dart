@@ -28,6 +28,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     return Scaffold(
       body: SafeArea(
         child: Stack(
+          alignment: Alignment.center,
           children: [
             PageView(
               controller: _controller,
@@ -56,53 +57,46 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             ),
             Positioned.directional(
               textDirection: ui.TextDirection.ltr,
-              bottom: 210,
-              start: 20,
-              end: 20,
-              child: Center(
-                child: SmoothPageIndicator(
-                  controller: _controller,
-                  count: 3,
-                  effect: ExpandingDotsEffect(
-                    dotHeight: 12,
-                    expansionFactor: 2,
-                    dotColor: ColorManager.lightGray,
-                    activeDotColor: ColorManager.primaryColor,
-                  ),
+              bottom: 200,
+              child: SmoothPageIndicator(
+                controller: _controller,
+                count: 3,
+                effect: ExpandingDotsEffect(
+                  dotHeight: 12,
+                  expansionFactor: 2,
+                  dotColor: ColorManager.lightGray,
+                  activeDotColor: ColorManager.primaryColor,
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                left: AppPadding.p40,
-                right: AppPadding.p40,
-                bottom: AppPadding.p50,
-              ),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: CustomElevatedButton(
-                  padding: EdgeInsets.zero,
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  label: onLastPage ? 'filled_btn'.tr() : 'next'.tr(),
-                  onPressed: () {
-                    if (onLastPage) {
-                     Navigator.pushReplacementNamed(context, WelcomeScreen.routeName);
-                    } else {
-                      _controller.nextPage(
-                        duration: Duration(milliseconds: 500),
-                        curve: Curves.easeIn,
-                      );
-                    }
-                  },
-                  backgroundColor: ColorManager.primaryColor,
-                ),
+            Positioned(
+            bottom: 50,
+              child: Row(
+                children: [
+                  CustomElevatedButton(
+                    padding: EdgeInsets.zero,
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    label: onLastPage ? 'filled_btn'.tr() : 'next'.tr(),
+                    onPressed: () {
+                      if (onLastPage) {
+                       Navigator.pushReplacementNamed(context, WelcomeScreen.routeName);
+                      } else {
+                        _controller.nextPage(
+                          duration: Duration(milliseconds: 500),
+                          curve: Curves.easeIn,
+                        );
+                      }
+                    },
+                    backgroundColor: ColorManager.primaryColor,
+                  ),
+                ],
               ),
             ),
             Align(
               alignment: Alignment.topLeft,
               child: TextButton(
                 onPressed: () {
-                  _controller.jumpToPage(2);
+                 Navigator.pushReplacementNamed(context, WelcomeScreen.routeName);
                 },
                 child: Text(
                   'skip'.tr(),

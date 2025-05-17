@@ -35,6 +35,42 @@ class AssetsManager{
   static const String birthday = '${profileInfoIcons}birthday.svg';
   static const String user = '${profileInfoIcons}user.svg';
   static const String edit = '${profileInfoIcons}edit.svg';
+
+  //////////*********home*************///////////////
+  static const String homeIcons = '${baseIconsURI}home/';
+  static const String homeImages = '${baseImagesURI}home/';
+
+  static const String home = '${homeIcons}home.svg';
+  static const String robot = '${homeIcons}robot.svg';
+  static const String group = '${homeIcons}group.svg';
+  static const String videoPlayer = '${homeIcons}video-player.svg';
+  static const String market = '${homeIcons}market.svg';
+  static const String chart = '${homeIcons}chart.svg';
+  static const String diary = '${homeIcons}diary.svg';
+  static const String friendShip = '${homeIcons}friend_ship.svg';
+  static const String messages = '${homeIcons}messages.svg';
+  static const String notification = '${homeIcons}notification.svg';
+  static const String personalAccount = '${homeIcons}personal_account.svg';
+  static const String settings = '${homeIcons}settings.svg';
+  static const String drawer = '${homeIcons}drawer.svg';
+  static const String addStory= '${homeIcons}add.svg';
+  static const String cartoon = '${homeImages}cartoon.png';
+  static const String homeExample1 = '${homeImages}home_example1.jpg';
+  static const String homeExample2 = '${homeImages}home_example2.png';
+  static const String homeExample3 = '${homeImages}home_example3.png';
+  static const String manExample  = '${homeImages}man_example.png';
+  static const String addImage  = '${homeIcons}add_image.svg';
+  static const String postInfo  = '${homeIcons}post_info.svg';
+  static const String like  = '${homeIcons}like.svg';
+  static const String share  = '${homeIcons}share.svg';
+  static const String comment  = '${homeIcons}comment.svg';
+  static const String save  = '${homeIcons}save.svg';
+  static const String share2  = '${homeIcons}share2.svg';
+  static const String copyLink  = '${homeIcons}copy_link.svg';
+  static const String report  = '${homeIcons}report_post.svg';
+  static const String hidePost  = '${homeIcons}hide.svg';
+  static const String deleteFriendship  = '${homeIcons}delete_friendship.svg';
+
   //////////////****lotties *********///////////
 
   static const String baseLottieURI = 'assets/lottie/';

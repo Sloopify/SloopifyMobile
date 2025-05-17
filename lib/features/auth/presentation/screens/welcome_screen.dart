@@ -23,84 +23,86 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: ColorManager.white,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Gaps.vGap3,
-            Center(child: Image.asset(AssetsManager.startUp, height: 300)),
-            Gaps.vGap2,
-            Text(
-              'let_you_in'.tr(),
-              style: AppTheme.headline1.copyWith(
-                color: ColorManager.black,
-                fontWeight: FontWeight.w500,
-                fontSize: 28,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Gaps.vGap3,
+              Center(child: Image.asset(AssetsManager.startUp, height: 300)),
+              Gaps.vGap2,
+              Text(
+                'let_you_in'.tr(),
+                style: AppTheme.headline1.copyWith(
+                  color: ColorManager.black,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 28,
+                ),
               ),
-            ),
-            Gaps.vGap4,
-            CustomElevatedButton(
-              isBold: true,
-              svgAlignment: IconAlignment.start,
-              svgPic: SvgPicture.asset(AssetsManager.google),
-              width: MediaQuery.of(context).size.width * 0.7,
-              label: 'continue_with_google'.tr(),
-              onPressed: () {},
-              backgroundColor: ColorManager.white,
-              foregroundColor: ColorManager.primaryColor,
-              borderSide: BorderSide(color: ColorManager.primaryColor),
-            ),
-            Gaps.vGap1,
-            CustomElevatedButton(
-              isBold: true,
-              svgAlignment: IconAlignment.start,
-              svgPic: SvgPicture.asset(AssetsManager.apple),
-              width: MediaQuery.of(context).size.width * 0.7,
-              label: 'continue_with_apple'.tr(),
-              onPressed: () {},
-              backgroundColor: ColorManager.white,
-              foregroundColor: ColorManager.primaryColor,
-              borderSide: BorderSide(color: ColorManager.primaryColor),
-            ),
-            Gaps.vGap2,
-            _buildOrWidget(),
-            Gaps.vGap2,
-            CustomElevatedButton(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              width: MediaQuery.of(context).size.width * 0.7,
-              label: 'login'.tr(),
-              onPressed: () {
-                Navigator.pushNamed(context, SignInScreen.routeName);
-              },
-              backgroundColor: ColorManager.primaryColor,
-            ),
-            Gaps.vGap2,
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: "don't_have_account".tr(),
-                    style: AppTheme.bodyText3.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  TextSpan(
-                    text: ' ${"signup".tr()}',
-                    style: AppTheme.bodyText3.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: ColorManager.primaryColor,
-                    ),
-                    recognizer:
-                        TapGestureRecognizer()
-                          ..onTap =
-                              () => Navigator.pushNamed(
-                                context,
-                                SignupScreen.routeName,
-                              ),
-                  ),
-                ],
+              Gaps.vGap4,
+              CustomElevatedButton(
+                isBold: true,
+                svgAlignment: IconAlignment.start,
+                svgPic: SvgPicture.asset(AssetsManager.google),
+                width: MediaQuery.of(context).size.width * 0.7,
+                label: 'continue_with_google'.tr(),
+                onPressed: () {},
+                backgroundColor: ColorManager.white,
+                foregroundColor: ColorManager.primaryColor,
+                borderSide: BorderSide(color: ColorManager.primaryColor),
               ),
-            ),
-          ],
+              Gaps.vGap1,
+              CustomElevatedButton(
+                isBold: true,
+                svgAlignment: IconAlignment.start,
+                svgPic: SvgPicture.asset(AssetsManager.apple),
+                width: MediaQuery.of(context).size.width * 0.7,
+                label: 'continue_with_apple'.tr(),
+                onPressed: () {},
+                backgroundColor: ColorManager.white,
+                foregroundColor: ColorManager.primaryColor,
+                borderSide: BorderSide(color: ColorManager.primaryColor),
+              ),
+              Gaps.vGap2,
+              _buildOrWidget(),
+              Gaps.vGap2,
+              CustomElevatedButton(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                width: MediaQuery.of(context).size.width * 0.7,
+                label: 'login'.tr(),
+                onPressed: () {
+                  Navigator.pushNamed(context, SignInScreen.routeName);
+                },
+                backgroundColor: ColorManager.primaryColor,
+              ),
+              Gaps.vGap2,
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "don't_have_account".tr(),
+                      style: AppTheme.bodyText3.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' ${"signup".tr()}',
+                      style: AppTheme.bodyText3.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: ColorManager.primaryColor,
+                      ),
+                      recognizer:
+                          TapGestureRecognizer()
+                            ..onTap =
+                                () => Navigator.pushNamed(
+                                  context,
+                                  SignupScreen.routeName,
+                                ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

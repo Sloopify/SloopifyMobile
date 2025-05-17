@@ -21,6 +21,8 @@
   "continue_with_google": "Continue With Google",
   "continue_with_apple": "Continue With Apple",
   "login": "Log in",
+  "login_with_otp_code": "Log in with OTP",
+  "send": "Send",
   "don't_have_account": "Don’t have an account?",
   "signup": "Sign up",
   "first_name": "First name",
@@ -82,6 +84,8 @@
   "location2": "Location",
   "referred_by": "Referred by",
   "referred_by2": "referred by",
-  "referred_by_hint": "lorem ipsum dolor anet slorem ipsum dolor anet lorem ipsum dolor anet (optional)"
+  "referred_by_hint": "lorem ipsum dolor anet slorem ipsum dolor anet lorem ipsum dolor anet (optional)",
+  "read_more": "Read more",
+  "read_less": "Read less"
 
 }

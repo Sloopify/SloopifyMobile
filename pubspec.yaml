@@ -39,7 +39,11 @@ dependencies:
   shimmer: ^3.0.0
   image_picker: ^1.1.2
   lottie: ^3.3.1
-dev_dependencies:
+  flutter_inner_shadow: 0.0.1
+  readmore: ^3.0.0
+  flutter_polls: ^0.1.6
+  comment_tree:
+   path: lib/core/external_packages/comment_tree-master
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
@@ -55,9 +59,11 @@ flutter:
      - assets/icons/
      - assets/lottie/
      - assets/icons/auth/
+     - assets/icons/home/
      - assets/icons/profile_info/
      - assets/images/
      - assets/images/start_up/
+     - assets/images/home/
      - assets/locales/
      - pubspec.yaml
 
@@ -70,6 +76,17 @@ flutter:
          - asset: assets/fonts/Poppins-Bold.ttf
            weight: 500
          - asset: assets/fonts/Poppins-Black.ttf
+     - family: Kavoon
+       fonts:
+         - asset: assets/fonts/Kavoon-Regular.ttf
+     - family: Kanit
+       fonts:
+         - asset: assets/fonts/Kanit-Black.ttf
+         - asset: assets/fonts/Kanit-Regular.ttf
+         - asset: assets/fonts/Kanit-Medium.ttf
+         - asset: assets/fonts/Kanit-Bold.ttf
+         - asset: assets/fonts/Kanit-Light.ttf
+
 
   #
   # For details regarding fonts from package dependencies,

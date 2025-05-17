@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sloopify_mobile/core/locator/service_locator.dart';
 import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
@@ -10,7 +12,10 @@ import 'package:sloopify_mobile/core/ui/widgets/custom_text_field.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/account_info/user_interests.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_otp_code.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/signup_screen.dart';
+import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
+import 'package:sloopify_mobile/features/home/presentation/screens/home_navigation_screen.dart';
 
+import '../../../../core/locator/service_locator.dart' as sl;
 import '../../../../core/managers/app_gaps.dart';
 import '../../../../core/managers/color_manager.dart';
 import '../../../../core/managers/theme_manager.dart';
@@ -81,8 +86,9 @@ class SignInScreen extends StatelessWidget {
                       isBold: true,
                       label: "login".tr(),
                       onPressed: () {
-                        //  if(!(_formKey.currentState!.validate()))return;
-                        Navigator.pushNamed(context, UserInterests.routeName);
+                     //    if(!(_formKey.currentState!.validate()))return;
+                          Navigator.pushNamed(context, UserInterests.routeName);
+
                       },
                       width: MediaQuery.of(context).size.width * 0.7,
                       backgroundColor: ColorManager.primaryColor,
@@ -110,7 +116,17 @@ class SignInScreen extends StatelessWidget {
                         width: 50,
                         svgPic: SvgPicture.asset(AssetsManager.google),
                         label: "",
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => BlocProvider(
+                                create: (context) => sl.locator<HomeNavigationCubit>(),
+                                child: HomeNavigationScreen(),
+                              ),
+                            ),
+                          );
+                        },
                         backgroundColor: ColorManager.white,
                         borderSide: BorderSide(
                           color: ColorManager.primaryColor,
@@ -121,7 +137,17 @@ class SignInScreen extends StatelessWidget {
                         width: 50,
                         svgPic: SvgPicture.asset(AssetsManager.apple),
                         label: "",
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => BlocProvider(
+                                create: (context) => sl.locator<HomeNavigationCubit>(),
+                                child: HomeNavigationScreen(),
+                              ),
+                            ),
+                          );
+                        },
                         backgroundColor: ColorManager.white,
                         borderSide: BorderSide(
                           color: ColorManager.primaryColor,
