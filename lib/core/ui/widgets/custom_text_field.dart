@@ -182,8 +182,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 labelStyle: AppTheme.bodyText2.copyWith(
                   color: ColorManager.black,
                 ),
-                disabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: ColorManager.disActive),
+                disabledBorder:  OutlineInputBorder(
+                  borderSide: BorderSide(color: ColorManager.disActive.withOpacity(0.5)),
                 ),
                 errorMaxLines: 2,
                 fillColor: widget.fillColor,

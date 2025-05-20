@@ -10,7 +10,7 @@ class CommentEntity extends Equatable {
   final String creationDate;
   final int numberOfLike;
   final bool isLiked;
-  final List<ReplyEntity> replies;
+  final List<CommentEntity> replies;
 
   CommentEntity({
     required this.postId,
@@ -61,7 +61,7 @@ class CommentEntity extends Equatable {
     String? creationDate,
     int? numberOfLike,
     bool? isLiked,
-    List<ReplyEntity>? replies,
+    List<CommentEntity>? replies,
   }) {
     return CommentEntity(
       postId: postId ?? this.postId,

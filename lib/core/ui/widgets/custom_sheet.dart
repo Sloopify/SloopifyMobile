@@ -99,11 +99,9 @@ class CustomSheet<T> extends StatelessWidget {
                   style: AppTheme.headline3.copyWith(color: ColorManager.black),
                 ),
               ),
+
             Flexible(
               child: SingleChildScrollView(child: child),
-            ),
-            const SizedBox(
-              height: 50,
             ),
           ],
         ),

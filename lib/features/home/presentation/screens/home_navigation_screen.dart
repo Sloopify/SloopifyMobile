@@ -25,7 +25,6 @@ class HomeNavigationScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: ColorManager.white,
       drawer: CustomDrawer(),
-      drawerScrimColor: ColorManager.white,
       body: SafeArea(
         child: BlocBuilder<HomeNavigationCubit, HomeNavigationState>(
           builder:

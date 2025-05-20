@@ -5,24 +5,16 @@ import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_sheet.dart';
 import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
+import 'package:sloopify_mobile/features/posts/domain/entities/post_entity.dart';
 import 'package:sloopify_mobile/features/posts/presentation/widgets/post_items_widget/post_more_option_sheet.dart';
 
 import '../../../../../core/managers/app_dimentions.dart';
 import '../../../../../core/managers/color_manager.dart';
 
 class PostPublisherInfo extends StatelessWidget {
-  final String publisherName;
-  final String image;
-  final String postDate;
-  final String? location;
+  final PostEntity postEntity;
 
-  const PostPublisherInfo({
-    super.key,
-    required this.publisherName,
-    required this.postDate,
-    required this.image,
-    this.location,
-  });
+  const PostPublisherInfo({super.key, required this.postEntity});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +30,7 @@ class PostPublisherInfo extends StatelessWidget {
           ),
           radius: 50,
           isNetworkImage: false,
-          image: image,
+          image: postEntity.profileImage,
           fit: BoxFit.cover,
         ),
         Padding(
@@ -48,7 +40,7 @@ class PostPublisherInfo extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                publisherName,
+                postEntity.publisherName,
                 style: AppTheme.bodyText3.copyWith(fontWeight: FontWeight.bold),
               ),
               Row(
@@ -62,9 +54,9 @@ class PostPublisherInfo extends StatelessWidget {
                     ),
                   ),
                   Gaps.hGap1,
-                  if (location != null)
+                  if (postEntity.location != null)
                     Text(
-                      location!,
+                      postEntity.location!,
                       style: AppTheme.bodyText2.copyWith(
                         fontWeight: FontWeight.w500,
                         fontSize: 12,
@@ -79,7 +71,7 @@ class PostPublisherInfo extends StatelessWidget {
         InkWell(
           onTap: () {
             CustomSheet.show(
-              child: PostMoreOptionSheet(),
+              child: PostMoreOptionSheet(postEntity: postEntity),
               context: context,
               barrierColor: ColorManager.black.withOpacity(0.2),
             );

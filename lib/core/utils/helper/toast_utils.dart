@@ -5,7 +5,7 @@ import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 class ToastUtils {
   static showErrorToastMessage(String message) {
     Fluttertoast.showToast(
-        fontAsset:poppinsFontFamily ,
+        fontAsset:'assets/fonts/Poppins-Regular.ttf' ,
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
@@ -17,7 +17,7 @@ class ToastUtils {
 
   static showSusToastMessage(String message) {
     Fluttertoast.showToast(
-        fontAsset:poppinsFontFamily ,
+        fontAsset:'assets/fonts/Poppins-Regular.ttf' ,
         msg: message,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.TOP,
@@ -29,7 +29,7 @@ class ToastUtils {
 
   static showWarningToastMessage(String message) {
     Fluttertoast.showToast(
-        fontAsset:poppinsFontFamily ,
+        fontAsset:'assets/fonts/Poppins-Regular.ttf' ,
         msg: message,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.TOP,

@@ -39,7 +39,9 @@ class RootPainter extends CustomPainter {
   Color? pathColor;
   double? strokeWidth;
   final TextDirection textDecoration;
-  RootPainter(this.avatar, this.pathColor, this.strokeWidth, this.textDecoration) {
+
+  RootPainter(
+      this.avatar, this.pathColor, this.strokeWidth, this.textDecoration) {
     _paint = Paint()
       ..color = pathColor!
       ..style = PaintingStyle.stroke
@@ -49,11 +51,9 @@ class RootPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if(textDecoration == TextDirection.rtl)
-    canvas.translate(size.width, 0);
+    if (textDecoration == TextDirection.rtl) canvas.translate(size.width, 0);
     double dx = avatar!.width / 2;
-    if(textDecoration == TextDirection.rtl)
-      dx *= -1;
+    if (textDecoration == TextDirection.rtl) dx *= -1;
     canvas.drawLine(
       Offset(dx, avatar!.height),
       Offset(dx, size.height),

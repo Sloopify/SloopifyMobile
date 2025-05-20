@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
+import 'package:sloopify_mobile/core/utils/helper/utils.dart';
+import 'package:sloopify_mobile/features/posts/domain/entities/post_entity.dart';
 
 import '../../../../../core/managers/app_dimentions.dart';
 
 class PostMoreOptionSheet extends StatelessWidget {
-  const PostMoreOptionSheet({super.key});
+  final PostEntity postEntity;
+  const PostMoreOptionSheet({super.key,required this.postEntity});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +32,11 @@ class PostMoreOptionSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      SharePlus.instance.share(
+                          ShareParams(text: postEntity.content,)
+                      );                 },
                     child: SvgPicture.asset(AssetsManager.share2),
                   ),
                   Text(
@@ -42,7 +50,10 @@ class PostMoreOptionSheet extends StatelessWidget {
               Column(
                 children: [
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Utils.copyToClipboard(postEntity.content);
+                    },
                     child: SvgPicture.asset(AssetsManager.copyLink),
                   ),
                   Text(

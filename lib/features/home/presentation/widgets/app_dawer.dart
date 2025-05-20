@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
+import 'package:sloopify_mobile/core/managers/app_gaps.dart';
+import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
+import 'package:sloopify_mobile/core/managers/theme_manager.dart';
+import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
 
 class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: ColorManager.primaryShade1,
-      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Stack(
         alignment: Alignment.center,
         fit: StackFit.expand,
@@ -29,9 +34,7 @@ class CustomDrawer extends StatelessWidget {
               ),
               Container(
                 height: MediaQuery.of(context).size.height * 0.364,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
+                decoration: BoxDecoration(color: Colors.white),
               ),
               Container(
                 height: MediaQuery.of(context).size.height * 0.159,
@@ -63,74 +66,101 @@ class CustomDrawer extends StatelessWidget {
               ),
               Container(
                 height: MediaQuery.of(context).size.height * 0.159,
-                decoration: BoxDecoration(
-                  color: ColorManager.primaryShade3,
-                ),
+                decoration: BoxDecoration(color: ColorManager.primaryShade3),
               ),
             ],
           ),
           Positioned(
             left: 0,
             right: 0,
-            top: 70,
+            top: 30,
             child: Container(
+              padding: EdgeInsets.only(
+                left: AppPadding.p10,
+                right: AppPadding.p10,
+                top: AppPadding.p50,
+                bottom: AppPadding.p35,
+              ),
+              height: MediaQuery.of(context).size.height * 0.65,
+              width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.elliptical(400,100),bottom: Radius.elliptical(400,100)),
+                color: Colors.transparent,
+                image: DecorationImage(
+                  image: AssetImage(AssetsManager.backGroundDrawer),
+                  fit: BoxFit.cover,
+                ),
                 boxShadow: [
                   BoxShadow(
-                      offset: Offset(0, 2),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                      color: ColorManager.bottomNavigationBackGround
+                    offset: Offset(0, 10),
+                    blurRadius: 10,
+                    spreadRadius: 0,
+                    color: ColorManager.black.withOpacity(0.25),
                   ),
                   BoxShadow(
-                      offset: Offset(0, 10),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                      color: ColorManager.black.withOpacity(0.25)
+                    offset: Offset(0, -10),
+                    blurRadius: 10,
+                    spreadRadius: 0,
+                    color: ColorManager.black.withOpacity(0.25),
                   ),
-
-                  BoxShadow(
-                      offset: Offset(0, -2),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                      color: ColorManager.bottomNavigationBackGround
-                  ),
-                  BoxShadow(
-                      offset: Offset(0, -10),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                      color: ColorManager.black.withOpacity(0.25)
-                  ),
-
-
                 ],
-                color: ColorManager.white,
               ),
-              height: MediaQuery.of(context).size.height * 0.511, // Not full height
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 60),
-
-                  SizedBox(height: 10),
-                  Text(
-                    "Lorem Ipsum",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Image.asset(AssetsManager.logo, width: 50, height: 25),
+                      InkWell(
+                        onTap: () {
+                          Scaffold.of(context).closeDrawer();
+                        },
+                        child: Icon(
+                          Icons.close,
+                          color: ColorManager.primaryColor,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 20),
-                  drawerItem(Icons.person, "Personal account"),
-                  drawerItem(Icons.group, "Friendship"),
-                  drawerItem(Icons.bar_chart, "Statistics"),
-                  drawerItem(Icons.book, "My diary"),
-                  drawerItem(Icons.settings, "Settings"),
-                  Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Text(
-                      "Powered by SpinerLoop\nV 1.0.0",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
+                  Gaps.vGap3,
+                  drawerItem(
+                    itemName: "Nour Alkhalil",
+                    isPersonalAccount: true,
+                    onTap: () {},
+                  ),
+                  Gaps.vGap2,
+                  drawerItem(
+                    itemName: "Personal account",
+                    assets: AssetsManager.personalAccount,
+                    onTap: () {},
+                  ),
+                  Gaps.vGap2,
+
+                  drawerItem(
+                    itemName: "Friendship",
+                    assets: AssetsManager.friendShip,
+                    onTap: () {},
+                  ),
+                  Gaps.vGap2,
+
+                  drawerItem(
+                    itemName: "Statistics",
+                    assets: AssetsManager.chart,
+                    onTap: () {},
+                  ),
+                  Gaps.vGap2,
+
+                  drawerItem(
+                    itemName: "My diary",
+                    assets: AssetsManager.diary,
+                    onTap: () {},
+                  ),
+                  Gaps.vGap2,
+
+                  drawerItem(
+                    itemName: "Settings",
+                    assets: AssetsManager.settings,
+                    onTap: () {},
                   ),
                 ],
               ),
@@ -141,15 +171,40 @@ class CustomDrawer extends StatelessWidget {
     );
   }
 
-  Widget drawerItem(IconData icon, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.black87),
-          SizedBox(width: 12),
-          Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
-        ],
+  Widget drawerItem({
+    String? assets,
+    required String itemName,
+    bool isPersonalAccount = false,
+    required Function() onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: AppPadding.p10,
+          horizontal: AppPadding.p10,
+        ),
+        child: Row(
+          children: [
+            if (isPersonalAccount) ...[
+              GeneralImage.circular(
+                radius: 50,
+                image: AssetsManager.manExample2,
+                isNetworkImage: false,
+              ),
+            ] else ...[
+              SvgPicture.asset(assets!),
+            ],
+            Gaps.hGap3,
+            Text(
+              itemName,
+              style: AppTheme.headline4.copyWith(
+                fontWeight: FontWeight.bold,
+                color: ColorManager.primaryColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -165,15 +220,29 @@ class CurveClipper extends CustomClipper<Path> {
     Offset topEndPoint = Offset(size.width, curveHeight);
 
     // Bottom curve
-    Offset bottomControlPoint = Offset(size.width / 2, size.height + curveHeight);
+    Offset bottomControlPoint = Offset(
+      size.width / 2,
+      size.height + curveHeight,
+    );
     Offset bottomEndPoint = Offset(0, size.height - curveHeight);
 
-    Path path = Path()
-      ..moveTo(0, curveHeight)
-      ..quadraticBezierTo(topControlPoint.dx, topControlPoint.dy, topEndPoint.dx, topEndPoint.dy)
-      ..lineTo(size.width, size.height - curveHeight)
-      ..quadraticBezierTo(bottomControlPoint.dx, bottomControlPoint.dy, bottomEndPoint.dx, bottomEndPoint.dy)
-      ..close();
+    Path path =
+        Path()
+          ..moveTo(0, curveHeight)
+          ..quadraticBezierTo(
+            topControlPoint.dx,
+            topControlPoint.dy,
+            topEndPoint.dx,
+            topEndPoint.dy,
+          )
+          ..lineTo(size.width, size.height - curveHeight)
+          ..quadraticBezierTo(
+            bottomControlPoint.dx,
+            bottomControlPoint.dy,
+            bottomEndPoint.dx,
+            bottomEndPoint.dy,
+          )
+          ..close();
 
     return path;
   }

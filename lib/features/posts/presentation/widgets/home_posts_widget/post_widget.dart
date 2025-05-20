@@ -43,16 +43,13 @@ class PostWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PostPublisherInfo(
-            publisherName: postEntity.publisherName,
-            postDate: postEntity.postDate,
-            image: postEntity.profileImage,
-          ),
+          PostPublisherInfo(postEntity: postEntity),
           PostFeelings(postEntity: postEntity),
           PostContent(postEntity: postEntity),
           Align(
             alignment: Alignment.bottomCenter,
-              child: PostReactionsWidget(postEntity: postEntity)),
+            child: PostReactionsWidget(postEntity: postEntity),
+          ),
         ],
       ),
     );

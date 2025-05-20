@@ -59,6 +59,8 @@ class AssetsManager{
   static const String homeExample2 = '${homeImages}home_example2.png';
   static const String homeExample3 = '${homeImages}home_example3.png';
   static const String manExample  = '${homeImages}man_example.png';
+  static const String manExample2  = '${homeImages}man_example2.png';
+  static const String backGroundDrawer  = '${homeImages}drawer_background.png';
   static const String addImage  = '${homeIcons}add_image.svg';
   static const String postInfo  = '${homeIcons}post_info.svg';
   static const String like  = '${homeIcons}like.svg';
@@ -70,12 +72,33 @@ class AssetsManager{
   static const String report  = '${homeIcons}report_post.svg';
   static const String hidePost  = '${homeIcons}hide.svg';
   static const String deleteFriendship  = '${homeIcons}delete_friendship.svg';
+  static const String backGroundDrawerImage  = '${homeIcons}drawer_background.png';
 
   //////////////****lotties *********///////////
 
   static const String baseLottieURI = 'assets/lottie/';
   static const String success = '${baseLottieURI}success.json';
   static const String loading = '${baseLottieURI}loading.json';
+
+
+  static const String chatIcons = '${baseIconsURI}chat/';
+  static const String addChat = '${chatIcons}add_chat.svg';
+  static const String inboxInfo = '${chatIcons}inbox_info.svg';
+  static const String newGroup = '${chatIcons}new_group.svg';
+  static const String makeAsRead = '${chatIcons}make_as_read.svg';
+  static const String starredMessage = '${chatIcons}starred_message.svg';
+  static const String settingChat = '${chatIcons}settings.svg';
+  static const String message = '${chatIcons}message.svg';
+  static const String call = '${chatIcons}call.svg';
+  static const String videoCall = '${chatIcons}video_call.svg';
+  static const String messageOption = '${chatIcons}message_option.svg';
+  static const String record = '${chatIcons}record.svg';
+  static const String camera = '${chatIcons}camera.svg';
+  static const String attached = '${chatIcons}attached.svg';
+  static const String privacy = '${chatIcons}privacy.svg';
+  static const String chat = '${chatIcons}chat.svg';
+  static const String chatNotification = '${chatIcons}chat_notification.svg';
+
 
 
 }

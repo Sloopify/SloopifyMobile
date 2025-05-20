@@ -27,6 +27,7 @@ class PostContent extends StatelessWidget {
         if (postEntity.hashtags != null && postEntity.hashtags!.isNotEmpty) ...[
           Gaps.vGap1,
           PostHashtags(postEntity: postEntity),
+          Gaps.vGap1,
         ],
         if (postEntity.images != null && postEntity.images!.isNotEmpty) ...[
           Gaps.vGap2,

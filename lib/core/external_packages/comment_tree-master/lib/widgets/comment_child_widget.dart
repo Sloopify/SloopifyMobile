@@ -74,7 +74,7 @@ class _Painter extends CustomPainter {
       ..color = pathColor!
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth!
-      ..strokeCap = StrokeCap.square;
+      ..strokeCap = StrokeCap.round;
   }
 
   late Paint _paint;
