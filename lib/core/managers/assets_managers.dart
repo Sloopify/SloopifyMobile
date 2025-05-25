@@ -99,6 +99,26 @@ class AssetsManager{
   static const String chat = '${chatIcons}chat.svg';
   static const String chatNotification = '${chatIcons}chat_notification.svg';
 
+  static const String baseCreatePostIcons = '${baseIconsURI}create_post/';
+  static const String postTime = '${baseCreatePostIcons}24hours.svg';
+  static const String album = '${baseCreatePostIcons}album.svg';
+  static const String feelings = '${baseCreatePostIcons}fellings.svg';
+  static const String location = '${baseCreatePostIcons}location.svg';
+  static const String postFriends = '${baseCreatePostIcons}post_friends.svg';
+  static const String postMention = '${baseCreatePostIcons}post_mention.svg';
+  static const String photoPost = '${baseCreatePostIcons}post_image.svg';
+  static const String shamiPost = '${baseCreatePostIcons}shami.svg';
+  static const String cameraPost = '${baseCreatePostIcons}camera_post.svg';
+  static const String opinionPoll = '${baseCreatePostIcons}opinion_poll.svg';
+  static const String live = '${baseCreatePostIcons}live.svg';
+  static const String occasion = '${baseCreatePostIcons}occasion.svg';
+  static const String postPublic = '${baseCreatePostIcons}public_post.svg';
+  static const String friendsExcept = '${baseCreatePostIcons}public_post.svg';
+  static const String specificFriend = '${baseCreatePostIcons}specific_friends.svg';
+  static const String onlyMe = '${baseCreatePostIcons}only_me.svg';
+  static const String albums = '${baseCreatePostIcons}albums.svg';
+
+
 
 
 }

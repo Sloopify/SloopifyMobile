@@ -9,6 +9,7 @@ import 'package:sloopify_mobile/features/auth/presentation/blocs/upload_photo_cu
 import 'package:sloopify_mobile/features/auth/presentation/blocs/verify_account/verify_account_cubit.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/chat_bloc/chat_bloc.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/message_bloc/messages_bloc.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
 import 'package:sloopify_mobile/features/posts/presentation/blocs/fetch_comments_bloc/fetch_comments_bloc.dart';
 
@@ -34,4 +35,5 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => CommentFetchBloc());
   locator.registerFactory(() => MessagesBloc());
   locator.registerFactory(() => ChatBloc());
+  locator.registerFactory(() => CreatePostCubit());
 }

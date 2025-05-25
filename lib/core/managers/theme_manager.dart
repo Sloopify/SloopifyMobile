@@ -44,10 +44,11 @@ class AppTheme {
 
 //radio button theme
       radioTheme: RadioThemeData(
+
         fillColor:
         WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
           if (states.contains(WidgetState.disabled)) {
-            return null;
+            return ColorManager.primaryColor;
           }
           if (states.contains(WidgetState.selected)) {
             return ColorManager.primaryColor;
@@ -64,7 +65,7 @@ class AppTheme {
             return null;
           }
           if (states.contains(WidgetState.selected)) {
-            return ColorManager.primaryColor;
+            return ColorManager.white;
           }
           return null;
         }),

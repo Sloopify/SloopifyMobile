@@ -22,32 +22,33 @@ class PostsLists extends StatelessWidget {
             feelings: "happy",
             friendsSharing: ["nour", "fadi", "ibrahim"],
             hashtags: ["flutter","test","design","syria"],
+            images: [AssetsManager.homeExample2,AssetsManager.homeExample3,AssetsManager.homeExample1],
             id: "1",
             content:
                 "Lorem ipsum dolor sit amet consectetur. Volutpat morbi viverra ornare posuere aliquam dictum. Faucibus turpis dignissim massa quisque. Molestie vivamus eget at tristique pharetra. Mi aliquet purus hendrerit malesuada. Dictum convallis volutpat euismod neque tincidunt non ut. Sollicitudin quis cras ut aliquet turpis ut ante morbi. A aliquam volutpat mi sit pulvinar aenean nibh dui mus. Eros feugiat tellus euismod pellentesque. Pellentesque habitasse lacus vitae mattis aliquam blandit malesuada dolor. Viverra quis eu amet morbi libero et nullam auctor. Ipsum neque integer auctor pulvinar.",
             profileImage: AssetsManager.manExample,
-            // polls: PostPollEntity(
-            //   id: "1",
-            //   pollOptions: [
-            //     PollOption(
-            //       id: 'option1',
-            //       title: Text('option1', style: AppTheme.bodyText3),
-            //       votes: 40,
-            //     ),
-            //     PollOption(
-            //       id: 'option2',
-            //
-            //       title: Text('option2', style: AppTheme.bodyText3,textAlign: TextAlign.start,),
-            //       votes: 30,
-            //     ),
-            //     PollOption(
-            //       id: 'option3',
-            //
-            //       title: Text('option3', style: AppTheme.bodyText3),
-            //       votes: 20,
-            //     ),
-            //   ],
-            // ),
+            polls: PostPollEntity(
+              id: "1",
+              pollOptions: [
+                PollOption(
+                  id: 'option1',
+                  title: Text('option1', style: AppTheme.bodyText3),
+                  votes: 40,
+                ),
+                PollOption(
+                  id: 'option2',
+
+                  title: Text('option2', style: AppTheme.bodyText3,textAlign: TextAlign.start,),
+                  votes: 30,
+                ),
+                PollOption(
+                  id: 'option3',
+
+                  title: Text('option3', style: AppTheme.bodyText3),
+                  votes: 20,
+                ),
+              ],
+            ),
 
             publisherName: "Nour alkhalil",
             postDate: "",

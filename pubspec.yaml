@@ -44,6 +44,21 @@ dependencies:
   share_plus: ^11.0.0
   flutter_polls: ^0.1.6
   super_tooltip: ^2.0.9
+  photo_manager: ^3.0.0
+  permission_handler: ^12.0.0+1
+  flutter_quill: ^9.6.0
+  delta_to_html: ^0.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.0.15
+  google_maps_flutter: ^2.12.2
+  geolocator: ^14.0.0
+  logger: ^2.5.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.15
+
+
+
   comment_tree:
    path: lib/core/external_packages/comment_tree-master
   flutter_test:
@@ -64,6 +79,7 @@ flutter:
      - assets/icons/home/
      - assets/icons/chat/
      - assets/icons/profile_info/
+     - assets/icons/create_post/
      - assets/images/
      - assets/images/start_up/
      - assets/images/home/

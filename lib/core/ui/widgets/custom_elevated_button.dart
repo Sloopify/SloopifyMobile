@@ -103,7 +103,6 @@ class CustomElevatedButton extends StatelessWidget {
   Widget _buildElevatedWithoutIcon(bool? isRounded, BuildContext context) {
     return Container(
       width: width ?? MediaQuery.of(context).size.width * 0.9,
-
       decoration: BoxDecoration(
         border: Border.all(color: borderSide?.color??ColorManager.primaryColor,width: borderSide?.width??1),
         borderRadius: BorderRadius.circular(10),
