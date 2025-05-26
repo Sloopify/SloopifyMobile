@@ -2,43 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:sloopify_mobile/core/locator/service_locator.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/core/utils/helper/snackbar.dart';
 import 'dart:typed_data';
-
-import 'package:sloopify_mobile/features/create_posts/domain/entities/custom_album.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/ui/widgets/custom_elevated_button.dart';
 import '../../data/models/album_model.dart';
+import '../blocs/media_selection_cubit/media_selection_cubit.dart';
 
 class CreateAlbumScreen extends StatefulWidget {
+  final Function()? updateAfterCreateAlbum;
   final bool toCreateAlbum;
-  final Function() ?updateAfterCreateAlbum;
 
-  const CreateAlbumScreen({super.key,this.toCreateAlbum=true, this.updateAfterCreateAlbum});
+  const CreateAlbumScreen({
+    super.key,
+    this.updateAfterCreateAlbum,
+    this.toCreateAlbum = true,
+  });
+
   @override
   State<CreateAlbumScreen> createState() => _CreateAlbumScreenState();
 }
 
 class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
   final List<AssetEntity> _media = [];
-  final List<AssetEntity> _selected = [];
   final ScrollController _scrollController = ScrollController();
 
   int _currentPage = 0;
   bool _isLoading = false;
   final int _pageSize = 60;
   Map<String, Uint8List> _thumbnailCache = {};
+
   @override
   void initState() {
     super.initState();
     _requestAndLoad();
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
         _loadMoreMedia();
       }
     });
@@ -57,11 +63,16 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
     if (_isLoading) return;
     _isLoading = true;
 
-    final albums = await PhotoManager.getAssetPathList(type: RequestType.common);
+    final albums = await PhotoManager.getAssetPathList(
+      type: RequestType.common,
+    );
     if (albums.isEmpty) return;
 
     final recent = albums.first;
-    final newAssets = await recent.getAssetListPaged(page: _currentPage, size: _pageSize);
+    final newAssets = await recent.getAssetListPaged(
+      page: _currentPage,
+      size: _pageSize,
+    );
 
     if (newAssets.isNotEmpty) {
       setState(() {
@@ -73,13 +84,10 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
     _isLoading = false;
   }
 
-  void _toggleSelection(AssetEntity asset) {
-    _selected.contains(asset) ? _selected.remove(asset) : _selected.add(asset);
-
-    setState(() {
-    });
-  }
-  Future<void> createNewAlbum( List<AssetEntity> selectedAssets,final Function() updateListOfAlbum) async {
+  Future<void> createNewAlbum(
+    List<AssetEntity> selectedAssets,
+    final Function() updateListOfAlbum,
+  ) async {
     final box = Hive.box<AlbumModel>('albums');
     final assetIds = selectedAssets.map((a) => a.id).toList();
 
@@ -95,125 +103,181 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
     updateListOfAlbum();
   }
 
-  void _createAlbum() async {
-    final name = "Album ${DateTime.now().millisecondsSinceEpoch}";
-    final id = UniqueKey().toString();
-
-    final album = CustomAlbum(
-      assets: _selected,
-      id: id,
-      name: name,
-      assetIds: _selected.map((e) => e.id).toList(),
-    );
-
-    final box = await Hive.openBox('albums');
-    await box.put(id, album.toMap());
-
-    showSnackBar(context, "Album created  ${album.name}");
-
-    Navigator.pop(context); // or go to albums list
-  }
-
-  Widget _buildGridItem(AssetEntity asset) {
-    return StatefulBuilder(
-      builder: (context, setLocalState) {
-        final isSelected = _selected.contains(asset);
-        final assetId = asset.id;
-
-        return GestureDetector(
-          onTap: () async {
-            if(widget.toCreateAlbum){
-              setState(() {
-                isSelected ? _selected.remove(asset) : _selected.add(asset);
-              });
-              setLocalState(() {});
-            }else{
-              context.read<CreatePostCubit>().setImages((await asset.file)!);
-            }
-
-          },
-          child: Stack(
+  Widget _buildGridItem(AssetEntity asset, BuildContext context) {
+    final selected = context.watch<MediaSelectionCubit>().state;
+    final isSelected = selected.contains(asset);
+    final assetId = asset.id;
+    return GestureDetector(
+      onTap: () async {
+        context.read<MediaSelectionCubit>().toggleSelection(asset);
+      },
+      child: BlocBuilder<MediaSelectionCubit, List<AssetEntity>>(
+        builder: (context, state) {
+          return Stack(
             children: [
               Positioned.fill(
-                child: _thumbnailCache.containsKey(assetId)
-                    ? Image.memory(_thumbnailCache[assetId]!, fit: BoxFit.cover)
-                    : FutureBuilder<Uint8List?>(
-                  future: asset.thumbnailDataWithSize(ThumbnailSize(200, 200)),
-                  builder: (_, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                      _thumbnailCache[assetId] = snapshot.data!;
-                      return Image.memory(snapshot.data!, fit: BoxFit.cover);
-                    }
-                    return Container(color: Colors.grey[300]);
-                  },
-                ),
+                child:
+                    _thumbnailCache.containsKey(assetId)
+                        ? Image.memory(
+                          _thumbnailCache[assetId]!,
+                          fit: BoxFit.cover,
+                        )
+                        : FutureBuilder<Uint8List?>(
+                          future: asset.thumbnailDataWithSize(
+                            ThumbnailSize(200, 200),
+                          ),
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                snapshot.hasData) {
+                              _thumbnailCache[assetId] = snapshot.data!;
+                              return Image.memory(
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                            return Container(color: Colors.grey[300]);
+                          },
+                        ),
               ),
               if (isSelected)
                 Positioned(
                   top: 5,
-                  right: 5,
-                  child: Icon(Icons.check_circle, color: Colors.green, size: 24),
+                  left: 5,
+                  child: Icon(
+                    Icons.check_circle,
+                    color: ColorManager.primaryColor,
+                    size: 24,
+                  ),
                 ),
-              if(asset.type==AssetType.video)
+              if (asset.type == AssetType.video)
                 Align(
                   alignment: Alignment.center,
-                  child: Icon(Icons.play_arrow,color: ColorManager.black,),
-                )
-            ],
-          ),
-        );
-      },
-    );
-  }  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: getCustomAppBar(context: context,title: "New album"),
-      body: Stack(
-        children: [
-          GridView.builder(
-            shrinkWrap: true,
-            controller: _scrollController,
-            padding: EdgeInsets.all(4),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-            ),
-            itemCount: _media.length,
-            itemBuilder: (_, index) => _buildGridItem(_media[index]),
-          ),
-          if (_selected.isNotEmpty)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: double.infinity,
-                height: 60,
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.p50,
-                  vertical: AppPadding.p8,
-                ),
-                decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  boxShadow: [
-                    BoxShadow(
-                      offset: Offset(0, 4),
-                      spreadRadius: 0,
-                      blurRadius: 6,
-                      color: ColorManager.black.withOpacity(0.25),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
                     ),
-                  ],
+                    child: Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
                 ),
-                child: CustomElevatedButton(
-                  label:widget.toCreateAlbum?"create your album (${_selected.length})":"Done",
-                  onPressed:widget.toCreateAlbum? ()=>createNewAlbum(_selected..map((e)=>e.id).toList(),widget.updateAfterCreateAlbum!):(){
+            ],
+          );
+        },
+      ),
+    );
+  }
 
-                  },
-                  backgroundColor: ColorManager.primaryColor,
-                  width: MediaQuery.of(context).size.width * 0.5,
-                ),
-              ),
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => locator<MediaSelectionCubit>(),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            appBar: getCustomAppBar(
+              context: context,
+              title: widget.toCreateAlbum ? "New album" : "select thumbnail",
             ),
-        ],
+            body: Stack(
+              children: [
+                GridView.builder(
+                  shrinkWrap: true,
+                  controller: _scrollController,
+                  padding: EdgeInsets.all(4),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                  ),
+                  itemCount: _media.length,
+                  itemBuilder:
+                      (_, index) => _buildGridItem(_media[index], context),
+                ),
+                if (context.read<MediaSelectionCubit>().state.isNotEmpty)
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      width: double.infinity,
+                      height: 60,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppPadding.p50,
+                        vertical: AppPadding.p8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorManager.white,
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0, 4),
+                            spreadRadius: 0,
+                            blurRadius: 6,
+                            color: ColorManager.black.withOpacity(0.25),
+                          ),
+                        ],
+                      ),
+                      child: BlocBuilder<CreatePostCubit, CreatePostState>(
+                        builder: (context, state) {
+                          return CustomElevatedButton(
+                            label:
+                                widget.toCreateAlbum
+                                    ? "create your album (${context.read<MediaSelectionCubit>().state.length})"
+                                    : "Done",
+                            onPressed:
+                                widget.toCreateAlbum
+                                    ? () => createNewAlbum(
+                                      context.read<MediaSelectionCubit>().state
+                                        ..map((e) => e.id).toList(),
+                                      widget.updateAfterCreateAlbum!,
+                                    )
+                                    : () {
+                                      context
+                                          .read<MediaSelectionCubit>()
+                                          .selectedFilesWithType
+                                          .then((value) {
+                                            context
+                                                .read<CreatePostCubit>()
+                                                .setImages(
+                                                  value
+                                                      .where(
+                                                        (e) =>
+                                                            e.type ==
+                                                            AssetType.image,
+                                                      )
+                                                      .map((e) => e.file)
+                                                      .toList(),
+                                                );
+                                            context
+                                                .read<CreatePostCubit>()
+                                                .setVideoThumbnail(
+                                                  context
+                                                      .read<
+                                                        MediaSelectionCubit
+                                                      >()
+                                                      .state
+                                                      .firstWhere(
+                                                        (e) =>
+                                                            e.type ==
+                                                            AssetType.video,
+                                                      ),
+                                                );
+                                          });
+                                      Navigator.of(context).pop();
+                                    },
+                            backgroundColor: ColorManager.primaryColor,
+                            width: MediaQuery.of(context).size.width * 0.5,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/create_post_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/post_audience_screen.dart';
@@ -73,13 +74,16 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     emit(state.copyWith(
         friends:  state.createPostEntity.friends, createPostStatus: CreatePostStatus.init));
   }
-  void setImages(File image) {
-    if (!(state.createPostEntity.images.contains(image))) {
-      state.createPostEntity.images.add(image);
-    } else {
-      state.createPostEntity.images.remove(image);
-    }
+  void setImages(List<File> files) {
     emit(state.copyWith(
-        images:  state.createPostEntity.images, createPostStatus: CreatePostStatus.init));
+        images: files, createPostStatus: CreatePostStatus.init));
+  }
+  void setVideos(List<File> files) {
+    emit(state.copyWith(
+        videos: files, createPostStatus: CreatePostStatus.init));
+  }
+  void setVideoThumbnail(AssetEntity assetEntity) {
+    emit(state.copyWith(
+        assetEntity: assetEntity, createPostStatus: CreatePostStatus.init));
   }
 }

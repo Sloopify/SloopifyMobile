@@ -16,10 +16,13 @@ import 'package:sloopify_mobile/features/create_posts/presentation/screens/album
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/create_album_screen.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/freinds_list.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/post_audience_screen.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/screens/video_player_screen.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/widgets/selected_video_thumbnail.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/ship_selection.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/ui/widgets/text_editor_widget.dart';
+import '../../../location/presentation/screens/location_map_screen.dart';
 
 class CreatePostText extends StatelessWidget {
   const CreatePostText({super.key});
@@ -30,7 +33,6 @@ class CreatePostText extends StatelessWidget {
       create: (context) => locator<CreatePostCubit>(),
       child: BlocBuilder<CreatePostCubit, CreatePostState>(
         builder: (context, state) {
-          print(state.createPostEntity.text);
           return Scaffold(
             appBar: getCustomAppBar(
               context: context,
@@ -170,7 +172,9 @@ class CreatePostText extends StatelessWidget {
                                 svgAssets: AssetsManager.feelings,
                               ),
                               ShipSelection(
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>LocationMapScreen()));
+                                },
                                 text: "Location",
                                 svgAssets: AssetsManager.location,
                               ),
@@ -188,14 +192,34 @@ class CreatePostText extends StatelessWidget {
                             },
                           ),
                           if (state.createPostEntity.images.isNotEmpty)
-                            BlocBuilder<CreatePostCubit, CreatePostState>(
-                              builder: (context, state) {
-                                return _buildImageGallery(
-                                  context,
-                                  state.createPostEntity.images,
-                                );
-                              },
+                            _buildImageGallery(
+                              context,
+                              state.createPostEntity.images,
                             ),
+                          if (state.createPostEntity.assetEntity != null)
+                            ...[
+                              Gaps.vGap2,
+                              SizedBox(
+                                width: double.infinity,
+                                height: MediaQuery.of(context).size.height * 0.25,
+                                child: SelectedVideoItem(
+                                  asset: state.createPostEntity.assetEntity!,
+                                  onTap:
+                                      () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => VideoPlayerScreen(
+                                        video:
+                                        state
+                                            .createPostEntity
+                                            .assetEntity!,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Gaps.vGap2
+                            ]
                         ],
                       ),
                     ),
@@ -471,7 +495,7 @@ class CreatePostText extends StatelessWidget {
         fit: BoxFit.cover,
         isNetworkImage: false,
         width: double.infinity,
-        height: 200,
+        height: 300,
         // Set a fixed height for the images
       ),
     );

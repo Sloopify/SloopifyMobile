@@ -178,6 +178,7 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
         );
       },
       child: Stack(
+        fit: StackFit.passthrough,
         children: [
           FutureBuilder<Uint8List?>(
             future: thumbnail?.thumbnailDataWithSize(ThumbnailSize(300, 300)),
@@ -187,7 +188,6 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.memory(
-                    alignment: Alignment.center,
                     height: 400,
                     snapshot.data!,
                     fit: BoxFit.cover,
@@ -203,6 +203,7 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
             left: 0,
             right: 0,
             child: Container(
+              alignment: Alignment.bottomCenter,
               height: 75,
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(

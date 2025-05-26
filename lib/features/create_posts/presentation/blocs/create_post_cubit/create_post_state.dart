@@ -48,6 +48,7 @@ class CreatePostState extends Equatable {
     List<FriendEntity>? allFriends,
     String? searchFriendName,
     GetAllFriendStatus? getAllFriendStatus,
+    AssetEntity? assetEntity
   }) {
     return CreatePostState(
       getAllFriendStatus: getAllFriendStatus??this.getAllFriendStatus,
@@ -55,6 +56,7 @@ class CreatePostState extends Equatable {
       allFriends: allFriends??this.allFriends,
       createPostStatus: createPostStatus ?? this.createPostStatus,
       createPostEntity: createPostEntity.copyWith(
+        assetEntity: assetEntity??createPostEntity.assetEntity,
         postAudience: postAudience??createPostEntity.postAudience,
         text: text??createPostEntity.text,
         activities: activities??createPostEntity.activities,

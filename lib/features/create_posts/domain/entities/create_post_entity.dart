@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:photo_manager/photo_manager.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/entities/selected_file_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/post_audience_screen.dart';
 import 'package:sloopify_mobile/features/posts/domain/entities/frined_entity.dart';
 
@@ -8,6 +10,7 @@ class CreatePostEntity extends Equatable {
   final String text;
   final List<FriendEntity> friends;
   final List<FriendEntity> mentions;
+  final AssetEntity? assetEntity;
   final String feelings;
   final bool is24Hours;
   final double latitude;
@@ -28,7 +31,8 @@ class CreatePostEntity extends Equatable {
     required this.latitude,
     required this.longtitude,
     required this.activities,
-    required this.postAudience
+    required this.postAudience,
+    required this.assetEntity
   });
 
   @override
@@ -44,7 +48,8 @@ class CreatePostEntity extends Equatable {
     latitude,
     longtitude,
     activities,
-    postAudience
+    postAudience,
+    assetEntity
   ];
 
   factory CreatePostEntity.fromEmpty() {
@@ -59,7 +64,8 @@ class CreatePostEntity extends Equatable {
       latitude: 0.0,
       longtitude: 0.0,
       activities: [],
-      postAudience: PostAudience.public
+      postAudience: PostAudience.public,
+      assetEntity: null
     );
   }
 
@@ -75,6 +81,7 @@ class CreatePostEntity extends Equatable {
     double? longtitude,
     List<String>? activities,
     PostAudience ?postAudience,
+    AssetEntity ? assetEntity
   }) {
     return CreatePostEntity(
       postAudience: postAudience??this.postAudience,
@@ -88,6 +95,7 @@ class CreatePostEntity extends Equatable {
       latitude: latitude ?? this.latitude,
       longtitude: longtitude ?? this.longtitude,
       activities: activities ?? this.activities,
+      assetEntity: assetEntity??this.assetEntity
     );
   }
 }

@@ -113,7 +113,7 @@ class _LocationMapScreenState extends State<LocationMapScreen> {
         );
         //marker for the user current location
         final Uint8List _currentLocationMarkerIcon =
-        await _createCustomMarkerBitmap("your_are_here_now".tr());
+        await _createCustomMarkerBitmap("you are here now ".tr());
         _currentLocationMarker = Marker(
             markerId: MarkerId(CURRENT_LOCATION),
             icon: BitmapDescriptor.fromBytes(_currentLocationMarkerIcon),
@@ -131,7 +131,7 @@ class _LocationMapScreenState extends State<LocationMapScreen> {
       if (_userPreviousLocationCoords != null) {
         final Uint8List _previousLocationMarkerIcon =
         await _createCustomMarkerBitmap(
-            "your_last_location".tr(), Colors.blue);
+            "your last location".tr(), Colors.blue);
         _previousLocationMarker = Marker(
             markerId: MarkerId(PREVIOUS_LOCATION),
             icon: BitmapDescriptor.fromBytes(_previousLocationMarkerIcon),
@@ -141,18 +141,18 @@ class _LocationMapScreenState extends State<LocationMapScreen> {
       setState(() {
         if (_currentLocationMarker != null) {
           _markers.add(_currentLocationMarker!);
-          _circles.add(
-            Circle(
-              circleId: CircleId('maxRadiusCircle'),
-              center: LatLng(_userCurrentLocationCoords!.latitude,
-                  _userCurrentLocationCoords!.longitude),
-              radius: maxRadiusKM * 1000.r,
-              // Radius in meters
-              fillColor: Colors.orange.withOpacity(0.3),
-              strokeColor: Colors.orange,
-              strokeWidth: 1,
-            ),
-          );
+          // _circles.add(
+          //   Circle(
+          //     circleId: CircleId('maxRadiusCircle'),
+          //     center: LatLng(_userCurrentLocationCoords!.latitude,
+          //         _userCurrentLocationCoords!.longitude),
+          //     radius: maxRadiusKM * 1000.r,
+          //     // Radius in meters
+          //     fillColor: Colors.orange.withOpacity(0.3),
+          //     strokeColor: Colors.orange,
+          //     strokeWidth: 1,
+          //   ),
+          // );
         }
         if (_previousLocationMarker != null) {
           _markers.add(_previousLocationMarker!);
@@ -183,7 +183,7 @@ class _LocationMapScreenState extends State<LocationMapScreen> {
     return Builder(builder: (context) {
       return Scaffold(
         backgroundColor: ColorManager.white,
-        appBar: getCustomAppBar(context: context,title: "Where are you?"),
+        appBar: getCustomAppBar(context: context,title: "Where are you ?"),
         body: SafeArea(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -193,9 +193,8 @@ class _LocationMapScreenState extends State<LocationMapScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(
-                    height: widget.fromAccount!
-                        ? MediaQuery.of(context).size.height * 0.80
-                        : MediaQuery.of(context).size.height * 0.5,
+                    height:
+                         MediaQuery.of(context).size.height * 0.80,
                     width: MediaQuery.of(context).size.width,
                     child: GoogleMap(
                       gestureRecognizers:
@@ -224,7 +223,7 @@ class _LocationMapScreenState extends State<LocationMapScreen> {
 
                         final Uint8List _selectedLocationMarkerIcon =
                         await _createCustomMarkerBitmap(
-                            "your_new_location".tr(),
+                            "your new location".tr(),
                             Colors.green);
 
                         Marker _selectedLocationMarker = Marker(
@@ -255,21 +254,22 @@ class _LocationMapScreenState extends State<LocationMapScreen> {
                         horizontal: AppPadding.p16)
                         : EdgeInsets.zero,
                     child: CustomElevatedButton(
-                        backgroundColor: ColorManager.black,
-                        label: 'select_location'.tr(),
+                      width: MediaQuery.of(context).size.width,
+                        backgroundColor: ColorManager.primaryColor,
+                        label: 'select location'.tr(),
                         onPressed: () {
                           if (selectedLocation == null) {
                            // _showConfirmationDialog(context);
                           } else {
-                            double distance =
-                            LocationService.calculateDistanceInKilo(
-                              lat1:
-                              _userCurrentLocationCoords?.latitude?? 33.513876686466304,
-                              lat2: selectedLocation?.lat?? 33.513876686466304,
-                              lng1:
-                              _userCurrentLocationCoords?.longitude??36.27653299855675,
-                              lng2: selectedLocation?.lng??36.27653299855675,
-                            );
+                        //    double distance =
+                            // LocationService.calculateDistanceInKilo(
+                            //   lat1:
+                            //   _userCurrentLocationCoords?.latitude?? 33.513876686466304,
+                            //   lat2: selectedLocation?.lat?? 33.513876686466304,
+                            //   lng1:
+                            //   _userCurrentLocationCoords?.longitude??36.27653299855675,
+                            //   lng2: selectedLocation?.lng??36.27653299855675,
+                            // );
                             //
                             // BlocProvider.of<AddLocationCubit>(context)
                             //     .setLocation(
