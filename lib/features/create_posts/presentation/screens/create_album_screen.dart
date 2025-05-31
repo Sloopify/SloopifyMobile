@@ -65,6 +65,8 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
 
     final albums = await PhotoManager.getAssetPathList(
       type: RequestType.common,
+      filterOption: FilterOptionGroup(imageOption: FilterOption(sizeConstraint: SizeConstraint(ignoreSize: true)),
+      orders: [OrderOption(type: OrderOptionType.createDate,asc: false)])
     );
     if (albums.isEmpty) return;
 

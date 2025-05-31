@@ -57,6 +57,9 @@ dependencies:
   hive_generator: ^2.0.1
   build_runner: ^2.4.15
   video_player: ^2.9.5
+  country_code_picker: ^3.3.0
+  device_info_plus:
+
 
 
 

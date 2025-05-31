@@ -18,6 +18,7 @@ static const Color primaryShade2=Color(0xff2DD4BF);
 static const Color primaryShade3=Color(0xff5EEAD4);
 static const Color primaryShade4=Color(0xff0D9488);
 static const Color lightGrayShade1=Color(0xffECF0F1);
+static const Color textGray1=Color(0xff5D6778);
 static const Color textBlue=Color(0xff004182);
 
   static final gradient = const LinearGradient(

@@ -9,106 +9,108 @@ import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_elevated_button.dart';
+import 'package:sloopify_mobile/features/auth/domain/entities/otp_data_entity.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/signup_cubit/sign_up_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/verify_account/verify_account_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/otp_code_screen.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
+import '../../../../core/utils/helper/snackbar.dart';
 
 class VerifyAccountScreen extends StatelessWidget {
   final bool fromForgetPassword;
-  final String? email;
-  final String mobileNumber;
 
-  const VerifyAccountScreen({
-    super.key,
-    this.fromForgetPassword = false,
-    this.email = '',
-    this.mobileNumber = '',
-  });
+  const VerifyAccountScreen({super.key, this.fromForgetPassword = false});
 
   static const routeName = "verify_account_screen";
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl.locator<VerifyAccountCubit>(),
-      child: Builder(
-          builder: (context) {
-            return Scaffold(
-              appBar: getCustomAppBar(
-                  context: context, title: 'verify_account'.tr()),
-              body: SafeArea(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppPadding.p40,
-                      vertical: AppPadding.p10,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(AssetsManager.verifyAccount, height: 300),
-                        Text(
-                          'verify_account_type'.tr(),
-                          style: AppTheme.headline4.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 2,
+    return BlocListener<SignUpCubit, SignUpState>(
+      listener: (context, state) {
+        _buildRegisterOtpListener(state, context);
+      },
+      child: BlocBuilder<SignUpCubit, SignUpState>(
+        builder: (context, state) {
+          return Scaffold(
+            appBar: getCustomAppBar(
+              context: context,
+              title: 'verify_account'.tr(),
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppPadding.p40,
+                    vertical: AppPadding.p10,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(AssetsManager.verifyAccount, height: 300),
+                      Text(
+                        'verify_account_type'.tr(),
+                        style: AppTheme.headline4.copyWith(
+                          fontWeight: FontWeight.w500,
                         ),
-                        Gaps.vGap3,
-                        _buildSelectionTypeOfVerification(
-                          context: context,
-                          type: VerifyAccountType.email,
+                        maxLines: 2,
+                      ),
+                      Gaps.vGap3,
+                      _buildSelectionTypeOfVerification(
+                        context: context,
+                        type: OtpSendType.email,
+                      ),
+                      _buildSelectionTypeOfVerification(
+                        type: OtpSendType.phone,
+                        context: context,
+                      ),
+                      Gaps.vGap3,
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: CustomElevatedButton(
+                          isLoading:
+                              state.otpRegisterStatus ==
+                              OtpRegisterStatus.loading,
+                          label: 'send_code'.tr(),
+                          onPressed:
+                              state.otpRegisterStatus ==
+                                      OtpRegisterStatus.loading
+                                  ? () {}
+                                  : () {
+                                    if (context
+                                            .read<SignUpCubit>()
+                                            .state
+                                            .otpSendType ==
+                                        OtpSendType.none) {
+                                      return;
+                                    } else {
+                                      context.read<SignUpCubit>().registerOtp();
+                                    }
+                                  },
+                          backgroundColor: ColorManager.primaryColor,
+                          isBold: true,
                         ),
-                        _buildSelectionTypeOfVerification(
-                          type: VerifyAccountType.code,
-                          context: context,
-                        ),
-                        Gaps.vGap3,
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: CustomElevatedButton(
-                            label: 'send_code'.tr(),
-                            onPressed: () {
-                              if (context
-                                  .read<VerifyAccountCubit>()
-                                  .state
-                                  .verifyAccountType == VerifyAccountType.none){
-                                return;
-                              }else {
-                                Navigator
-                                  .push(context,MaterialPageRoute(builder: (_)
-                              =>
-                                  BlocProvider.value(
-                                    value: context.read<VerifyAccountCubit>(),
-                                    child: OtpCodeScreen(),)
-                              ));
-                              }
-                            },
-                            backgroundColor: ColorManager.primaryColor,
-                            isBold: true,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          }
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildSelectionTypeOfVerification({
-    required VerifyAccountType type,
+    required OtpSendType type,
     required BuildContext context,
   }) {
-    return BlocBuilder<VerifyAccountCubit, VerifyAccountState>(
+    return BlocBuilder<SignUpCubit, SignUpState>(
       builder: (context, state) {
         return InkWell(
           onTap: () {
-            context.read<VerifyAccountCubit>().setVerifyAccountType(type);
+            context.read<SignUpCubit>().setOtpType(type);
           },
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -120,16 +122,16 @@ class VerifyAccountScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color:
-                state.verifyAccountType != VerifyAccountType.none
-                    ? ColorManager.primaryColor
-                    : Colors.transparent,
+                    state.otpSendType != OtpSendType.none
+                        ? ColorManager.primaryColor
+                        : Colors.transparent,
               ),
               color:
-              state.verifyAccountType == VerifyAccountType.none
-                  ? ColorManager.darkGray
-                  : state.verifyAccountType == type
-                  ? ColorManager.primaryColor
-                  : ColorManager.white,
+                  state.otpSendType == OtpSendType.none
+                      ? ColorManager.darkGray
+                      : state.otpSendType == type
+                      ? ColorManager.primaryColor
+                      : ColorManager.white,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -140,23 +142,22 @@ class VerifyAccountScreen extends StatelessWidget {
                   height: 50,
                   decoration: BoxDecoration(
                     color:
-                    state.verifyAccountType == VerifyAccountType.none
-                        ? ColorManager.disActive.withOpacity(0.5)
-                        : state.verifyAccountType == type
-                        ? ColorManager.white
-                        : ColorManager.disActive.withOpacity(0.5),
+                        state.otpSendType == OtpSendType.none
+                            ? ColorManager.disActive.withOpacity(0.5)
+                            : state.otpSendType == type
+                            ? ColorManager.white
+                            : ColorManager.disActive.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: SvgPicture.asset(
-                    type == VerifyAccountType.email
+                    type == OtpSendType.email
                         ? AssetsManager.email
                         : AssetsManager.sms,
                     color:
-                    type == state.verifyAccountType &&
-                        state.verifyAccountType !=
-                            VerifyAccountType.none
-                        ? ColorManager.primaryColor
-                        : ColorManager.white,
+                        type == state.otpSendType &&
+                                state.otpSendType != OtpSendType.none
+                            ? ColorManager.primaryColor
+                            : ColorManager.white,
                   ),
                 ),
                 Padding(
@@ -165,31 +166,31 @@ class VerifyAccountScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        type == VerifyAccountType.email
+                        type == OtpSendType.email
                             ? 'via_email'.tr()
                             : 'via_sms'.tr(),
                         style: AppTheme.bodyText3.copyWith(
                           fontWeight: FontWeight.w500,
                           color:
-                          state.verifyAccountType == VerifyAccountType.none
-                              ? ColorManager.disActive
-                              : state.verifyAccountType == type
-                              ? ColorManager.white
-                              : ColorManager.disActive.withOpacity(0.5),
+                              state.otpSendType == OtpSendType.none
+                                  ? ColorManager.disActive
+                                  : state.otpSendType == type
+                                  ? ColorManager.white
+                                  : ColorManager.disActive.withOpacity(0.5),
                         ),
                       ),
                       Gaps.vGap1,
                       Text(
-                        type == VerifyAccountType.email
-                            ? email??""
-                            : mobileNumber??"",
+                        type == OtpSendType.email
+                            ? state.signupDataEntity.email
+                            : state.signupDataEntity.fullPhoneNumber,
                         style: AppTheme.bodyText3.copyWith(
                           color:
-                          state.verifyAccountType == VerifyAccountType.none
-                              ? ColorManager.disActive
-                              : state.verifyAccountType == type
-                              ? ColorManager.white
-                              : ColorManager.disActive.withOpacity(0.5),
+                              state.otpSendType == OtpSendType.none
+                                  ? ColorManager.disActive
+                                  : state.otpSendType == type
+                                  ? ColorManager.white
+                                  : ColorManager.disActive.withOpacity(0.5),
                         ),
                       ),
                     ],
@@ -201,5 +202,25 @@ class VerifyAccountScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _buildRegisterOtpListener(SignUpState state, BuildContext context) {
+    if (state.otpRegisterStatus == OtpRegisterStatus.success) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) {
+            return BlocProvider.value(
+              value: context.read<SignUpCubit>(),
+              child: OtpCodeScreen(),
+            );
+          },
+        ),
+      );
+    } else if (state.otpRegisterStatus == OtpRegisterStatus.offline) {
+      showSnackBar(context, 'no_internet_connection'.tr());
+    } else if (state.otpRegisterStatus == OtpRegisterStatus.error) {
+      showSnackBar(context, state.errorMessage);
+    }
   }
 }

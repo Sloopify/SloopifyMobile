@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sloopify_mobile/core/local_storage/preferene_utils.dart';
+import 'package:sloopify_mobile/core/local_storage/prefernces_key.dart';
 import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
@@ -77,9 +79,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     padding: EdgeInsets.zero,
                     width: MediaQuery.of(context).size.width * 0.7,
                     label: onLastPage ? 'filled_btn'.tr() : 'next'.tr(),
-                    onPressed: () {
+                    onPressed: () async {
                       if (onLastPage) {
-                       Navigator.pushReplacementNamed(context, WelcomeScreen.routeName);
+                        await PreferenceUtils.setBool(SharedPrefsKey.firstTime, true);
+                        Navigator.pushReplacementNamed(context, WelcomeScreen.routeName);
                       } else {
                         _controller.nextPage(
                           duration: Duration(milliseconds: 500),
@@ -95,7 +98,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             Align(
               alignment: Alignment.topLeft,
               child: TextButton(
-                onPressed: () {
+                onPressed: () async {
+                 await PreferenceUtils.setBool(SharedPrefsKey.firstTime, true);
                  Navigator.pushReplacementNamed(context, WelcomeScreen.routeName);
                 },
                 child: Text(

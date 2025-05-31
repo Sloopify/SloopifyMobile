@@ -2,11 +2,21 @@ import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:sloopify_mobile/core/api_service/base_api_service.dart';
 import 'package:sloopify_mobile/core/api_service/network_service_dio.dart';
+import 'package:sloopify_mobile/features/auth/data/repositories/account_repo_impl.dart';
+import 'package:sloopify_mobile/features/auth/domain/reposritory/account_repo.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/email_login_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/phone_login_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/signup_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/verify_otp_code_login.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/verify_token_use_case.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/account_info/profile_info_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/authentication_bloc/authentication_bloc.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/login_cubit/login_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/login_with_otp_code/login_with_otp_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/signup_cubit/sign_up_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/upload_photo_cubit/upload_photo_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/verify_account/verify_account_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_otp_code.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/chat_bloc/chat_bloc.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/message_bloc/messages_bloc.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
@@ -14,21 +24,37 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/media_s
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
 import 'package:sloopify_mobile/features/posts/presentation/blocs/fetch_comments_bloc/fetch_comments_bloc.dart';
 
+import '../../features/auth/data/account_data_provider/account_data_provider.dart';
+import '../../features/auth/data/repositories/auth_repo_impl.dart';
+import '../../features/auth/domain/reposritory/auth_repo.dart';
+import '../../features/auth/domain/use_cases/opt_login_use_case.dart';
+import '../../features/auth/domain/use_cases/register_otp_use_case.dart';
+import '../../features/auth/domain/use_cases/verify_otp_register_use_case.dart';
 import '../../features/posts/presentation/blocs/comment_reaction_cubit/comment_reactions_cubit.dart';
+import '../network/check_internet.dart';
 
 final locator = GetIt.I;
 
 Future<void> setupLocator() async {
-  ///
-  ///external
-  ///
-  locator.registerLazySingleton<BaseApiService>(() => NetworkServiceDio());
-  locator.registerLazySingleton(() => InternetConnectionChecker.instance);
-
   ////blocs
   locator.registerFactory(() => VerifyAccountCubit());
-  locator.registerFactory(() => LoginCubit());
-  locator.registerFactory(() => SignUpCubit());
+  locator.registerFactory(
+    () =>
+        LoginCubit(emailLoginUseCase: locator(), phoneLoginUseCase: locator()),
+  );
+  locator.registerFactory(
+    () => SignUpCubit(
+      registerOtpUseCase: locator(),
+      signupUseCase: locator(),
+      verifyOtpRegisterUseCase: locator(),
+    ),
+  );
+  locator.registerFactory(
+    () => LoginWithOtpCubit(
+      verifyOtpCodeLogin: locator(),
+      optLoginUseCase: locator(),
+    ),
+  );
   locator.registerFactory(() => ProfileInfoCubit());
   locator.registerFactory(() => UploadPictureCubit());
   locator.registerFactory(() => HomeNavigationCubit());
@@ -38,4 +64,63 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => ChatBloc());
   locator.registerFactory(() => CreatePostCubit());
   locator.registerFactory(() => MediaSelectionCubit());
+  locator.registerFactory(
+    () => AuthenticationBloc(
+      authRepository: locator(),
+      verifyTokenUseCase: locator(),
+    ),
+  );
+
+  ///
+  ///use cases
+  ////////
+  locator.registerLazySingleton(() => SignupUseCase(accountsRepo: locator()));
+  locator.registerLazySingleton(
+    () => RegisterOtpUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => EmailLoginUseCase(accountsRepo: locator(), authRepo: locator()),
+  );
+
+  locator.registerLazySingleton(
+    () => PhoneLoginUseCase(accountsRepo: locator(), authRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => VerifyOtpCodeLogin(accountsRepo: locator(), authRepo: locator()),
+  );
+  locator.registerLazySingleton(() => OptLoginUseCase(accountsRepo: locator()));
+  locator.registerLazySingleton(
+    () => VerifyOtpRegisterUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => VerifyTokenUseCase(accountsRepo: locator()),
+  );
+
+  ///
+  ///Repositories
+  ////////
+  locator.registerLazySingleton<AccountRepo>(
+    () => AccountRepoImpl(accountsDataProvider: locator()),
+  );
+  locator.registerLazySingleton<AuthRepo>(() => AuthRepoImpl());
+
+  ////
+  //////data source
+  ////
+  locator.registerLazySingleton<AccountsDataProvider>(
+    () => AccountsDataProviderImpl(client: locator()),
+  );
+
+  ///
+  ///core
+  ///
+  locator.registerLazySingleton<NetworkInfo>(
+    () => NetworkInfoImpl(internetConnectionChecker: locator()),
+  );
+
+  ///
+  ///external
+  ///
+  locator.registerLazySingleton<BaseApiService>(() => NetworkServiceDio());
+  locator.registerLazySingleton(() => InternetConnectionChecker.instance);
 }

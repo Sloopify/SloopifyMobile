@@ -6,7 +6,7 @@ import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
-import 'package:sloopify_mobile/core/utils/extentions.dart';
+import 'package:sloopify_mobile/core/utils/helper/app_extensions/post_audience_extention.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/freinds_list.dart';
 

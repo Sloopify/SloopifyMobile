@@ -16,6 +16,8 @@ class AppConfiguration{
   static Future<void> initializeCore() async {
     WidgetsFlutterBinding.ensureInitialized();
     await EasyLocalization.ensureInitialized();
+    await PreferenceUtils.init();
+
     final dir =await getApplicationDocumentsDirectory();
     Hive.init(dir.path);
     await Hive.initFlutter();

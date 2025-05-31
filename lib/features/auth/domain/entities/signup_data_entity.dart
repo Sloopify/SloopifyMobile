@@ -9,6 +9,7 @@ class SignupDataEntity extends Equatable {
   final bool isCheckedTerms;
   final String mobileNumber;
   final String countryCode;
+  final String fullPhoneNumber;
 
   const SignupDataEntity({
     required this.firstName,
@@ -18,7 +19,8 @@ class SignupDataEntity extends Equatable {
     required this.confirmPassword,
     required this.isCheckedTerms,
     required this.mobileNumber,
-    required this.countryCode
+    required this.countryCode,
+    required this.fullPhoneNumber,
   });
 
   factory SignupDataEntity.empty() {
@@ -29,8 +31,9 @@ class SignupDataEntity extends Equatable {
       firstName: '',
       lastName: '',
       isCheckedTerms: false,
-      countryCode: '',
-      mobileNumber: ''
+      countryCode: '+963',
+      fullPhoneNumber: "",
+      mobileNumber: '',
     );
   }
 
@@ -43,7 +46,8 @@ class SignupDataEntity extends Equatable {
     confirmPassword,
     isCheckedTerms,
     mobileNumber,
-    countryCode
+    countryCode,
+    fullPhoneNumber,
   ];
 
   SignupDataEntity copyWith({
@@ -55,11 +59,14 @@ class SignupDataEntity extends Equatable {
     bool? isCheckedTerms,
     String? mobileNumber,
     String? countryCode,
+    String? fullPhoneNumber,
   }) {
     return SignupDataEntity(
       firstName: firstName ?? this.firstName,
-      countryCode: countryCode??this.countryCode,
-      mobileNumber: mobileNumber??this.mobileNumber,
+      fullPhoneNumber: fullPhoneNumber ?? this.fullPhoneNumber,
+
+      countryCode: countryCode ?? this.countryCode,
+      mobileNumber: mobileNumber ?? this.mobileNumber,
       lastName: firstName ?? this.firstName,
       email: email ?? this.email,
       password: password ?? this.password,

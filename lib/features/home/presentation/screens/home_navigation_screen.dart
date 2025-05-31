@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sloopify_mobile/core/locator/service_locator.dart';
 import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
@@ -13,6 +14,7 @@ import '../blocs/home_navigation_cubit/home_navigation_cubit.dart';
 import '../widgets/ai_system_widgets/header_ai_system.dart';
 
 class HomeNavigationScreen extends StatelessWidget {
+  static const routeName = "home_navigation_screen";
   final List<Widget> pages = const [
     HomeScreen(),
     Center(child: Text("will be implemented soon ")),
@@ -22,118 +24,127 @@ class HomeNavigationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorManager.white,
-      drawer: CustomDrawer(),
-      body: SafeArea(
-        child: BlocBuilder<HomeNavigationCubit, HomeNavigationState>(
-          builder:
-              (context, state) => Stack(
-                children: [
-                  pages[state.selectedIndex],
-                  if (state.isFabPanelOpen)
-                    Positioned.fill(
-                      child: Container(
-                        color: ColorManager.white,
-                        child: AiSystemScreen(),
+    return BlocProvider(
+      create: (context) => locator<HomeNavigationCubit>(),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: ColorManager.white,
+            drawer: CustomDrawer(),
+            body: SafeArea(
+              child: BlocBuilder<HomeNavigationCubit, HomeNavigationState>(
+                builder:
+                    (context, state) =>
+                    Stack(
+                      children: [
+                        pages[state.selectedIndex],
+                        if (state.isFabPanelOpen)
+                          Positioned.fill(
+                            child: Container(
+                              color: ColorManager.white,
+                              child: AiSystemScreen(),
+                            ),
+                          ),
+                      ],
+                    ),
+              ),
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: GestureDetector(
+              onTap: () {
+                context.read<HomeNavigationCubit>().toggleFabPanel();
+              },
+              child: Transform.rotate(
+                angle: 0.78539,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.rectangle,
+                        border: Border.all(color: ColorManager.primaryColor),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                ],
-              ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: GestureDetector(
-        onTap: () {
-          context.read<HomeNavigationCubit>().toggleFabPanel();
-        },
-        child: Transform.rotate(
-          angle: 0.78539,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.rectangle,
-                  border: Border.all(color: ColorManager.primaryColor),
-                  borderRadius: BorderRadius.circular(10),
+                    Transform.rotate(
+                      angle: -0.78539,
+                      child: SvgPicture.asset(AssetsManager.robot),
+                    ),
+                  ],
                 ),
               ),
-              Transform.rotate(
-                angle: -0.78539,
-                child: SvgPicture.asset(AssetsManager.robot),
+            ),
+            bottomNavigationBar: BottomAppBar(
+              color: ColorManager.bottomNavigationBackGround.withOpacity(0.6),
+              height: 65,
+              shape: RoundedDiamondNotchedShape(),
+              notchMargin: 12,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: AppPadding.p4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildNavIcon(context, AssetsManager.home, 0, 'Home'),
+                    _buildNavIcon(context, AssetsManager.group, 1, "Group"),
+                    SizedBox(width: 50), // FAB space
+                    _buildNavIcon(context, AssetsManager.market, 2, "Market"),
+                    _buildNavIcon(context, AssetsManager.videoPlayer, 3, "Video"),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: ColorManager.bottomNavigationBackGround.withOpacity(0.6),
-        height: 65,
-        shape: RoundedDiamondNotchedShape(),
-        notchMargin: 12,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: AppPadding.p4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildNavIcon(context, AssetsManager.home, 0, 'Home'),
-              _buildNavIcon(context, AssetsManager.group, 1, "Group"),
-              SizedBox(width: 50), // FAB space
-              _buildNavIcon(context, AssetsManager.market, 2, "Market"),
-              _buildNavIcon(context, AssetsManager.videoPlayer, 3, "Video"),
-            ],
-          ),
-        ),
+            ),
+          );
+        }
       ),
     );
   }
 
-  Widget _buildNavIcon(
-    BuildContext context,
-    String assetName,
-    int index,
-    String text,
-  ) {
+  Widget _buildNavIcon(BuildContext context,
+      String assetName,
+      int index,
+      String text,) {
     final selectedIndex =
-        context.watch<HomeNavigationCubit>().state.selectedIndex;
+        context
+            .watch<HomeNavigationCubit>()
+            .state
+            .selectedIndex;
     return selectedIndex != index
         ? InkWell(
-          child: SvgPicture.asset(assetName),
-          onTap: () {
-            context.read<HomeNavigationCubit>().navigateTo(index);
-          },
-        )
+      child: SvgPicture.asset(assetName),
+      onTap: () {
+        context.read<HomeNavigationCubit>().navigateTo(index);
+      },
+    )
         : InkWell(
-          onTap: () {
-            context.read<HomeNavigationCubit>().navigateTo(index);
-          },
-          child: Container(
-            width: 90,
-            height: 35,
-            padding: EdgeInsets.symmetric(horizontal: AppPadding.p8),
-            decoration: BoxDecoration(
-              color: ColorManager.white,
-              borderRadius: BorderRadius.circular(10),
+      onTap: () {
+        context.read<HomeNavigationCubit>().navigateTo(index);
+      },
+      child: Container(
+        width: 90,
+        height: 35,
+        padding: EdgeInsets.symmetric(horizontal: AppPadding.p8),
+        decoration: BoxDecoration(
+          color: ColorManager.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(assetName, color: ColorManager.primaryColor),
+            Text(
+              text,
+              style: AppTheme.bodyText3.copyWith(
+                color: ColorManager.primaryColor,
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(assetName, color: ColorManager.primaryColor),
-                Text(
-                  text,
-                  style: AppTheme.bodyText3.copyWith(
-                    color: ColorManager.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -165,9 +176,9 @@ class RoundedDiamondNotchedShape extends NotchedShape {
           host.left,
           host.top + barCornerRadius,
         )
-        ..lineTo(host.left, host.bottom)
-        ..lineTo(host.right, host.bottom)
-        ..lineTo(host.right, host.top + barCornerRadius)
+        ..lineTo(host.left, host.bottom)..lineTo(
+            host.right, host.bottom)..lineTo(
+            host.right, host.top + barCornerRadius)
         ..quadraticBezierTo(
           host.right,
           host.top,

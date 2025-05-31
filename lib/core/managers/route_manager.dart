@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/login_with_otp_code/login_with_otp_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/signup_cubit/sign_up_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/account_info/gender_identity.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/account_info/user_interests.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_otp_code.dart';
@@ -8,12 +11,14 @@ import 'package:sloopify_mobile/features/auth/presentation/screens/verify_accoun
 import 'package:sloopify_mobile/features/auth/presentation/screens/write_otp_code_screen.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
+import '../../features/app_wrapper/presentation/screens/app_wrapper.dart';
 import '../../features/auth/presentation/screens/account_info/birthday_screen.dart';
 import '../../features/auth/presentation/screens/account_info/fill_account_screen.dart';
 import '../../features/auth/presentation/screens/account_info/referred_day.dart';
 import '../../features/auth/presentation/screens/signin_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
+import '../../features/home/presentation/screens/home_navigation_screen.dart';
 import '../../features/start_up/presenation/screens/on_boarding_screen.dart';
 
 class AppRouter {
@@ -25,7 +30,12 @@ class AppRouter {
             return SplashScreen();
           },
         );
-
+      case AppWrapper.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return AppWrapper();
+          },
+        );
       case OnBoardingScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
@@ -48,10 +58,11 @@ class AppRouter {
         final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
           builder: (context) {
-            return VerifyAccountScreen(
-              mobileNumber: arg['mobileNumber'],
-              email: arg['email'],
-              fromForgetPassword: arg['fromPassword'],
+            return BlocProvider.value(
+              value: arg["signUpCubit"] as SignUpCubit,
+              child: VerifyAccountScreen(
+                fromForgetPassword: arg['fromPassword'],
+              ),
             );
           },
         );
@@ -74,9 +85,14 @@ class AppRouter {
           },
         );
       case WriteOtpCodeScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+
         return MaterialPageRoute(
-          builder: (context) {
-            return WriteOtpCodeScreen();
+          builder: (_) {
+            return BlocProvider.value(
+              value: arg["otpLoginCubit"] as LoginWithOtpCubit,
+              child: WriteOtpCodeScreen(),
+            );
           },
         );
       case UserInterests.routeName:
@@ -109,6 +125,12 @@ class AppRouter {
             return ReferredDay();
           },
         );
+      case HomeNavigationScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return HomeNavigationScreen();
+          },
+        );
       default:
         return unDefinedRoute();
     }
@@ -117,7 +139,8 @@ class AppRouter {
   Route<dynamic> unDefinedRoute() {
     return MaterialPageRoute(
       builder:
-          (_) => Scaffold(
+          (_) =>
+          Scaffold(
             appBar: AppBar(title: Text('no_route'.tr())),
             body: Center(child: Text('no_route'.tr())),
           ),

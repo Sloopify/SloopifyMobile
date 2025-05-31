@@ -3,6 +3,10 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:logger/logger.dart';
+import 'package:sloopify_mobile/core/api_service/api_urls.dart';
+import 'package:sloopify_mobile/core/local_storage/preferene_utils.dart';
+import 'package:sloopify_mobile/core/local_storage/prefernces_key.dart';
 
 import '../errors/dio_exceptions.dart';
 import 'base_api_service.dart';
@@ -10,16 +14,17 @@ import 'base_api_service.dart';
 class NetworkServiceDio implements BaseApiService {
   Future<Dio> get dio async {
     // String? token = PreferenceUtils.getString("TOKEN");
+      final token=  PreferenceUtils.getString(SharedPrefsKey.accessToken);
 
     BaseOptions options = BaseOptions(
-      baseUrl:'',
+      baseUrl:ApiUrls.baseUrl,
       connectTimeout: const Duration(seconds: 100000),
       receiveTimeout: const Duration(seconds: 100000),
       headers: {
-        "Content-Type": Headers.multipartFormDataContentType
-        // if (token != null) 'Authorization': 'Bearer $token',
+        "Content-Type": Headers.jsonContentType,
+        if (token != null) 'Authorization': 'Bearer $token',
       },
-      contentType: Headers.multipartFormDataContentType,
+      contentType: Headers.jsonContentType,
       responseType: ResponseType.json,
       validateStatus: (validate)=>true
     );
@@ -61,7 +66,9 @@ class NetworkServiceDio implements BaseApiService {
       var response = await _dio.get(
         url,
       );
-
+      if(response.headers.value("Authorization")!=null){
+        await PreferenceUtils.setString(SharedPrefsKey.accessToken, response.headers.value("Authorization")!);
+      }
       print('status code ${response.statusCode}');
       print('response data ${response.data}');
       return response.data;
@@ -81,6 +88,7 @@ class NetworkServiceDio implements BaseApiService {
     List<File>? files,
   }) async {
     print('API $url');
+    Logger().i(jsonBody);
     Dio _dio = await dio;
     try {
       if (filesAttributeName != null && files != null) {
@@ -96,34 +104,31 @@ class NetworkServiceDio implements BaseApiService {
         }
         await jsonBody.putIfAbsent(filesAttributeName, () => docsFile);
       }
-
-      FormData formData = FormData.fromMap(jsonBody);
-      print('files : ${formData.files}');
-      print('body: ${formData.fields}');
       if (headers != null) {
         _dio.options.headers = headers;
       }
       final response = await _dio.post(
         url,
-        data: formData,
+        data: jsonBody,
       );
 
-      //save specific cookie if the user send saveCookies as true
-      if (saveCookies) {
-        final setCookieHeader = response.headers['Set-Cookie'];
-        if (setCookieHeader != null) {
-          final cookieValue = extractSpecificCookieValue(
-              cookiesList: setCookieHeader, cookieName: cookieName!);
-         // PreferenceUtils.setString(cookieName, cookieValue!);
-          print('Stored value: $cookieValue');
-        }
+      // //save specific cookie if the user send saveCookies as true
+      // if (saveCookies) {
+      //   final setCookieHeader = response.headers['Set-Cookie'];
+      //   if (setCookieHeader != null) {
+      //     final cookieValue = extractSpecificCookieValue(
+      //         cookiesList: setCookieHeader, cookieName: cookieName!);
+      //    // PreferenceUtils.setString(cookieName, cookieValue!);
+      //     print('Stored value: $cookieValue');
+      //   }
+      // }
+      if(response.headers.value("Authorization")!=null){
+        await PreferenceUtils.setString(SharedPrefsKey.accessToken, response.headers.value("Authorization")!);
       }
 
       print('status code ${response.statusCode}');
-      print('response data ${response.data}');
-      print('cookies ${response.headers['Set-Cookie']}');
-      print('headers ${headers}');
-      print('headers response  ${response.headers}');
+      print('header token ${response.headers.value("Authorization")}');
+     Logger().i(response.data);
       return response.data;
     } catch (error) {
       print('errrrrrrrrrrrrrrrrrrrrr${error}');
@@ -148,9 +153,9 @@ class NetworkServiceDio implements BaseApiService {
         _dio.options.headers = headers;
       }
       var response = await _dio.post(url, data: jsonBody);
-      print('resssss${response.statusCode}');
-      print('resssss${response.statusMessage}');
-      print('status code ${response.statusCode}');
+      if(response.headers.value("Authorization")!=null){
+        await PreferenceUtils.setString(SharedPrefsKey.accessToken, response.headers.value("Authorization")!);
+      }
 
       print('headers response  ${response.headers}');
 
@@ -160,7 +165,6 @@ class NetworkServiceDio implements BaseApiService {
         print(error.error.toString());
         print('Error ${error.response?.data}');
         print('status code ${error.response?.statusCode}');
-        print('message ${error.message}');
       }else{
         print('errrrrrrrrrrrrrrrrrrrrr${error}');
 

@@ -20,6 +20,8 @@ import 'package:sloopify_mobile/features/auth/presentation/widgets/policy_terms.
 
 import '../../../../core/managers/app_gaps.dart';
 import '../../../../core/utils/app_validators.dart';
+import '../../../../core/utils/helper/snackbar.dart';
+import '../widgets/country_code_widget.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({super.key});
@@ -32,12 +34,10 @@ class SignupScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => sl.locator<SignUpCubit>(),
       child: Scaffold(
-        appBar: getCustomAppBar(
-          context: context,
-        ),
+        appBar: getCustomAppBar(context: context),
         body: BlocConsumer<SignUpCubit, SignUpState>(
           listener: (context, state) {
-            // TODO: implement listener
+            _buildSignUpListener(state, context);
           },
           builder: (context, state) {
             return SafeArea(
@@ -64,6 +64,7 @@ class SignupScreen extends StatelessWidget {
                           ),
                         ),
                         CustomTextField(
+                          initialValue: state.signupDataEntity.firstName,
                           labelText: 'first_name'.tr(),
                           onChanged: (value) {
                             context.read<SignUpCubit>().setFirstName(value);
@@ -79,6 +80,7 @@ class SignupScreen extends StatelessWidget {
                         ),
                         Gaps.vGap1,
                         CustomTextField(
+                          initialValue: state.signupDataEntity.lastName,
                           labelText: 'last_name'.tr(),
                           withTitle: true,
                           hintText: "last_name2".tr(),
@@ -93,6 +95,7 @@ class SignupScreen extends StatelessWidget {
                         ),
                         Gaps.vGap1,
                         CustomTextField(
+                          initialValue: state.signupDataEntity.email,
                           labelText: 'email'.tr(),
                           withTitle: true,
                           hintText: "email2".tr(),
@@ -106,9 +109,49 @@ class SignupScreen extends StatelessWidget {
                                   Validator.emailValidator(value!, context),
                         ),
                         Gaps.vGap1,
-                        PhoneNumber(formKey: _formKey),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: CountryCodeWidget(
+                                onChanged: (value) {
+                                  context.read<SignUpCubit>().setCountryCode(
+                                    value,
+                                  );
+                                },
+                              ),
+                            ),
+                            Gaps.hGap2,
+                            Expanded(
+                              flex: 3,
+                              child: CustomTextField(
+                                initialValue:
+                                    state.signupDataEntity.mobileNumber,
+                                labelText: 'mobile_number'.tr(),
+                                onChanged: (value) {
+                                  context.read<SignUpCubit>().setMobileNumber(
+                                    value,
+                                  );
+                                },
+                                withTitle: true,
+                                hintText: 'mobile_number2'.tr(),
+                                /*icon: Icons.email,*/
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.next,
+                                validator:
+                                    (value) => Validator.phoneNumberValidator(
+                                      value!,
+                                      context,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
                         Gaps.vGap1,
                         CustomTextField(
+                          initialValue: state.signupDataEntity.password,
                           labelText: 'password'.tr(),
                           withTitle: true,
                           hintText: "password2".tr(),
@@ -124,6 +167,7 @@ class SignupScreen extends StatelessWidget {
                         ),
                         Gaps.vGap1,
                         CustomTextField(
+                          initialValue: state.signupDataEntity.confirmPassword,
                           labelText: 'confirm_password'.tr(),
                           withTitle: true,
                           hintText: "confirm_password2".tr(),
@@ -145,30 +189,29 @@ class SignupScreen extends StatelessWidget {
                         Gaps.vGap2,
                         Center(
                           child: CustomElevatedButton(
+                            isLoading:
+                                state.signupStatus == SignupStatus.loading,
                             width: MediaQuery.of(context).size.width * 0.65,
                             label: 'register'.tr(),
                             isBold: true,
-                            onPressed: () {
-                              if (!(_formKey.currentState!.validate())) return;
-                              if (!state.signupDataEntity.isCheckedTerms) {
-                                ToastUtils.showErrorToastMessage(
-                                  "please_check_terms".tr(),
-                                );
-                                return;
-                              }else{
-                                Navigator.pushNamed(
-                                  context,
-                                  VerifyAccountScreen.routeName,
-                                  arguments: {
-                                    'mobileNumber':
-                                    state.signupDataEntity.mobileNumber,
-                                    'email': state.signupDataEntity.email,
-                                    "fromPassword": false,
-                                  },
-                                );
-                              }
+                            onPressed:
+                                state.signupStatus == SignupStatus.loading
+                                    ? () {}
+                                    : () {
+                                      if (!(_formKey.currentState!.validate()))
+                                        return;
+                                      if (!state
+                                          .signupDataEntity
+                                          .isCheckedTerms) {
+                                        ToastUtils.showErrorToastMessage(
+                                          "please_check_terms".tr(),
+                                        );
+                                        return;
+                                      } else {
 
-                            },
+                                        context.read<SignUpCubit>().submit();
+                                      }
+                                    },
                             backgroundColor: ColorManager.primaryColor,
                           ),
                         ),
@@ -245,5 +288,22 @@ class SignupScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void _buildSignUpListener(SignUpState state, BuildContext context) {
+    if (state.signupStatus == SignupStatus.done) {
+      Navigator.pushNamed(
+        context,
+        VerifyAccountScreen.routeName,
+        arguments: {
+          "signUpCubit": context.read<SignUpCubit>(),
+          "fromPassword": false,
+        },
+      );
+    } else if (state.signupStatus == SignupStatus.noInternet) {
+      showSnackBar(context, 'no_internet_connection'.tr());
+    } else if (state.signupStatus == SignupStatus.networkError) {
+      showSnackBar(context, state.errorMessage);
+    }
   }
 }
