@@ -78,7 +78,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   CustomElevatedButton(
                     padding: EdgeInsets.zero,
                     width: MediaQuery.of(context).size.width * 0.7,
-                    label: onLastPage ? 'filled_btn'.tr() : 'next'.tr(),
+                    label:  'next'.tr(),
                     onPressed: () async {
                       if (onLastPage) {
                         await PreferenceUtils.setBool(SharedPrefsKey.firstTime, true);

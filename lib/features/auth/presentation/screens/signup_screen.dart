@@ -126,25 +126,41 @@ class SignupScreen extends StatelessWidget {
                             Gaps.hGap2,
                             Expanded(
                               flex: 3,
-                              child: CustomTextField(
-                                initialValue:
-                                    state.signupDataEntity.mobileNumber,
-                                labelText: 'mobile_number'.tr(),
-                                onChanged: (value) {
-                                  context.read<SignUpCubit>().setMobileNumber(
-                                    value,
-                                  );
-                                },
-                                withTitle: true,
-                                hintText: 'mobile_number2'.tr(),
-                                /*icon: Icons.email,*/
-                                keyboardType: TextInputType.number,
-                                textInputAction: TextInputAction.next,
-                                validator:
-                                    (value) => Validator.phoneNumberValidator(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                      context
+                                              .read<SignUpCubit>()
+                                              .state
+                                              .hssPhoneNumberError
+                                          ? 16.0
+                                          : 0.0,
+                                ),
+                                child: CustomTextField(
+                                  initialValue:
+                                      state.signupDataEntity.mobileNumber,
+                                  labelText: 'mobile_number'.tr(),
+                                  onChanged: (value) {
+                                    context.read<SignUpCubit>().setMobileNumber(
+                                      value,
+                                    );
+                                  },
+                                  withTitle: true,
+                                  hintText: 'mobile_number2'.tr(),
+                                  /*icon: Icons.email,*/
+                                  keyboardType: TextInputType.number,
+                                  textInputAction: TextInputAction.next,
+                                  validator: (value) {
+                                    final err = Validator.phoneNumberValidator(
                                       value!,
                                       context,
-                                    ),
+                                    );
+                                    context
+                                        .read<SignUpCubit>()
+                                        .setHasPhoneNumberError(err != null);
+                                    return err;
+                                  },
+                                ),
                               ),
                             ),
                           ],
@@ -182,7 +198,7 @@ class SignupScreen extends StatelessWidget {
                           textInputAction: TextInputAction.next,
                           validator:
                               (value) =>
-                                  Validator.passwordValidate(value!, context),
+                                  Validator.confirmPasswordValidate(value!, state.signupDataEntity.password,context),
                         ),
                         Gaps.vGap2,
                         ConfirmPolicy(),
@@ -208,7 +224,6 @@ class SignupScreen extends StatelessWidget {
                                         );
                                         return;
                                       } else {
-
                                         context.read<SignUpCubit>().submit();
                                       }
                                     },

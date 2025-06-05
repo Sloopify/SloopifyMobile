@@ -14,6 +14,7 @@ import 'package:sloopify_mobile/features/auth/presentation/blocs/login_cubit/log
 import 'package:sloopify_mobile/features/auth/presentation/screens/account_info/user_interests.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_otp_code.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/signup_screen.dart';
+import 'package:sloopify_mobile/features/auth/presentation/screens/verify_account_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/widgets/country_code_widget.dart';
 import 'package:sloopify_mobile/features/auth/presentation/widgets/switch_login_type.dart';
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
@@ -27,6 +28,7 @@ import '../../../../core/utils/app_validators.dart';
 import '../../../../core/utils/helper/snackbar.dart';
 import '../../../app_wrapper/presentation/screens/app_wrapper.dart';
 import '../blocs/authentication_bloc/authentication_bloc.dart';
+import 'forget_password_screens/otp_forget_password.dart';
 
 class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
@@ -46,9 +48,6 @@ class SignInScreen extends StatelessWidget {
           },
           child: BlocBuilder<LoginCubit, LoginState>(
             builder: (context, state) {
-              print(state.loginDataEntity.phoneNumber);
-              print(state.loginDataEntity.fullFormatedNumber);
-              print(state.loginDataEntity.loginType);
               return SafeArea(
                 child: SingleChildScrollView(
                   child: Padding(
@@ -62,10 +61,7 @@ class SignInScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width * 0.6,
+                            width: MediaQuery.of(context).size.width * 0.6,
                             child: Text(
                               'login_to_your_account'.tr(),
                               style: AppTheme.headline1.copyWith(
@@ -80,10 +76,7 @@ class SignInScreen extends StatelessWidget {
                               margin: EdgeInsets.symmetric(
                                 vertical: AppPadding.p20,
                               ),
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width * 0.4,
+                              width: MediaQuery.of(context).size.width * 0.4,
                               height: 50,
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
@@ -112,11 +105,11 @@ class SignInScreen extends StatelessWidget {
                                     },
                                     loginType: LoginType.email,
                                     isSelected:
-                                    context
-                                        .read<LoginCubit>()
-                                        .state
-                                        .loginDataEntity
-                                        .loginType ==
+                                        context
+                                            .read<LoginCubit>()
+                                            .state
+                                            .loginDataEntity
+                                            .loginType ==
                                         LoginType.email,
                                   ),
                                   SwitchLoginType(
@@ -127,11 +120,11 @@ class SignInScreen extends StatelessWidget {
                                     },
                                     loginType: LoginType.phoneNumber,
                                     isSelected:
-                                    context
-                                        .read<LoginCubit>()
-                                        .state
-                                        .loginDataEntity
-                                        .loginType ==
+                                        context
+                                            .read<LoginCubit>()
+                                            .state
+                                            .loginDataEntity
+                                            .loginType ==
                                         LoginType.phoneNumber,
                                   ),
                                 ],
@@ -146,58 +139,73 @@ class SignInScreen extends StatelessWidget {
                               children: [
                                 Expanded(
                                   flex: 1,
-                                  child: CountryCodeWidget(
-                                    onChanged: (value) {
-                                      context.read<LoginCubit>().setDialCode(
-                                        value,
-                                      );
-                                    },
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom:
+                                          context
+                                                  .read<LoginCubit>()
+                                                  .state
+                                                  .phoneNumberHasError
+                                              ? 16.0
+                                              : 0.0,
+                                    ),
+                                    child: CountryCodeWidget(
+                                      onChanged: (value) {
+                                        context.read<LoginCubit>().setDialCode(
+                                          value,
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                                 Gaps.hGap2,
                                 Expanded(
                                   flex: 3,
                                   child: CustomTextField(
-                                    initialValue: state.loginDataEntity.phoneNumber,
+                                    initialValue:
+                                        state.loginDataEntity.phoneNumber,
                                     labelText: 'mobile_number'.tr(),
                                     onChanged: (value) {
                                       context.read<LoginCubit>().setPhoneNumber(
                                         value,
                                       );
-
                                     },
                                     withTitle: true,
                                     hintText: 'mobile_number2'.tr(),
                                     /*icon: Icons.email,*/
                                     keyboardType: TextInputType.number,
                                     textInputAction: TextInputAction.next,
-                                    validator:
-                                        (value) =>
-                                        Validator.phoneNumberValidator(
-                                          value!,
-                                          context,
-                                        ),
+                                    validator: (value) {
+                                      final err =
+                                          Validator.phoneNumberValidator(
+                                            value!,
+                                            context,
+                                          );
+                                      context
+                                          .read<LoginCubit>()
+                                          .setPhoneNumberValidator(err != null);
+                                      return err;
+                                    },
                                   ),
                                 ),
                               ],
                             ),
-                          ] else
-                            ...[
-                              CustomTextField(
-                                labelText: 'email'.tr(),
-                                onChanged: (value) {
-                                  context.read<LoginCubit>().setEmail(value);
-                                },
-                                withTitle: true,
-                                hintText: 'email'.tr(),
-                                /*icon: Icons.email,*/
-                                keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.next,
-                                validator:
-                                    (value) =>
-                                    Validator.emailValidator(value!, context),
-                              ),
-                            ],
+                          ] else ...[
+                            CustomTextField(
+                              labelText: 'email'.tr(),
+                              onChanged: (value) {
+                                context.read<LoginCubit>().setEmail(value);
+                              },
+                              withTitle: true,
+                              hintText: 'email'.tr(),
+                              /*icon: Icons.email,*/
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              validator:
+                                  (value) =>
+                                      Validator.emailValidator(value!, context),
+                            ),
+                          ],
 
                           Gaps.vGap2,
                           CustomTextField(
@@ -213,47 +221,56 @@ class SignInScreen extends StatelessWidget {
                             textInputAction: TextInputAction.next,
                             validator:
                                 (value) =>
-                                Validator.passwordValidate(value!, context),
+                                    Validator.passwordValidate(value!, context),
                           ),
                           Gaps.vGap2,
-                         // _buildRememberMe(),
-                        //  Gaps.vGap2,
+                          // _buildRememberMe(),
+                          //  Gaps.vGap2,
                           Center(
                             child: CustomElevatedButton(
                               isBold: true,
                               isLoading:
-                              state.loginStatus == LoginStatus.loading,
+                                  state.loginStatus == LoginStatus.loading,
                               label: "login".tr(),
                               onPressed:
-                              state.loginStatus == LoginStatus.loading
-                                  ? () {}
-                                  : () {
-                                if (!(_formKey.currentState!
-                                    .validate())) {
-                                  return;
-                                }
-                                if (state.loginDataEntity.loginType ==
-                                    LoginType.email) {
-                                  context.read<LoginCubit>().loginWithEmail();
-                                } else {
-                                  context.read<LoginCubit>().loginWithPhone();
-                                }
-                              },
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width * 0.7,
+                                  state.loginStatus == LoginStatus.loading
+                                      ? () {}
+                                      : () {
+                                        if (!(_formKey.currentState!
+                                            .validate())) {
+                                          return;
+                                        }
+                                        if (state.loginDataEntity.loginType ==
+                                            LoginType.email) {
+                                          context
+                                              .read<LoginCubit>()
+                                              .loginWithEmail();
+                                        } else {
+                                          context
+                                              .read<LoginCubit>()
+                                              .loginWithPhone();
+                                        }
+                                      },
+                              width: MediaQuery.of(context).size.width * 0.7,
                               backgroundColor: ColorManager.primaryColor,
                               padding: EdgeInsets.symmetric(vertical: 4),
                             ),
                           ),
                           Gaps.vGap2,
                           Center(
-                            child: Text(
-                              'forget_password'.tr(),
-                              style: AppTheme.headline3.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: ColorManager.primaryColor,
+                            child: InkWell(
+                              onTap: (){
+                                Navigator.pushNamed(
+                                  context,
+                                  OtpForgetPassword.routeName,
+                                );
+                              },
+                              child: Text(
+                                'forget_password'.tr(),
+                                style: AppTheme.headline3.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: ColorManager.primaryColor,
+                                ),
                               ),
                             ),
                           ),
@@ -263,11 +280,22 @@ class SignInScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              _buildSocialMediaBtn(assets: AssetsManager.google, onTap: (){}),
-                              _buildSocialMediaBtn(assets: AssetsManager.apple, onTap: (){}),
-                              _buildSocialMediaBtn(assets: AssetsManager.otp, onTap: (){
-                                Navigator.of(context).pushNamed(LoginWithOtpCode.routeName);
-                              }),
+                              _buildSocialMediaBtn(
+                                assets: AssetsManager.google,
+                                onTap: () {},
+                              ),
+                              _buildSocialMediaBtn(
+                                assets: AssetsManager.apple,
+                                onTap: () {},
+                              ),
+                              _buildSocialMediaBtn(
+                                assets: AssetsManager.otp,
+                                onTap: () {
+                                  Navigator.of(
+                                    context,
+                                  ).pushNamed(LoginWithOtpCode.routeName);
+                                },
+                              ),
                             ],
                           ),
                           Gaps.vGap3,
@@ -288,13 +316,13 @@ class SignInScreen extends StatelessWidget {
                                       color: ColorManager.primaryColor,
                                     ),
                                     recognizer:
-                                    TapGestureRecognizer()
-                                      ..onTap =
-                                          () =>
-                                          Navigator.pushReplacementNamed(
-                                            context,
-                                            SignupScreen.routeName,
-                                          ),
+                                        TapGestureRecognizer()
+                                          ..onTap =
+                                              () =>
+                                                  Navigator.pushReplacementNamed(
+                                                    context,
+                                                    SignupScreen.routeName,
+                                                  ),
                                   ),
                                 ],
                               ),
@@ -375,7 +403,7 @@ class SignInScreen extends StatelessWidget {
       Navigator.pushNamedAndRemoveUntil(
         context,
         AppWrapper.routeName,
-            (route) => false,
+        (route) => false,
       );
     } else if (state.loginStatus == LoginStatus.noInternet) {
       showSnackBar(context, 'no_internet_connection'.tr());
@@ -383,7 +411,11 @@ class SignInScreen extends StatelessWidget {
       showSnackBar(context, state.errorMessage);
     }
   }
-  Widget _buildSocialMediaBtn({required String assets,required Function() onTap }){
+
+  Widget _buildSocialMediaBtn({
+    required String assets,
+    required Function() onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -397,9 +429,9 @@ class SignInScreen extends StatelessWidget {
               offset: Offset(0, 2),
               color: ColorManager.black.withOpacity(0.2),
               spreadRadius: 0,
-              blurRadius: 4
-            )
-          ]
+              blurRadius: 4,
+            ),
+          ],
         ),
         child: SvgPicture.asset(assets),
       ),

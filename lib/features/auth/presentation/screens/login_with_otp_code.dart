@@ -128,12 +128,23 @@ class LoginWithOtpCode extends StatelessWidget {
                             children: [
                               Expanded(
                                 flex: 1,
-                                child: CountryCodeWidget(
-                                  onChanged: (value) {
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom:
                                     context
                                         .read<LoginWithOtpCubit>()
-                                        .setDialCode(value);
-                                  },
+                                        .state
+                                        .hasPhoneNumberError
+                                        ? 16.0
+                                        : 0.0,
+                                  ),
+                                  child: CountryCodeWidget(
+                                    onChanged: (value) {
+                                      context
+                                          .read<LoginWithOtpCubit>()
+                                          .setDialCode(value);
+                                    },
+                                  ),
                                 ),
                               ),
                               Gaps.hGap2,
@@ -154,10 +165,14 @@ class LoginWithOtpCode extends StatelessWidget {
                                   keyboardType: TextInputType.number,
                                   textInputAction: TextInputAction.next,
                                   validator:
-                                      (value) => Validator.phoneNumberValidator(
+                                      (value) {
+                                        final err= Validator.phoneNumberValidator(
                                         value!,
                                         context,
-                                      ),
+                                      );
+                                        context.read<LoginWithOtpCubit>().setHasPhoneNumberError(err!=null);
+                                        return err;
+                                      },
                                 ),
                               ),
                             ],

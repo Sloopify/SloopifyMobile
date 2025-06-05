@@ -1,180 +1,160 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sloopify_mobile/core/locator/service_locator.dart';
-import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
-import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
-import 'package:sloopify_mobile/core/ui/widgets/custom_elevated_button.dart';
-import 'package:sloopify_mobile/core/ui/widgets/custom_text_field.dart';
-import 'package:sloopify_mobile/core/utils/app_validators.dart';
-import 'package:sloopify_mobile/features/auth/presentation/blocs/account_info/profile_info_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/upload_photo_cubit/upload_photo_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/upload_photo_cubit/upload_photo_state.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/account_info/referred_day.dart';
-import 'package:sloopify_mobile/features/auth/presentation/widgets/account_photos_header.dart';
+
+import '../../../../../core/managers/app_dimentions.dart';
+import '../../../../../core/managers/assets_managers.dart';
+import '../../../../../core/managers/color_manager.dart';
+import '../../../../../core/ui/widgets/custom_elevated_button.dart';
+import '../../../../../core/utils/helper/image_picker.dart';
+import '../../../../../core/utils/helper/snackbar.dart';
 
 class FillAccountScreen extends StatelessWidget {
-   FillAccountScreen({super.key});
+  FillAccountScreen({super.key});
 
   static const routeName = "fill_account";
-  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => locator<UploadPictureCubit>(),
-      child: Scaffold(
-        appBar: getCustomAppBar(context: context, title: "fill_your_account".tr(),centerTitle: true),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                AccountPhotosHeader(),
-                Gaps.vGap3,
-                Builder(
-                  builder: (context) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppPadding.p30),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          children: [
-                            CustomTextField(
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              hintText: "bio2".tr(),
-                              withTitle: true,
-                              labelText: "bio".tr(),
-                              onChanged: (value) {
-                                context.read<ProfileInfoCubit>().setBio(value);
+    return Scaffold(
+      appBar: getCustomAppBar(
+        onArrowBack: (){
+          if(Navigator.of(context).canPop()){
+            Navigator.of(context).pop(());
+          }else{
+            SystemNavigator.pop();
+          }
+        },
+        context: context,
+        title: "fill_your_account".tr(),
+        centerTitle: true,
+      ),
+      body: BlocConsumer<UploadPictureCubit, UploadPictureState>(
+        listener: (context, state) {
+          _buildSubmitListener(context, state);
+        },
+        builder: (context, state) {
+          return SafeArea(
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  state.image != null
+                      ? Stack(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: FileImage(state.image!),
+                            radius: 150,
+                          ),
+                          PositionedDirectional(
+                            bottom: 8,
+                            start: 210,
+                            child: InkWell(
+                              onTap: () async {
+                                ImageSource imageSource =
+                                await showPickerImageSheet(context);
+                                File? pickedImage = await pickImage(
+                                  context,
+                                  imageSource,
+                                );
+                                if (pickedImage != null) {
+                                  context.read<UploadPictureCubit>().setPicture(
+                                    pickedImage,
+                                  );
+                                }
                               },
-                              validator:
-                                  (value) =>
-                                      Validator.requiredValidate(value!, context),
+                              child: SvgPicture.asset(AssetsManager.edit),
                             ),
-                            Gaps.vGap1,
-                            CustomTextField(
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              hintText: "education2".tr(),
-                              withTitle: true,
-                              labelText: "education".tr(),
-                              onChanged: (value) {
-                                context.read<ProfileInfoCubit>().setEducation(value);
+                          ),
+                        ],
+                      )
+                      : Stack(
+                        children: [
+                          Container(
+                            width: 250,
+                            height: 250,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: ColorManager.backGroundGrayLight,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsetsDirectional.all(AppPadding.p20),
+                            child: SvgPicture.asset(AssetsManager.user),
+                          ),
 
+                          PositionedDirectional(
+                            bottom: 12,
+                            start: 200,
+                            child: InkWell(
+                              onTap: () async {
+                                ImageSource imageSource =
+                                    await showPickerImageSheet(context);
+                                File? pickedImage = await pickImage(
+                                  context,
+                                  imageSource,
+                                );
+                                if (pickedImage != null) {
+                                  context.read<UploadPictureCubit>().setPicture(
+                                    pickedImage,
+                                  );
+                                }
                               },
-                              validator:
-                                  (value) =>
-                                      Validator.requiredValidate(value!, context),
+                              child: SvgPicture.asset(AssetsManager.edit),
                             ),
-                            Gaps.vGap1,
-                            CustomTextField(
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              hintText: "job2".tr(),
-                              withTitle: true,
-                              labelText: "job".tr(),
-                              onChanged: (value) {
-                                context.read<ProfileInfoCubit>().setJobs(value);
-
-                              },
-                              validator:
-                                  (value) =>
-                                      Validator.requiredValidate(value!, context),
-                            ),
-                            Gaps.vGap1,
-                            CustomTextField(
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              hintText: "experience2".tr(),
-                              withTitle: true,
-                              labelText: "experience".tr(),
-                              onChanged: (value) {
-                                context.read<ProfileInfoCubit>().setEducation(value);
-
-                              },
-                              validator:
-                                  (value) =>
-                                      Validator.requiredValidate(value!, context),
-                            ),
-                            Gaps.vGap1,
-                            CustomTextField(
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              hintText: "skills2".tr(),
-                              withTitle: true,
-                              labelText: "Skills".tr(),
-                              onChanged: (value) {
-                                context.read<ProfileInfoCubit>().setSkills(value);
-
-                              },
-                              validator:
-                                  (value) =>
-                                      Validator.requiredValidate(value!, context),
-                            ),
-                            Gaps.vGap1,
-                            CustomTextField(
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              hintText: "links2".tr(),
-                              withTitle: true,
-                              labelText: "links".tr(),
-                              onChanged: (value) {
-                                context.read<ProfileInfoCubit>().setLinks(value);
-
-                              },
-                              validator:
-                                  (value) =>
-                                      Validator.requiredValidate(value!, context),
-                            ),
-                            Gaps.vGap1,
-                            CustomTextField(
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              hintText: "location2".tr(),
-                              withTitle: true,
-                              labelText: "location".tr(),
-                              onChanged: (value) {
-                                context.read<ProfileInfoCubit>().setLocation(value);
-
-                              },
-                              validator:
-                                  (value) =>
-                                      Validator.requiredValidate(value!, context),
-                            ),
-                            Gaps.vGap3,
-                            CustomElevatedButton(isBold: true,
-                              label: "continue".tr(),
-                              onPressed: () {
-                              if(!(_formKey.currentState!.validate())) return;
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) {
-                                    return BlocProvider.value(
-                                      value: context.read<ProfileInfoCubit>(),
-                                      child: ReferredDay(),
-                                    );
-                                  },
-                                ),
-                              );
-                              },
-                              backgroundColor: ColorManager.primaryColor,
-                              width: MediaQuery.of(context).size.width * 0.75,
-                            ),
-                            Gaps.vGap3,
-
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    );
-                  }
-                ),
-              ],
+                  Gaps.vGap5,
+                  Center(
+                    child: CustomElevatedButton(
+                      isLoading:
+                          state.uploadPictureStatus ==
+                          UploadPictureStatus.loading,
+                      isBold: true,
+                      label: "continue".tr(),
+                      onPressed: () {
+                        if (state.image == null) {
+                          showSnackBar(context, 'you should choose an image.');
+                        } else {
+                          if (state.uploadPictureStatus ==
+                              UploadPictureStatus.loading) {
+                            return;
+                          } else {
+                            context.read<UploadPictureCubit>().submit();
+                          }
+                        }
+                      },
+                      backgroundColor: ColorManager.primaryColor,
+                      width: MediaQuery.of(context).size.width * 0.75,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
+  }
+
+  void _buildSubmitListener(BuildContext context, UploadPictureState state) {
+    if (state.uploadPictureStatus == UploadPictureStatus.done) {
+      Navigator.of(context).pushNamed(ReferredDay.routeName);
+    } else if (state.uploadPictureStatus == UploadPictureStatus.noInternet) {
+      showSnackBar(context, "no_internet_connection".tr());
+    } else if (state.uploadPictureStatus == UploadPictureStatus.networkError) {
+      showSnackBar(context, state.errorMessage);
+    }
   }
 }

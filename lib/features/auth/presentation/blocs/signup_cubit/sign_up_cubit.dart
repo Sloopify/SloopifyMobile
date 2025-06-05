@@ -32,7 +32,9 @@ class SignUpCubit extends Cubit<SignUpState> {
   void setLastName(String lastName) {
     emit(state.copyWith(lastName: lastName, signupStatus: SignupStatus.init));
   }
-
+  void setHasPhoneNumberError(bool value) {
+    emit(state.copyWith(hssPhoneNumberError: value, signupStatus: SignupStatus.init));
+  }
   void setEmail(String email) {
     emit(state.copyWith(email: email, signupStatus: SignupStatus.init));
   }

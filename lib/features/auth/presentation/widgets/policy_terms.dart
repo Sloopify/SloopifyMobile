@@ -54,6 +54,7 @@ class _ConfirmPolicyState extends State<ConfirmPolicy> {
             width: 24,
             height: 24,
             child: Checkbox(
+              activeColor:ColorManager.primaryColor ,
               side: BorderSide(color: ColorManager.primaryColor, width: 2),
               shape: ContinuousRectangleBorder(
                 borderRadius: BorderRadius.circular(10),

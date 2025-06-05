@@ -16,6 +16,11 @@ static const String loginWithPhone="auth/login-mobile";
 static const String loginWithOtp="auth/login-otp";
 static const String verifyLoginWithOtp="auth/verify-login-otp";
 static const String verifyUserToken="auth/verify-token";
+static const String getInterests="auth/register/get-interests-by-category-name";
+static const String getAllCategories="auth/register/get-interest-category";
+static const String requestCodeForForgetPassword="auth/forgot-password/send-otp";
+static const String verifyCodeForForgetPassword="auth/forgot-password/verify-otp";
+static const String changePassword="auth/forgot-password/reset-password";
 
 
 

@@ -1,5 +1,6 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 
@@ -20,7 +21,6 @@ class _CountryCodeWidgetState extends State<CountryCodeWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 48,
       alignment: Alignment.center,
       margin: EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
@@ -36,39 +36,50 @@ class _CountryCodeWidgetState extends State<CountryCodeWidget> {
           ),
         ],
       ),
-      child: CountryCodePicker(
-        hideMainText: true,
-        backgroundColor: ColorManager.white,
-        showDropDownButton: false,
-        flagWidth: 25,
-        dialogTextStyle: AppTheme.bodyText3,
-        dialogBackgroundColor: ColorManager.white,
-        padding: EdgeInsets.zero,
-        dialogSize: Size(
-          double.infinity,
-          MediaQuery.of(context).size.height * 0.6,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: Row(
+          children: [
+            Text(dialCode,style: AppTheme.bodyText3.copyWith(fontWeight: FontWeight.w500),),
+            Expanded(
+              child: CountryCodePicker(
+                margin: EdgeInsets.zero,
+                hideMainText: true,
+                backgroundColor: ColorManager.white,
+                showDropDownButton: false,
+                flagWidth: 18,
+                dialogTextStyle: AppTheme.bodyText3,
+                dialogBackgroundColor: ColorManager.white,
+                padding: EdgeInsets.zero,
+                dialogSize: Size(
+                  double.infinity,
+                  MediaQuery.of(context).size.height * 0.6,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    dialCode=value.dialCode??"+963";
+                  });
+                  widget.onChanged(dialCode);
+                },
+                // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
+                initialSelection: 'Sy',
+                // optional. Shows only country name and flag
+                showCountryOnly: false,
+                showFlag: true,
+                showFlagDialog: true,
+                showFlagMain: true,
+                searchStyle: AppTheme.bodyText3.copyWith(fontWeight: FontWeight.w500),
+                headerTextStyle: AppTheme.headline3.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+                // optional. Shows only country name and flag when popup is closed.
+                showOnlyCountryWhenClosed: false,
+                // optional. aligns the flag and the Text left
+                alignLeft: true,
+              ),
+            ),
+          ],
         ),
-        onChanged: (value) {
-          setState(() {
-            dialCode=value.dialCode??"+963";
-          });
-          widget.onChanged(dialCode);
-        },
-        // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-        initialSelection: 'Sy',
-        // optional. Shows only country name and flag
-        showCountryOnly: false,
-        showFlag: true,
-        showFlagDialog: true,
-        showFlagMain: true,
-        searchStyle: AppTheme.bodyText3.copyWith(fontWeight: FontWeight.w500),
-        headerTextStyle: AppTheme.headline3.copyWith(
-          fontWeight: FontWeight.w500,
-        ),
-        // optional. Shows only country name and flag when popup is closed.
-        showOnlyCountryWhenClosed: false,
-        // optional. aligns the flag and the Text left
-        alignLeft: true,
       ),
     );
   }

@@ -26,7 +26,9 @@ class LoginWithOtpCubit extends Cubit<LoginWithOtpState> {
   void setEmail(String email) {
     emit(state.copyWith(email: email, otpLoginStatus: OtpLoginStatus.init));
   }
-
+  void setHasPhoneNumberError(bool value) {
+    emit(state.copyWith(hasPhoneNumberError: value, otpLoginStatus: OtpLoginStatus.init));
+  }
   void setPhoneNumber(String phoneNumber) {
     emit(
       state.copyWith(

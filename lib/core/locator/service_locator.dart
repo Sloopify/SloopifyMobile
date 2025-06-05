@@ -4,19 +4,30 @@ import 'package:sloopify_mobile/core/api_service/base_api_service.dart';
 import 'package:sloopify_mobile/core/api_service/network_service_dio.dart';
 import 'package:sloopify_mobile/features/auth/data/repositories/account_repo_impl.dart';
 import 'package:sloopify_mobile/features/auth/domain/reposritory/account_repo.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/change_password_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/complete_birthday_usecase.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/complete_gender_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/complete_interests_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/complete_profile_image_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/complete_referred_by_use_case.dart';
 import 'package:sloopify_mobile/features/auth/domain/use_cases/email_login_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/get_all_categories_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/get_user_interests_use_case.dart';
 import 'package:sloopify_mobile/features/auth/domain/use_cases/phone_login_use_case.dart';
+import 'package:sloopify_mobile/features/auth/domain/use_cases/request_code_forget_password.dart';
 import 'package:sloopify_mobile/features/auth/domain/use_cases/signup_use_case.dart';
 import 'package:sloopify_mobile/features/auth/domain/use_cases/verify_otp_code_login.dart';
 import 'package:sloopify_mobile/features/auth/domain/use_cases/verify_token_use_case.dart';
-import 'package:sloopify_mobile/features/auth/presentation/blocs/account_info/profile_info_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/authentication_bloc/authentication_bloc.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/complete_birthday_cubit/complete_birthday_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/forget_password_cubit/forget_password_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/gender_identity_cubit/gender_identity_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/login_cubit/login_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/login_with_otp_code/login_with_otp_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/referred_by_cubit/referred_by_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/signup_cubit/sign_up_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/upload_photo_cubit/upload_photo_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/verify_account/verify_account_cubit.dart';
-import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_otp_code.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/chat_bloc/chat_bloc.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/message_bloc/messages_bloc.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
@@ -29,7 +40,9 @@ import '../../features/auth/data/repositories/auth_repo_impl.dart';
 import '../../features/auth/domain/reposritory/auth_repo.dart';
 import '../../features/auth/domain/use_cases/opt_login_use_case.dart';
 import '../../features/auth/domain/use_cases/register_otp_use_case.dart';
+import '../../features/auth/domain/use_cases/verify_code_forget_password_use_case.dart';
 import '../../features/auth/domain/use_cases/verify_otp_register_use_case.dart';
+import '../../features/auth/presentation/blocs/user_interets_cubit/user_interests_cubit.dart';
 import '../../features/posts/presentation/blocs/comment_reaction_cubit/comment_reactions_cubit.dart';
 import '../network/check_internet.dart';
 
@@ -55,8 +68,16 @@ Future<void> setupLocator() async {
       optLoginUseCase: locator(),
     ),
   );
-  locator.registerFactory(() => ProfileInfoCubit());
-  locator.registerFactory(() => UploadPictureCubit());
+  locator.registerFactory(
+    () => ForgetPasswordCubit(
+      changePasswordUseCase: locator(),
+      verifyCodeForgetPasswordUseCase: locator(),
+      requestCodeForgetPasswordUseCase: locator(),
+    ),
+  );
+  locator.registerFactory(
+    () => UploadPictureCubit(completeProfileImageUseCase: locator()),
+  );
   locator.registerFactory(() => HomeNavigationCubit());
   locator.registerFactory(() => CommentInteractionCubit());
   locator.registerFactory(() => CommentFetchBloc());
@@ -69,6 +90,22 @@ Future<void> setupLocator() async {
       authRepository: locator(),
       verifyTokenUseCase: locator(),
     ),
+  );
+  locator.registerFactory(
+    () => InterestCubit(
+      completeInterestsUseCase: locator(),
+      getUserInterestsUseCase: locator(),
+      getAllCategoriesUseCase: locator(),
+    ),
+  );
+  locator.registerFactory(
+    () => GenderIdentityCubit(completeGenderUseCase: locator()),
+  );
+  locator.registerFactory(
+    () => CompleteBirthdayCubit(completeBirthdayUseCase: locator()),
+  );
+  locator.registerFactory(
+    () => ReferredByCubit(completeReferredByUseCase: locator()),
   );
 
   ///
@@ -94,6 +131,36 @@ Future<void> setupLocator() async {
   );
   locator.registerLazySingleton(
     () => VerifyTokenUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => GetUserInterestsUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => GetAllCategoriesUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => CompleteInterestsUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => CompleteBirthdayUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => CompleteGenderUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => CompleteProfileImageUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => CompleteReferredByUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => RequestCodeForgetPasswordUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => VerifyCodeForgetPasswordUseCase(accountsRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => ChangePasswordUseCase(accountsRepo: locator()),
   );
 
   ///

@@ -82,15 +82,15 @@ class AuthenticationBloc
       final userCompletedInfo = authRepository.getCompletedUserInfo();
       if (!userInfo!.emailVerified) {
         emit(NotActivatedWithOtpCode());
-      } else if (!userCompletedInfo!.image) {
-        emit(NotCompletedImageInfo());
-      } else if (!userCompletedInfo.gender) {
+      }else if (!userCompletedInfo!.interests) {
+        emit(NotCompetedInterests());
+      }else if (!userCompletedInfo.gender) {
         emit(NotCompletedGenderInfo());
       } else if (!userCompletedInfo.birthDay) {
         emit(NotCompletedBirthdayInfo());
-      } else if (!userCompletedInfo.interests) {
-        emit(NotCompetedInterests());
-      }else {
+      } else if (!userCompletedInfo.image) {
+        emit(NotCompletedImageInfo());
+      }  else {
         emit(AuthenticatedState());
       }
     }

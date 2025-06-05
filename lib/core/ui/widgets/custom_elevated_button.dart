@@ -58,43 +58,50 @@ class CustomElevatedButton extends StatelessWidget {
   }
 
   Widget _buildElevatedWithIcon(bool? isRounded, BuildContext context) {
-    return Card(
-      elevation: 5,
-      color: Colors.transparent,
-      shadowColor: ColorManager.black.withOpacity(0.25),
-      borderOnForeground: true,
-      child: SizedBox(
-        width: width ?? MediaQuery.of(context).size.width * 0.9,
-        child: ElevatedButton.icon(
-          icon: icon!,
-          iconAlignment: iconAlignment ?? IconAlignment.start,
-          onPressed: onPressed,
-          label:
-              isLoading
-                  ? CircularProgressIndicator(
-                    color: loadingColor ?? ColorManager.white,
-                  )
-                  : FittedBox(
-                    child: Text(
-                      label,
-                      textAlign: TextAlign.center,
-                      style:
-                          btnTextStyle ??
-                          AppTheme.bodyText1.copyWith(
-                            fontSize: 18,
-                            fontWeight:
-                                isBold ? FontWeight.w500 : FontWeight.w400,
-                            color: foregroundColor ?? Colors.white,
-                          ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-          style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-            padding: WidgetStatePropertyAll(padding),
-            backgroundColor: WidgetStatePropertyAll(backgroundColor),
-            foregroundColor: WidgetStatePropertyAll(foregroundColor),
+    return Container(
+      width: width ?? MediaQuery.of(context).size.width * 0.9,
+      decoration: BoxDecoration(
+        border: Border.all(color: borderSide?.color??ColorManager.primaryColor,width: borderSide?.width??1),
+        borderRadius: BorderRadius.circular(10),
+        color: backgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: ColorManager.black.withOpacity(0.2),
+            spreadRadius: 0,
+            offset: Offset(0, 2),
+            blurRadius: 4,
           ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        icon: icon!,
+        iconAlignment: iconAlignment ?? IconAlignment.start,
+        onPressed: onPressed,
+        label:
+            isLoading
+                ? CircularProgressIndicator(
+                  color: loadingColor ?? ColorManager.white,
+                )
+                : FittedBox(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style:
+                        btnTextStyle ??
+                        AppTheme.bodyText1.copyWith(
+                          fontSize: 18,
+                          fontWeight:
+                              isBold ? FontWeight.w500 : FontWeight.w400,
+                          color: foregroundColor ?? Colors.white,
+                        ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+        style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+          padding: WidgetStatePropertyAll(padding),
+          backgroundColor: WidgetStatePropertyAll(backgroundColor),
+          foregroundColor: WidgetStatePropertyAll(foregroundColor),
         ),
       ),
     );
@@ -148,78 +155,81 @@ class CustomElevatedButton extends StatelessWidget {
   }
 
   _buildElevatedWithSvg(bool? isRounded, BuildContext context) {
-    return Card(
-      elevation: 5,
-      color: Colors.transparent,
-      shadowColor: ColorManager.black.withOpacity(0.25),
-      borderOnForeground: true,
-      shape: RoundedRectangleBorder(
+    return Container(
+      width: width ?? MediaQuery.of(context).size.width * 0.9,
+      decoration: BoxDecoration(
+        border: Border.all(color: borderSide?.color??ColorManager.primaryColor,width: borderSide?.width??1),
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: ColorManager.primaryColor, width: 1.5),
-      ),
-      child: SizedBox(
-        width: width ?? MediaQuery.of(context).size.width * 0.9,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-            padding: WidgetStatePropertyAll(padding),
-            backgroundColor: WidgetStatePropertyAll(backgroundColor),
-            foregroundColor: WidgetStatePropertyAll(foregroundColor),
+        color: backgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: ColorManager.black.withOpacity(0.2),
+            spreadRadius: 0,
+            offset: Offset(0, 2),
+            blurRadius: 4,
           ),
-          child:
-              isLoading
-                  ? CircularProgressIndicator(color: ColorManager.white)
-                  : FittedBox(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (svgAlignment == IconAlignment.end) ...[
-                          if(label.isNotEmpty)
-                      ...[    Text(
-                        label,
-                        textAlign: TextAlign.center,
-                        style:
-                        btnTextStyle ??
-                            AppTheme.bodyText1.copyWith(
-                              fontSize: 18,
-                              fontWeight:
-                              isBold
-                                  ? FontWeight.w500
-                                  : FontWeight.w400,
-                              color: foregroundColor ?? Colors.white,
-                            ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                        Gaps.hGap2,],
-                          svgPic!,
-                        ] else ...[
-                          svgPic!,
-                          if(label.isNotEmpty)...[
-                            Gaps.hGap2,
-                            Text(
-                              label,
-                              textAlign: TextAlign.center,
-                              style:
-                              btnTextStyle ??
-                                  AppTheme.bodyText1.copyWith(
-                                    fontSize: 18,
-                                    fontWeight:
-                                    isBold
-                                        ? FontWeight.w500
-                                        : FontWeight.w400,
-                                    color: foregroundColor ?? Colors.white,
-                                  ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-
-                        ],
-                      ],
-                    ),
-                  ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+          padding: WidgetStatePropertyAll(padding),
+          backgroundColor: WidgetStatePropertyAll(backgroundColor),
+          foregroundColor: WidgetStatePropertyAll(foregroundColor),
         ),
+        child:
+            isLoading
+                ? CircularProgressIndicator(color: ColorManager.white)
+                : FittedBox(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (svgAlignment == IconAlignment.end) ...[
+                        if(label.isNotEmpty)
+                    ...[    Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style:
+                      btnTextStyle ??
+                          AppTheme.bodyText1.copyWith(
+                            fontSize: 18,
+                            fontWeight:
+                            isBold
+                                ? FontWeight.w500
+                                : FontWeight.w400,
+                            color: foregroundColor ?? Colors.white,
+                          ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                      Gaps.hGap2,],
+                        svgPic!,
+                      ] else ...[
+                        svgPic!,
+                        if(label.isNotEmpty)...[
+                          Gaps.hGap2,
+                          Text(
+                            label,
+                            textAlign: TextAlign.center,
+                            style:
+                            btnTextStyle ??
+                                AppTheme.bodyText1.copyWith(
+                                  fontSize: 18,
+                                  fontWeight:
+                                  isBold
+                                      ? FontWeight.w500
+                                      : FontWeight.w400,
+                                  color: foregroundColor ?? Colors.white,
+                                ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+
+                      ],
+                    ],
+                  ),
+                ),
       ),
     );
   }

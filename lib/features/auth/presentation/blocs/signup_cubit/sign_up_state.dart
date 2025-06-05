@@ -14,6 +14,7 @@ class SignUpState extends Equatable {
   final String otpCode;
   final OtpRegisterStatus otpRegisterStatus;
   final VerifyRegisterOtpStatus verifyRegisterOtpStatus;
+  final bool hssPhoneNumberError;
 
   const SignUpState({
     required this.signupDataEntity,
@@ -25,6 +26,7 @@ class SignUpState extends Equatable {
     required this.otpRegisterStatus,
     required this.verifyRegisterOtpStatus,
     required this.otpDataEntity,
+    required this.hssPhoneNumberError
   });
 
   @override
@@ -38,11 +40,13 @@ class SignUpState extends Equatable {
     otpDataEntity,
     verifyOtpEntity,
     verifyRegisterOtpStatus,
-    otpRegisterStatus
+    otpRegisterStatus,
+    hssPhoneNumberError
   ];
 
   factory SignUpState.empty() {
     return SignUpState(
+      hssPhoneNumberError: false,
       otpRegisterStatus: OtpRegisterStatus.init,
       verifyRegisterOtpStatus: VerifyRegisterOtpStatus.init,
       verifyOtpEntity: VerifyOtpEntity.fromEmpty(),
@@ -71,8 +75,10 @@ class SignUpState extends Equatable {
     String? otpCode,
      OtpRegisterStatus ?otpRegisterStatus,
      VerifyRegisterOtpStatus? verifyRegisterOtpStatus,
+    bool? hssPhoneNumberError
   }) {
     return SignUpState(
+      hssPhoneNumberError: hssPhoneNumberError??this.hssPhoneNumberError,
       verifyRegisterOtpStatus: verifyRegisterOtpStatus??this.verifyRegisterOtpStatus,
       otpRegisterStatus: otpRegisterStatus??this.otpRegisterStatus,
       verifyOtpEntity: verifyOtpEntity.copyWith(

@@ -10,6 +10,7 @@ class LoginWithOtpState extends Equatable {
   final OtpLoginStatus otpLoginStatus;
   final VerifyOtpLoginStatus verifyOtpLoginStatus;
   final VerifyOtpEntity verifyOtpEntity;
+  final bool hasPhoneNumberError;
 
   const LoginWithOtpState({
     required this.otpLoginStatus,
@@ -17,6 +18,7 @@ class LoginWithOtpState extends Equatable {
     required this.errorMessage,
     required this.verifyOtpLoginStatus,
     required this.verifyOtpEntity,
+    required this.hasPhoneNumberError,
   });
 
   @override
@@ -27,10 +29,12 @@ class LoginWithOtpState extends Equatable {
     otpLoginStatus,
     verifyOtpEntity,
     verifyOtpLoginStatus,
+    hasPhoneNumberError,
   ];
 
   factory LoginWithOtpState.empty() {
     return LoginWithOtpState(
+      hasPhoneNumberError: false,
       verifyOtpEntity: VerifyOtpEntity.fromEmpty(),
       verifyOtpLoginStatus: VerifyOtpLoginStatus.init,
       otpLoginStatus: OtpLoginStatus.init,
@@ -49,8 +53,10 @@ class LoginWithOtpState extends Equatable {
     VerifyOtpLoginStatus? verifyOtpLoginStatus,
     String? phoneNumbers,
     String? errorMessage,
+    bool? hasPhoneNumberError,
   }) {
     return LoginWithOtpState(
+      hasPhoneNumberError: hasPhoneNumberError ?? this.hasPhoneNumberError,
       verifyOtpLoginStatus: verifyOtpLoginStatus ?? this.verifyOtpLoginStatus,
       verifyOtpEntity: verifyOtpEntity.copyWith(
         otp: otpCode ?? verifyOtpEntity.otp,

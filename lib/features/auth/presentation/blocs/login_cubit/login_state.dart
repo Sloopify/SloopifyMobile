@@ -4,6 +4,7 @@ enum LoginStatus { init, loading, done, noInternet, networkError,  }
 
 class LoginState extends Equatable {
   final LoginDataEntity loginDataEntity;
+  final bool phoneNumberHasError;
   final LoginStatus loginStatus;
   final String errorMessage;
 
@@ -11,10 +12,12 @@ class LoginState extends Equatable {
     required this.loginStatus,
     required this.loginDataEntity,
     required this.errorMessage,
+    required this.phoneNumberHasError,
   });
 
   factory LoginState.empty() {
     return LoginState(
+      phoneNumberHasError: false,
       loginDataEntity: LoginDataEntity.empty(),
       loginStatus: LoginStatus.init,
       errorMessage: '',
@@ -27,6 +30,7 @@ class LoginState extends Equatable {
     loginDataEntity,
     loginStatus,
     errorMessage,
+    phoneNumberHasError
 
   ];
 
@@ -39,9 +43,11 @@ class LoginState extends Equatable {
     bool? rememberMe,
     String? countryCode,
     LoginType? loginType,
-    String ? fullPhoneNumber
+    String ? fullPhoneNumber,
+    bool? phoneNumberHasError
   }) {
     return LoginState(
+      phoneNumberHasError: phoneNumberHasError??this.phoneNumberHasError,
       loginDataEntity: loginDataEntity.copyWith(
         loginType: loginType??loginDataEntity.loginType,
         countryCode: countryCode??loginDataEntity.countryCode,

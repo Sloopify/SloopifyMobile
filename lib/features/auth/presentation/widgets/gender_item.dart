@@ -23,51 +23,31 @@ class GenderItem extends StatelessWidget {
     return InkWell(
       onTap: onSelect,
       child: Container(
-        width: 200,
-        height: 200,
+        alignment: Alignment.center,
+        width: 250,
+        height:  180,
         padding: EdgeInsets.all(AppPadding.p16),
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0,2 ),
+              color: ColorManager.black.withOpacity(0.25),
+              blurRadius: 4,
+              spreadRadius: 0
+            )
+          ],
           color:
-              selectedGender == Gender.none
-                  ? ColorManager.darkGray
-                  : selectedGender == gender
-                  ? ColorManager.primaryColor
-                  : ColorManager.white,
+             ColorManager.white,
           border: Border.all(
             color:
-                selectedGender != Gender.none
+                selectedGender==gender
                     ? ColorManager.primaryColor
-                    : Colors.transparent,
+                    : ColorManager.disActive.withOpacity(0.5),
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SvgPicture.asset(
-              gender == Gender.male ? AssetsManager.male : AssetsManager.female,
-              color:
-                  selectedGender == Gender.none
-                      ? ColorManager.disActive.withOpacity(0.5)
-                      : gender == selectedGender
-                      ? ColorManager.white
-                      : ColorManager.disActive.withOpacity(0.5),
-            ),
-            Text(
-              gender == Gender.male ? "Male" : "Female",
-              style: AppTheme.headline3.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-                color:
-                    selectedGender == Gender.none
-                        ? ColorManager.disActive.withOpacity(0.5)
-                        : selectedGender == gender
-                        ? ColorManager.white
-                        : ColorManager.disActive.withOpacity(0.5),
-              ),
-            ),
-          ],
+        child: SvgPicture.asset(
+          gender == Gender.male ? AssetsManager.male : AssetsManager.female,
         ),
       ),
     );

@@ -59,6 +59,8 @@ dependencies:
   video_player: ^2.9.5
   country_code_picker: ^3.3.0
   device_info_plus:
+  pull_to_refresh: ^2.0.0
+
 
 
 

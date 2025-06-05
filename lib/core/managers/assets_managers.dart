@@ -16,6 +16,8 @@ class AssetsManager{
   static const String otpCode = '${baseStartUpImagesURI}otp.png';
   static const String writeOtpCode = '${baseStartUpImagesURI}write_otp.png';
   static const String referredBy = '${baseStartUpImagesURI}referred_by.png';
+  static const String forgetPassword = '${baseStartUpImagesURI}forget_password.jpg';
+  static const String writeNewPassword = '${baseStartUpImagesURI}write_new_password.png';
 
   //////////*********auth*************///////////////
   static const String authIcons = '${baseIconsURI}auth/';

@@ -20,6 +20,7 @@ static const Color primaryShade4=Color(0xff0D9488);
 static const Color lightGrayShade1=Color(0xffECF0F1);
 static const Color textGray1=Color(0xff5D6778);
 static const Color textBlue=Color(0xff004182);
+static const Color gray600=Color(0xff475569);
 
   static final gradient = const LinearGradient(
     begin: Alignment.topCenter,

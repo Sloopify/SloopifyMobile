@@ -28,6 +28,10 @@ class LoginCubit extends Cubit<LoginState> {
     emit(state.copyWith(email: email, loginStatus: LoginStatus.init));
   }
 
+  setPhoneNumberValidator(bool value){
+    emit(state.copyWith(phoneNumberHasError: value,loginStatus: LoginStatus.init));
+  }
+
   void setPhoneNumber(String phoneNumber) {
     emit(
       state.copyWith(phoneNumber: phoneNumber, loginStatus: LoginStatus.init),
