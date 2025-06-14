@@ -7,21 +7,16 @@ import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_elevated_button.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_text_field.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/screens/post_audience_screen.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/select_frind_item.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
+import '../blocs/post_friends_cubit/post_freinds_cubit.dart';
 
 class FriendsList extends StatelessWidget {
-  final bool isFriendsExcept;
-  final bool isSpecificFriends;
-  final bool isMentionFriends;
+  static const routeName = "friends_list_post";
 
-  const FriendsList({
-    super.key,
-    this.isFriendsExcept = false,
-    this.isMentionFriends = false,
-    this.isSpecificFriends = false,
-  });
+  const FriendsList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +24,14 @@ class FriendsList extends StatelessWidget {
       appBar: getCustomAppBar(
         context: context,
         title:
-            isFriendsExcept
+            context
+                        .read<CreatePostCubit>()
+                        .state
+                        .regularPostEntity
+                        .postAudience ==
+                    PostAudience.friendsExcept
                 ? "Friends except"
-                : isSpecificFriends
-                ? "Specific friends"
-                : "Mention friends",
+                : "Specific friends",
       ),
       body: Stack(
         alignment: Alignment.bottomCenter,
@@ -44,7 +42,7 @@ class FriendsList extends StatelessWidget {
                 horizontal: AppPadding.p20,
                 vertical: AppPadding.p10,
               ),
-              child: BlocBuilder<CreatePostCubit, CreatePostState>(
+              child: BlocBuilder<PostFriendsCubit, PostFriendsState>(
                 builder: (context, state) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,20 +55,29 @@ class FriendsList extends StatelessWidget {
                               withTitle: false,
                               onChanged: (value) {
                                 context
-                                    .read<CreatePostCubit>()
-                                    .setSearchFriendNameField(value);
+                                    .read<PostFriendsCubit>()
+                                    .setSearchFriendName(value);
                               },
                             ),
                           ),
                           Gaps.hGap2,
                           SizedBox(
                             width: 70,
-                            height:50,
+                            height: 50,
                             child: CustomElevatedButton(
                               label: "Find",
-                              onPressed: () {},
-                              backgroundColor: ColorManager.primaryColor.withOpacity(0.3),
-                              borderSide: BorderSide(color: ColorManager.primaryColor.withOpacity(0.3)),
+                              onPressed: () {
+                                context
+                                    .read<PostFriendsCubit>()
+                                    .searchFriendsList();
+                              },
+                              backgroundColor: ColorManager.primaryColor
+                                  .withOpacity(0.3),
+                              borderSide: BorderSide(
+                                color: ColorManager.primaryColor.withOpacity(
+                                  0.3,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -79,31 +86,94 @@ class FriendsList extends StatelessWidget {
                       if (state.getAllFriendStatus ==
                           GetAllFriendStatus.loading) ...[
                         Center(child: CircularProgressIndicator()),
-                      ] else ...[
-                        if(isMentionFriends)
-                          ...[
-                            Text("Suggested friends",style: AppTheme.bodyText3.copyWith(fontWeight: FontWeight.bold),)
-                          ],
+                      ] else if (state.getAllFriendStatus ==
+                          GetAllFriendStatus.offline) ...[
+                        Center(
+                          child: Text(
+                            "you are offline",
+                            style: AppTheme.headline4,
+                          ),
+                        ),
+                      ] else if (state.getAllFriendStatus ==
+                          GetAllFriendStatus.error) ...[
+                        Center(
+                          child: Text(
+                            "some thing went error, please try again later!",
+                            style: AppTheme.headline4,
+                          ),
+                        ),
+                      ] else if (context
+                              .read<CreatePostCubit>()
+                              .state
+                              .regularPostEntity
+                              .postAudience ==
+                          PostAudience.specificFriends) ...[
                         Expanded(
                           child: ListView.separated(
                             itemCount: state.allFriends.length,
                             itemBuilder: (context, index) {
+                              bool isSelcetd = state.selectedSpecificFriends
+                                  .contains(state.allFriends[index].id);
                               return SelectFriendItem(
                                 friendEntity: state.allFriends[index],
                                 onChanged: (value) {
                                   context
-                                      .read<CreatePostCubit>()
-                                      .selectFriendEntity(
-                                        state.allFriends[index],
+                                      .read<PostFriendsCubit>()
+                                      .toggleSelectSpecificFriends(
+                                        state.allFriends[index].id,
                                       );
-                                  print(state.createPostEntity.friends.length);
+                                  context
+                                      .read<CreatePostCubit>()
+                                      .setSpecificFriends(
+                                        state.selectedSpecificFriends,
+                                      );
                                 },
-                                initValue: state.createPostEntity.friends
-                                    .contains(state.allFriends[index]),
+                                initValue: isSelcetd,
                               );
-                            }, separatorBuilder: (BuildContext context, int index) {
+                            },
+                            separatorBuilder: (
+                              BuildContext context,
+                              int index,
+                            ) {
                               return Gaps.vGap2;
-                          },
+                            },
+                          ),
+                        ),
+                      ] else if (context
+                              .read<CreatePostCubit>()
+                              .state
+                              .regularPostEntity
+                              .postAudience ==
+                          PostAudience.friendsExcept) ...[
+                        Expanded(
+                          child: ListView.separated(
+                            itemCount: state.allFriends.length,
+                            itemBuilder: (context, index) {
+                              bool isSelcetd = state.selectedFriendsExcept
+                                  .contains(state.allFriends[index].id);
+                              return SelectFriendItem(
+                                friendEntity: state.allFriends[index],
+                                onChanged: (value) {
+                                  context
+                                      .read<PostFriendsCubit>()
+                                      .toggleSelectFriendsExcept(
+                                        state.allFriends[index].id,
+                                      );
+                                  context
+                                      .read<CreatePostCubit>()
+                                      .setSpecificFriends(
+                                        state.selectedSpecificFriends,
+                                      );
+                                },
+                                initValue: isSelcetd,
+                              );
+                            },
+                            separatorBuilder: (
+                              BuildContext context,
+                              int index,
+                            ) {
+                              return Gaps.vGap2;
+                            },
                           ),
                         ),
                       ],
@@ -125,7 +195,9 @@ class FriendsList extends StatelessWidget {
                 label: "Done",
                 onPressed: () {},
                 width: MediaQuery.of(context).size.width * 0.7,
-                borderSide: BorderSide(color:ColorManager.primaryColor.withOpacity(0.3) ),
+                borderSide: BorderSide(
+                  color: ColorManager.primaryColor.withOpacity(0.3),
+                ),
                 backgroundColor: ColorManager.primaryColor.withOpacity(0.3),
               ),
             ),

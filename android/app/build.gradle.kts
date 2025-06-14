@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    id("com.google.gms.google-services")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -32,15 +33,29 @@ android {
         versionName = flutter.versionName
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+        signingConfigs {
+        create("release") {
+            storeFile =file("C:\\Users\\Nour-Alkhalel\\StudioProjects\\Sloopify_Mobile\\android\\sloopiy-release-key.jks")
+            storePassword= "sloopify"
+            keyAlias ="sloopify-key-alias"
+            keyPassword ="sloopify"
         }
     }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("debug")
+              signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
+
 }
 
 flutter {
     source = "../.."
+}
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
 }

@@ -4,7 +4,7 @@ import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_text_field.dart';
-import 'package:sloopify_mobile/features/create_posts/presentation/screens/craete_post_text.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/screens/create_post.dart';
 import 'package:super_tooltip/super_tooltip.dart';
 
 import '../../../../../core/managers/assets_managers.dart';
@@ -78,7 +78,7 @@ class _HomeSearchState extends State<HomeSearch> {
         ),
         Gaps.hGap1,
         InkWell(onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CreatePostText()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CreatePost()));
         }, child: SvgPicture.asset(AssetsManager.addImage)),
       ],
     );

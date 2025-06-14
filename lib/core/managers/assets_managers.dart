@@ -119,8 +119,28 @@ class AssetsManager{
   static const String specificFriend = '${baseCreatePostIcons}specific_friends.svg';
   static const String onlyMe = '${baseCreatePostIcons}only_me.svg';
   static const String albums = '${baseCreatePostIcons}albums.svg';
+  static const String activities = '${baseCreatePostIcons}activity.svg';
+  static const String changeBgColor = '${baseCreatePostIcons}change_bg_color.svg';
+  static const String addBgColor = '${baseCreatePostIcons}add_background_color.svg';
+  static const String location2 = '${baseCreatePostIcons}location2.svg';
+  static const String addNewLocation = '${baseCreatePostIcons}add_new_location.svg';
+  static const String swap = '${baseCreatePostIcons}swap.svg';
+  static const String editPhotos = '${baseCreatePostIcons}edit.svg';
+  static const String arrowBackFilled = '${baseCreatePostIcons}arrow_back_filled.svg';
+  static const String arrowForwardFilled = '${baseCreatePostIcons}arrow_forward_filled.svg';
+  static const String crop = '${baseCreatePostIcons}crop.svg';
+  static const String rotate = '${baseCreatePostIcons}rotate.svg';
+  static const String effects = '${baseCreatePostIcons}effects.svg';
+  static const String deleteImage = '${baseCreatePostIcons}delete_image.svg';
 
 
+  ////////////////***************create post images ********************
+
+
+
+  static const String baseCreatePostImages = '${baseImagesURI}create_post/';
+  static const String addNewPlace = '${baseCreatePostImages}add_location.png';
+  static const String currentLocation = '${baseCreatePostImages}current_location.png';
 
 
 }

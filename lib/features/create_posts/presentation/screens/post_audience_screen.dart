@@ -11,12 +11,13 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/freinds_list.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
+import '../blocs/post_friends_cubit/post_freinds_cubit.dart';
 
 enum PostAudience { public, friends, friendsExcept, specificFriends, onlyMe }
 
 class PostAudienceScreen extends StatelessWidget {
   const PostAudienceScreen({super.key});
-
+static const routeName="post_Audience_screen";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,33 +112,18 @@ Your default audience is set to Friends, but you can change the audience of this
                 ],
               ),
               value: audience,
-              groupValue: state.createPostEntity.postAudience,
-              selected: state.createPostEntity.postAudience == audience,
+              groupValue: state.regularPostEntity.postAudience,
+              selected: state.regularPostEntity.postAudience == audience,
               onChanged: (value) {
                 context.read<CreatePostCubit>().setPostAudience(value!);
-                if (audience == PostAudience.friendsExcept) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) {
-                        return BlocProvider.value(
-                          value:
-                              context.read<CreatePostCubit>()..getAllFriends(),
-                          child: FriendsList(isFriendsExcept: true),
-                        );
-                      },
-                    ),
-                  );
-                } else {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) {
-                        return BlocProvider.value(
-                          value:
-                              context.read<CreatePostCubit>()..getAllFriends(),
-                          child: FriendsList(isSpecificFriends: true),
-                        );
-                      },
-                    ),
+                if (audience == PostAudience.friendsExcept || audience==PostAudience.specificFriends) {
+                  Navigator.pushNamed(
+                    context,
+                    FriendsList.routeName,
+                    arguments: {
+                      "create_post_cubit": context.read<CreatePostCubit>(),
+                      "post_friends_cubit": context.read<PostFriendsCubit>()..getFriendsList(),
+                    },
                   );
                 }
               },

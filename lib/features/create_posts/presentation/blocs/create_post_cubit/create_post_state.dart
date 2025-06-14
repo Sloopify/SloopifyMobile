@@ -1,76 +1,111 @@
 part of 'create_post_cubit.dart';
 
 enum CreatePostStatus { init, loading, success, error, offline }
-enum GetAllFriendStatus { init, loading, success, error, offline }
+
 
 class CreatePostState extends Equatable {
-  final CreatePostEntity createPostEntity;
+  final RegularPostEntity regularPostEntity;
   final CreatePostStatus createPostStatus;
-  final List<FriendEntity> allFriends;
-  final String searchFriendName;
-  final GetAllFriendStatus getAllFriendStatus;
+  final bool showVerticalOption;
+  final List<AssetEntity> selectedMedia;
 
   CreatePostState({
     required this.createPostStatus,
-    required this.createPostEntity,
-    required this.allFriends,
-    required this.searchFriendName,
-    required this.getAllFriendStatus
+    required this.regularPostEntity,
+    required this.showVerticalOption,
+    required this.selectedMedia,
   });
 
   @override
   // TODO: implement props
-  List<Object?> get props => [createPostStatus, createPostEntity,allFriends,searchFriendName,getAllFriendStatus];
+  List<Object?> get props => [
+    createPostStatus,
+    regularPostEntity,
+    showVerticalOption,
+    selectedMedia,
+  ];
 
   factory CreatePostState.empty() {
     return CreatePostState(
-      getAllFriendStatus: GetAllFriendStatus.init,
-      searchFriendName: '',
-      allFriends: [],
+      showVerticalOption: true,
+      selectedMedia: [],
       createPostStatus: CreatePostStatus.init,
-      createPostEntity: CreatePostEntity.fromEmpty(),
+      regularPostEntity: RegularPostEntity.empty(),
     );
   }
 
   CreatePostState copyWith({
-    String? text,
-    String? feelings,
-    bool? is24Hours,
-    List<File>? images,
-    List<File>? videos,
-    List<FriendEntity>? friends,
-    List<FriendEntity>? mentions,
-    double? latitude,
-    double? longtitude,
-    List<String>? activities,
-    PostAudience?postAudience,
+    String? content,
+    bool? isBold,
+    bool? isItalic,
+    bool? isUnderLine,
+    String? color,
+    List<int>? friends,
+    int? placeId,
+    String? activity,
+    String? feeling,
+    List<String>? backGroundColor,
+    bool? disappears24h,
+    PostAudience? postAudience,
+    List<int>? friendsExcept,
+    List<int>? specificFriends,
     CreatePostStatus? createPostStatus,
-    List<FriendEntity>? allFriends,
+    List<UserEntity>? allFriends,
     String? searchFriendName,
-    GetAllFriendStatus? getAllFriendStatus,
-    AssetEntity? assetEntity
+    List<AssetEntity>? selectedMedia,
+    bool? showVerticalOption,
+    List<MediaEntity>? mediaFiles,
+
   }) {
     return CreatePostState(
-      getAllFriendStatus: getAllFriendStatus??this.getAllFriendStatus,
-      searchFriendName: searchFriendName??this.searchFriendName,
-      allFriends: allFriends??this.allFriends,
+      showVerticalOption: showVerticalOption ?? this.showVerticalOption,
+      selectedMedia: selectedMedia ?? this.selectedMedia,
       createPostStatus: createPostStatus ?? this.createPostStatus,
-      createPostEntity: createPostEntity.copyWith(
-        assetEntity: assetEntity??createPostEntity.assetEntity,
-        postAudience: postAudience??createPostEntity.postAudience,
-        text: text??createPostEntity.text,
-        activities: activities??createPostEntity.activities,
-        feelings: feelings??createPostEntity.feelings,
-        friends: friends??createPostEntity.friends,
-        images: images??createPostEntity.images,
-        is24Hours: is24Hours??createPostEntity.is24Hours,
-        latitude: latitude??createPostEntity.latitude,
-        longtitude: longtitude??createPostEntity.longtitude,
-        mentions: mentions??createPostEntity.mentions,
-        videos: videos??createPostEntity.videos,
-
-
+      regularPostEntity: regularPostEntity.copyWith(
+        color: color ?? regularPostEntity.textPropertyEntity.color,
+        isUnderLine:
+            isUnderLine ?? regularPostEntity.textPropertyEntity.isUnderLine,
+        isItalic: isItalic ?? regularPostEntity.textPropertyEntity.isItalic,
+        isBold: isBold ?? regularPostEntity.textPropertyEntity.isBold,
+        friends: friends ?? regularPostEntity.mention?.friends,
+        activity: activity ?? regularPostEntity.mention?.activity,
+        feeling: feeling ?? regularPostEntity.mention?.feeling,
+        placeId: placeId ?? regularPostEntity.mention?.placeId,
+        postAudience: postAudience ?? regularPostEntity.postAudience,
+        backGroundColor: backGroundColor ?? regularPostEntity.backGroundColor,
+        content: content ?? regularPostEntity.content,
+        disappears24h: disappears24h ?? regularPostEntity.disappears24h,
+        friendsExcept: friendsExcept ?? regularPostEntity.friendsExcept,
+        updatedMediaFiles: mediaFiles ?? regularPostEntity.mediaFiles,
+        specificFriends: specificFriends ?? regularPostEntity.specificFriends,
       ),
     );
+  }
+  CreatePostState copyWithEditedMedia({
+    required int index,
+    bool? isRotate,
+    double? rotateAngle,
+    bool? isFlipHorizontal,
+    bool? isFlipVertical,
+    String? filterName,
+    bool? autoPlay,
+    bool? applyToDownload,
+  }) {
+    if (index < 0 || index >= regularPostEntity.mediaFiles!.length) return this;
+
+    final updatedList = List<MediaEntity>.from(regularPostEntity.mediaFiles!);
+    final media = updatedList[index];
+
+    updatedList[index] = media.copyWith(
+      isRotate: isRotate ?? media.isRotate,
+      rotateAngle: rotateAngle ?? media.rotateAngle,
+      isFlipHorizontal: isFlipHorizontal ?? media.isFlipHorizontal,
+      isFlipVertical: isFlipVertical ?? media.isFlipVertical,
+      filterName: filterName ?? media.filterName,
+      autoPlay: autoPlay ?? media.autoPlay,
+      applyToDownload: applyToDownload ?? media.applyToDownload,
+    );
+
+    return copyWith(mediaFiles: updatedList);
   }
 }

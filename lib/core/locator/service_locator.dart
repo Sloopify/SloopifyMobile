@@ -26,12 +26,22 @@ import 'package:sloopify_mobile/features/auth/presentation/blocs/login_cubit/log
 import 'package:sloopify_mobile/features/auth/presentation/blocs/login_with_otp_code/login_with_otp_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/referred_by_cubit/referred_by_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/signup_cubit/sign_up_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/social_media_login/social_media_login_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/upload_photo_cubit/upload_photo_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/verify_account/verify_account_cubit.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/chat_bloc/chat_bloc.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/message_bloc/messages_bloc.dart';
+import 'package:sloopify_mobile/features/create_posts/data/create_post_data_provider/create_post_data_provider.dart';
+import 'package:sloopify_mobile/features/create_posts/data/create_post_repo/create_post_repo_impl.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/repositories/create_post_repo.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/use_cases/create_place_use_case.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/use_cases/get_all_user_places_use_case.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/use_cases/search_places.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/use_cases/update_place_use_caes.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
-import 'package:sloopify_mobile/features/create_posts/presentation/blocs/media_selection_cubit/media_selection_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
 import 'package:sloopify_mobile/features/posts/presentation/blocs/fetch_comments_bloc/fetch_comments_bloc.dart';
 
@@ -43,6 +53,15 @@ import '../../features/auth/domain/use_cases/register_otp_use_case.dart';
 import '../../features/auth/domain/use_cases/verify_code_forget_password_use_case.dart';
 import '../../features/auth/domain/use_cases/verify_otp_register_use_case.dart';
 import '../../features/auth/presentation/blocs/user_interets_cubit/user_interests_cubit.dart';
+import '../../features/create_posts/domain/use_cases/get_activities_by_categories_name.dart';
+import '../../features/create_posts/domain/use_cases/get_categories_activities.dart';
+import '../../features/create_posts/domain/use_cases/get_feelings_use_case.dart';
+import '../../features/create_posts/domain/use_cases/get_friends_list_use_case.dart';
+import '../../features/create_posts/domain/use_cases/get_user_place_by_id_use_case.dart';
+import '../../features/create_posts/domain/use_cases/search_activities_by_name_use_case.dart';
+import '../../features/create_posts/domain/use_cases/search_categories_activiries_by_name.dart';
+import '../../features/create_posts/domain/use_cases/search_feelings_use_case.dart';
+import '../../features/create_posts/domain/use_cases/search_friend_use_case.dart';
 import '../../features/posts/presentation/blocs/comment_reaction_cubit/comment_reactions_cubit.dart';
 import '../network/check_internet.dart';
 
@@ -83,8 +102,23 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => CommentFetchBloc());
   locator.registerFactory(() => MessagesBloc());
   locator.registerFactory(() => ChatBloc());
+  locator.registerFactory(
+    () => PostFriendsCubit(
+      getFriendsListUseCase: locator(),
+      searchFriendsListUseCase: locator(),
+    ),
+  );
   locator.registerFactory(() => CreatePostCubit());
-  locator.registerFactory(() => MediaSelectionCubit());
+  locator.registerFactory(
+    () => FeelingsActivitiesCubit(
+      getActivitiesByCategoriesName: locator(),
+      getCategoriesActivities: locator(),
+      getFeelingsUseCase: locator(),
+      searchActivitiesByNameUseCase: locator(),
+      searchCategoriesActivitiesByName: locator(),
+      searchFeelingsUseCase: locator(),
+    ),
+  );
   locator.registerFactory(
     () => AuthenticationBloc(
       authRepository: locator(),
@@ -106,6 +140,16 @@ Future<void> setupLocator() async {
   );
   locator.registerFactory(
     () => ReferredByCubit(completeReferredByUseCase: locator()),
+  );
+  locator.registerFactory(() => SocialMediaLoginCubit());
+  locator.registerFactory(
+    () => AddLocationCubit(
+      updatePlaceUseCase: locator(),
+      createPlaceUseCase:  locator(),
+      searchPlaces:  locator(),
+      getUserPlaceByIdUseCase:  locator(),
+      getAllUserPlacesUseCase:  locator(),
+    ),
   );
 
   ///
@@ -162,6 +206,43 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton(
     () => ChangePasswordUseCase(accountsRepo: locator()),
   );
+  locator.registerLazySingleton(
+    () => GetActivitiesByCategoriesName(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => GetCategoriesActivities(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => GetFeelingsUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => GetFriendsListUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => SearchActivitiesByNameUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => SearchCategoriesActivitiesByName(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => SearchFeelingsUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => SearchFriendsListUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => GetAllUserPlacesUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => GetUserPlaceByIdUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(() => SearchPlaces(createPostRepo: locator()));
+  locator.registerLazySingleton(
+    () => CreatePlaceUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+    () => UpdatePlaceUseCase(createPostRepo: locator()),
+  );
 
   ///
   ///Repositories
@@ -170,10 +251,16 @@ Future<void> setupLocator() async {
     () => AccountRepoImpl(accountsDataProvider: locator()),
   );
   locator.registerLazySingleton<AuthRepo>(() => AuthRepoImpl());
+  locator.registerLazySingleton<CreatePostRepo>(
+    () => CreatePostRepoImpl(createPostDataProvider: locator()),
+  );
 
   ////
   //////data source
   ////
+  locator.registerLazySingleton<CreatePostDataProvider>(
+    () => CreatePosDataProviderImpl(client: locator()),
+  );
   locator.registerLazySingleton<AccountsDataProvider>(
     () => AccountsDataProviderImpl(client: locator()),
   );

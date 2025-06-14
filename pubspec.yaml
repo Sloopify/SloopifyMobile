@@ -60,12 +60,10 @@ dependencies:
   country_code_picker: ^3.3.0
   device_info_plus:
   pull_to_refresh: ^2.0.0
-
-
-
-
-
-
+  firebase_core: ^3.13.1
+  firebase_messaging: ^15.2.6
+  google_sign_in: ^6.3.0
+  http: ^1.4.0
   comment_tree:
    path: lib/core/external_packages/comment_tree-master
   flutter_test:
@@ -90,6 +88,7 @@ flutter:
      - assets/images/
      - assets/images/start_up/
      - assets/images/home/
+     - assets/images/create_post/
      - assets/locales/
      - pubspec.yaml
 

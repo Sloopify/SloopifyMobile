@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "643489866555",
+    "project_id": "sloopify-e1e84",
+    "storage_bucket": "sloopify-e1e84.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643489866555:android:f91efa2e5b005505ea8d1e",
+        "android_client_info": {
+          "package_name": "com.example.sloopify_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtin86wyGG_uL4kXFhYok7LONiIQwZnUs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643489866555:android:42e665dec4cdf945ea8d1e",
+        "android_client_info": {
+          "package_name": "com.spinnerloop.sloopify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtin86wyGG_uL4kXFhYok7LONiIQwZnUs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

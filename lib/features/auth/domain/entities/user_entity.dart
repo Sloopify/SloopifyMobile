@@ -24,6 +24,8 @@ class UserEntity extends Equatable {
   final String lastLoginDate;
   final String creationDate;
   final String updatedAt;
+  final bool? isSpecificFriend;
+  final bool ? friendsExcept;
 
   const UserEntity({
     required this.firstName,
@@ -47,6 +49,8 @@ class UserEntity extends Equatable {
     required this.referralCode,
     required this.referralLink,
     required this.updatedAt,
+    this.friendsExcept,
+    this.isSpecificFriend
   });
 
   @override
@@ -74,5 +78,7 @@ class UserEntity extends Equatable {
     creationDate,
     referredBy,
     bio,
+    friendsExcept,
+    isSpecificFriend
   ];
 }

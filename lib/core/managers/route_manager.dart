@@ -12,6 +12,9 @@ import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_ot
 import 'package:sloopify_mobile/features/auth/presentation/screens/otp_code_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/verify_account_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/write_otp_code_screen.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
 import '../../features/app_wrapper/presentation/screens/app_wrapper.dart';
@@ -27,6 +30,17 @@ import '../../features/auth/presentation/screens/forget_password_screens/write_o
 import '../../features/auth/presentation/screens/signin_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
+import '../../features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
+import '../../features/create_posts/presentation/screens/activities_by_categories.dart';
+import '../../features/create_posts/presentation/screens/create_post.dart';
+import '../../features/create_posts/presentation/screens/create_album_screen.dart';
+import '../../features/create_posts/presentation/screens/feelings_activities_screen.dart';
+import '../../features/create_posts/presentation/screens/freinds_list.dart';
+import '../../features/create_posts/presentation/screens/mention_friends.dart';
+import '../../features/create_posts/presentation/screens/places/add_new_place.dart';
+import '../../features/create_posts/presentation/screens/places/all_user_places_screen.dart';
+import '../../features/create_posts/presentation/screens/places/location_map_screen.dart';
+import '../../features/create_posts/presentation/screens/post_audience_screen.dart';
 import '../../features/home/presentation/screens/home_navigation_screen.dart';
 import '../../features/start_up/presenation/screens/on_boarding_screen.dart';
 
@@ -136,9 +150,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) {
             return BlocProvider(
-              create: (context) =>
-              locator<InterestCubit>()
-                ..getAllCategories(),
+              create: (context) => locator<InterestCubit>()..getAllCategories(),
               child: UserInterests(),
             );
           },
@@ -176,6 +188,158 @@ class AppRouter {
             return ReferredDay();
           },
         );
+      case CreatePost.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return CreatePost();
+          },
+        );
+      case AlbumPhotosScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return BlocProvider.value(
+              value: arg["create_post_cubit"] as CreatePostCubit,
+              child: AlbumPhotosScreen(),
+            );
+          },
+        );
+      case PostAudienceScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+              ],
+              child: PostAudienceScreen(),
+            );
+          },
+        );
+      case FriendsList.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+              ],
+              child: FriendsList(),
+            );
+          },
+        );
+      case FeelingsActivitiesScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
+              ],
+              child: FeelingsActivitiesScreen(),
+            );
+          },
+        );
+      case ActivitiesByCategories.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                  arg["feelings_activities_cubit"]
+                  as FeelingsActivitiesCubit,
+                ),
+              ],
+              child: ActivitiesByCategories(name: arg["categoryName"],),
+            );
+
+          },
+        );
+      case MentionFriends.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+              ],
+              child: MentionFriends(),
+            );
+          },
+        );
+      case AllUserPlacesScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value: (arg["add_location_cubit"] as AddLocationCubit)..getAllUserPlaces(),
+                ),
+              ],
+              child: AllUserPlacesScreen(),
+            );
+          },
+        );
+      case AddNewPlace.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+              ],
+              child: AddNewPlace(),
+            );
+          },
+        );
+      case LocationMapScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+              ],
+              child: LocationMapScreen(),
+            );
+          },
+        );
       case HomeNavigationScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
@@ -190,8 +354,7 @@ class AppRouter {
   Route<dynamic> unDefinedRoute() {
     return MaterialPageRoute(
       builder:
-          (_) =>
-          Scaffold(
+          (_) => Scaffold(
             appBar: AppBar(title: Text('no_route'.tr())),
             body: Center(child: Text('no_route'.tr())),
           ),

@@ -10,6 +10,7 @@ import 'package:sloopify_mobile/features/auth/data/models/sign_up_data_model.dar
 import 'package:sloopify_mobile/features/auth/domain/entities/user_profile_entity.dart';
 
 import '../../../../core/errors/failures.dart';
+import '../../../../core/utils/device_info_api.dart';
 import '../models/interests_data_result_model.dart';
 import '../models/login_data_model.dart';
 import '../models/otp_data_model.dart';
@@ -51,9 +52,18 @@ abstract class AccountsDataProvider {
   Future<Unit> completeImage({required File image});
 
   Future<Unit> completeByReferredCode({required String code});
-  Future<Unit> requestSendOtpCodeForForgetPassword({required OtpDataModel otpDataModel});
-  Future<Unit> verifyOtpCodeForForgetPassword({required VerifyOtpDataModel verifyOtpModel});
-  Future<Unit> changePassword({required ForgetPasswordModel forgetPasswordModel});
+
+  Future<Unit> requestSendOtpCodeForForgetPassword({
+    required OtpDataModel otpDataModel,
+  });
+
+  Future<Unit> verifyOtpCodeForForgetPassword({
+    required VerifyOtpDataModel verifyOtpModel,
+  });
+
+  Future<Unit> changePassword({
+    required ForgetPasswordModel forgetPasswordModel,
+  });
 }
 
 class AccountsDataProviderImpl extends AccountsDataProvider {
@@ -118,10 +128,28 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
   Future<LoginModel> loginWithEmail({
     required LoginDataModel loginDataModel,
   }) async {
+    final resInfo = await getDeviceInfo();
+
+    if (resInfo.isLeft()) {
+      throw NetworkErrorFailure(message: "");
+    }
+
+    final deviceInfo = resInfo.getOrElse(() => throw NetworkErrorFailure(message: ""));
+    String deviceInfoModel = deviceInfo.$1;
+    String operationSystemVersion = deviceInfo.$2;
+    String deviceId = deviceInfo.$3;
+
     final res = await client.multipartRequest(
       url: ApiUrls.loginWithEmail,
       jsonBody: loginDataModel.toJson(),
+      headers: {
+        "App-Type": "mobile",
+        "Device-Model": deviceInfoModel,
+        "Platform": operationSystemVersion,
+        "Device-ID": deviceId,
+      },
     );
+
     if (res["success"] == true) {
       return LoginModel.fromJson(res["data"]);
     } else {
@@ -131,9 +159,25 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
 
   @override
   Future<Unit> loginWithOtp({required OtpDataModel otpDateModel}) async {
+    final resInfo = await getDeviceInfo();
+
+    if (resInfo.isLeft()) {
+      throw NetworkErrorFailure(message: "");
+    }
+
+    final deviceInfo = resInfo.getOrElse(() => throw NetworkErrorFailure(message: ""));
+    String deviceInfoModel = deviceInfo.$1;
+    String operationSystemVersion = deviceInfo.$2;
+    String deviceId = deviceInfo.$3;
     final res = await client.multipartRequest(
       url: ApiUrls.loginWithOtp,
       jsonBody: otpDateModel.toJson(),
+      headers: {
+        "App-Type": "mobile",
+        "Device-Model": deviceInfoModel,
+        "Platform": operationSystemVersion,
+        "Device-ID": deviceId,
+      },
     );
     if (res["success"] == true) {
       return unit;
@@ -158,10 +202,28 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
   Future<LoginModel> loginWithPhone({
     required LoginDataModel loginDataModel,
   }) async {
+    final resInfo = await getDeviceInfo();
+
+    if (resInfo.isLeft()) {
+      throw NetworkErrorFailure(message: "");
+    }
+
+    final deviceInfo = resInfo.getOrElse(() => throw NetworkErrorFailure(message: ""));
+    String deviceInfoModel = deviceInfo.$1;
+    String operationSystemVersion = deviceInfo.$2;
+    String deviceId = deviceInfo.$3;
     final res = await client.multipartRequest(
       url: ApiUrls.loginWithPhone,
       jsonBody: loginDataModel.toJson(),
+      headers: {
+        "App-Type": "mobile",
+        "Device-Model": deviceInfoModel,
+        "Platform": operationSystemVersion,
+        "Device-ID": deviceId,
+      },
+
     );
+
     if (res["success"] == true) {
       return LoginModel.fromJson(res["data"]);
     } else {
@@ -185,9 +247,25 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
   Future<LoginModel> verifyLoginWithOtp({
     required VerifyOtpDataModel verifyOtpDataModel,
   }) async {
+    final resInfo = await getDeviceInfo();
+
+    if (resInfo.isLeft()) {
+      throw NetworkErrorFailure(message: "");
+    }
+
+    final deviceInfo = resInfo.getOrElse(() => throw NetworkErrorFailure(message: ""));
+    String deviceInfoModel = deviceInfo.$1;
+    String operationSystemVersion = deviceInfo.$2;
+    String deviceId = deviceInfo.$3;
     final res = await client.multipartRequest(
       url: ApiUrls.verifyLoginWithOtp,
       jsonBody: verifyOtpDataModel.toJson(),
+      headers: {
+        "App-Type": "mobile",
+        "Device-Model": deviceInfoModel,
+        "Platform": operationSystemVersion,
+        "Device-ID": deviceId,
+      },
     );
     if (res["success"] == true) {
       return LoginModel.fromJson(res["data"]);
@@ -296,9 +374,7 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
 
   @override
   Future<Unit> completeImage({required File image}) async {
-    final body = {
-      'image': await MultipartFile.fromFile(image.path),
-    };
+    final body = {'image': await MultipartFile.fromFile(image.path)};
 
     final res = await client.uploadFiles(
       url: ApiUrls.completeImage,
@@ -312,7 +388,9 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
   }
 
   @override
-  Future<Unit> changePassword({required ForgetPasswordModel forgetPasswordModel}) async {
+  Future<Unit> changePassword({
+    required ForgetPasswordModel forgetPasswordModel,
+  }) async {
     final res = await client.multipartRequest(
       url: ApiUrls.changePassword,
       jsonBody: forgetPasswordModel.toJson(),
@@ -325,7 +403,9 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
   }
 
   @override
-  Future<Unit> requestSendOtpCodeForForgetPassword({required OtpDataModel otpDataModel}) async {
+  Future<Unit> requestSendOtpCodeForForgetPassword({
+    required OtpDataModel otpDataModel,
+  }) async {
     final res = await client.multipartRequest(
       url: ApiUrls.requestCodeForForgetPassword,
       jsonBody: otpDataModel.toJson(),
@@ -338,7 +418,9 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
   }
 
   @override
-  Future<Unit> verifyOtpCodeForForgetPassword({required VerifyOtpDataModel verifyOtpModel}) async {
+  Future<Unit> verifyOtpCodeForForgetPassword({
+    required VerifyOtpDataModel verifyOtpModel,
+  }) async {
     final res = await client.multipartRequest(
       url: ApiUrls.verifyCodeForForgetPassword,
       jsonBody: verifyOtpModel.toJson(),
@@ -349,4 +431,11 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
       throw NetworkErrorFailure(message: res['message']);
     }
   }
+}
+
+Future<Either<Failure, (String, String, String)>> getDeviceInfo() async {
+  String? deviceModelInfo = await DeviceInfoApi.getDeviceInfo();
+  String? deviceId = await DeviceInfoApi.getDeviceId();
+  String? operationSystem = await DeviceInfoApi.getOperatingSystem();
+  return Right(('$deviceModelInfo', operationSystem, "$deviceId"));
 }

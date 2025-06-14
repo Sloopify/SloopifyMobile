@@ -7,8 +7,10 @@ class DeviceInfoApi {
   static final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
 
 //android or ios
-  static String getOperatingSystem(){
-    return '${Platform.operatingSystem}';
+  static Future<String> getOperatingSystem() async {
+    final info = await _deviceInfo.androidInfo;
+
+    return '${Platform.operatingSystem} ${info.version.sdkInt}';
   }
 
 

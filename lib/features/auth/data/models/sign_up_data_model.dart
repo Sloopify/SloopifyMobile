@@ -1,12 +1,8 @@
 import 'package:sloopify_mobile/features/auth/domain/entities/signup_data_entity.dart';
 
 class SignUpDataModel extends SignupDataEntity {
-  final String deviceId;
-  final String deviceType;
 
   const SignUpDataModel({
-    required this.deviceId,
-    required this.deviceType,
     required super.firstName,
     required super.lastName,
     required super.email,
@@ -24,8 +20,6 @@ class SignUpDataModel extends SignupDataEntity {
       "email": email,
       "password": password,
       "phone": fullPhoneNumber,
-      if(deviceId.isNotEmpty) "deviceId": deviceId,
-      if(deviceType.isNotEmpty) "deviceType": deviceType,
     };
   }
 }

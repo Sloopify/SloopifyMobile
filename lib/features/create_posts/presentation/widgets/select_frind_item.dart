@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
-import 'package:sloopify_mobile/features/posts/domain/entities/frined_entity.dart';
+import 'package:sloopify_mobile/features/auth/domain/entities/user_entity.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
-import '../../../../core/managers/assets_managers.dart';
 import '../../../../core/managers/color_manager.dart';
 import '../../../../core/ui/widgets/general_image.dart';
 
 class SelectFriendItem extends StatefulWidget {
-  final FriendEntity friendEntity;
+  final UserEntity friendEntity;
   final Function onChanged;
   final bool initValue;
 
@@ -38,8 +37,8 @@ class _SelectFriendItemState extends State<SelectFriendItem> {
     return Row(
       children: [
         GeneralImage.circular(
-          isNetworkImage: false,
-          image: widget.friendEntity.profileImge,
+          isNetworkImage: true,
+          image: widget.friendEntity.image,
           radius: 50,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -47,7 +46,7 @@ class _SelectFriendItemState extends State<SelectFriendItem> {
           ),
         ),
         Gaps.hGap2,
-        Text(widget.friendEntity.name, style: AppTheme.headline4),
+        Text("${widget.friendEntity.firstName} ${widget.friendEntity.lastName}", style: AppTheme.headline4),
         Spacer(),
         SizedBox(
           width: 18,

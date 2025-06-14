@@ -192,6 +192,7 @@ class SignInScreen extends StatelessWidget {
                             ),
                           ] else ...[
                             CustomTextField(
+                              initialValue: state.loginDataEntity.email,
                               labelText: 'email'.tr(),
                               onChanged: (value) {
                                 context.read<LoginCubit>().setEmail(value);
@@ -253,7 +254,7 @@ class SignInScreen extends StatelessWidget {
                                       },
                               width: MediaQuery.of(context).size.width * 0.7,
                               backgroundColor: ColorManager.primaryColor,
-                              padding: EdgeInsets.symmetric(vertical: 4),
+                              padding: EdgeInsets.symmetric(vertical: 8),
                             ),
                           ),
                           Gaps.vGap2,

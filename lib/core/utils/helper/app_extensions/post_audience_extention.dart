@@ -47,18 +47,18 @@ extension PostAudienceExtention on PostAudience {
     }
 
   }
-  int getValueForApi() {
+  String getValueForApi() {
     switch (this) {
       case PostAudience.public:
-        return PostAudience.public.index;
+        return "public";
       case PostAudience.friends:
-        return PostAudience.friends.index;
+        return "friends";
       case PostAudience.friendsExcept:
-        return PostAudience.friendsExcept.index;
+        return "friend_except";
       case PostAudience.specificFriends:
-        return PostAudience.specificFriends.index;
+        return "specific_friends";
       case PostAudience.onlyMe:
-        return PostAudience.onlyMe.index;
+        return "only_me";
     }
   }
 }

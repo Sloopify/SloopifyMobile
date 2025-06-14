@@ -27,33 +27,38 @@ class UserModel extends UserEntity {
     required super.referralCode,
     required super.referralLink,
     required super.updatedAt,
+    super.friendsExcept,
+    super.isSpecificFriend,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json){
+  factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-        firstName: json["first_name"]??"",
-        lastName: json["last_name"]??"",
-        gender: json["gender"]=="female"?Gender.female:Gender.male,
-        phoneNumberEntity: PhoneNumberModel.fromJson(json["phone"]),
-        email: json["email"]??"",
-        image: json["image"]??"",
-        city: json["city"]??"",
-        id: json["id"]??0,
-        status: json["status"]??"",
-        creationDate: json["created_at"]??"",
-        referredBy: json["reffered_by"]??"",
-        bio: json["bio"]??"",
-        country: json["country"]??"",
-        age: json["age"]??0.0,
-        birthDate: json["birthday"]??"",
-        emailVerified: json["email_verified"]??false,
-        lastLoginDate: json["last_login_at"]??"",
-        provider: json["provider"]??"",
-        referralCode: json["referral_code"]??"",
-        referralLink: json["referral_link"]??"",
-        updatedAt: json["updated_at"]??""
+      firstName: json["first_name"] ?? "",
+      lastName: json["last_name"] ?? "",
+      gender: json["gender"] == "female" ? Gender.female : Gender.male,
+      phoneNumberEntity: PhoneNumberModel.fromJson(json["phone"]),
+      email: json["email"] ?? "",
+      image: json["image"] ?? "",
+      city: json["city"] ?? "",
+      id: json["id"] ?? 0,
+      status: json["status"] ?? "",
+      creationDate: json["created_at"] ?? "",
+      referredBy: json["reffered_by"] ?? "",
+      bio: json["bio"] ?? "",
+      country: json["country"] ?? "",
+      age: json["age"] ?? 0.0,
+      birthDate: json["birthday"] ?? "",
+      emailVerified: json["email_verified"] ?? false,
+      lastLoginDate: json["last_login_at"] ?? "",
+      provider: json["provider"] ?? "",
+      referralCode: json["referral_code"] ?? "",
+      referralLink: json["referral_link"] ?? "",
+      updatedAt: json["updated_at"] ?? "",
+      friendsExcept: json["is_friend_except"],
+      isSpecificFriend: json["is_specific_friend"],
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       "first_name": firstName,
@@ -77,6 +82,7 @@ class UserModel extends UserEntity {
       "referral_code": referralCode,
       "referral_link": referralLink,
       "updated_at": updatedAt,
+
     };
   }
 

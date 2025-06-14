@@ -67,6 +67,7 @@ class NetworkServiceDio implements BaseApiService {
     print('API $url');
     Dio _dio = await dio;
     print("BODY $jsonBody");
+    print("Headers $headers");
 
     try {
       var response = await _dio.get(
@@ -76,6 +77,7 @@ class NetworkServiceDio implements BaseApiService {
       );
       if (headers != null) {
         _dio.options.headers = headers;
+        print('Headers${headers}');
       }
       if (response.headers.value("Authorization") != null) {
         await PreferenceUtils.setString(SharedPrefsKey.accessToken,
@@ -123,6 +125,8 @@ class NetworkServiceDio implements BaseApiService {
       }
       if (headers != null) {
         _dio.options.headers = headers;
+        print('Headers${headers}');
+
       }
       final response = await _dio.post(
         url,

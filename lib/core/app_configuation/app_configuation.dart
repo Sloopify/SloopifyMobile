@@ -17,12 +17,6 @@ class AppConfiguration{
     WidgetsFlutterBinding.ensureInitialized();
     await EasyLocalization.ensureInitialized();
     await PreferenceUtils.init();
-
-    final dir =await getApplicationDocumentsDirectory();
-    Hive.init(dir.path);
-    await Hive.initFlutter();
-    Hive.registerAdapter(AlbumModelAdapter());
-    await Hive.openBox<AlbumModel>('albums');
     await sl.setupLocator();
     HttpOverrides.global = MyHttpOverrides();
   // await getAppVersion();

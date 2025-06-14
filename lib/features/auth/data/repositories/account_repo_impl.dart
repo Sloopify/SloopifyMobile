@@ -115,39 +115,23 @@ class AccountRepoImpl extends AccountRepo {
   Future<Either<Failure, Unit>> signup({
     required SignupDataEntity signupDataEntity,
   }) async {
-    String operationSystem = '';
-    String deviceId = '';
-    final res = await getDeviceInfo();
-    return await res.fold(
-      (f) {
-        return Left(f);
-      },
-      (res) async {
-        operationSystem += res.$1;
-        deviceId += res.$2;
-        SignUpDataModel signupDataModel = SignUpDataModel(
-          fullPhoneNumber: signupDataEntity.fullPhoneNumber,
-          password: signupDataEntity.password,
-          confirmPassword: signupDataEntity.confirmPassword,
-          isCheckedTerms: signupDataEntity.isCheckedTerms,
-          email: signupDataEntity.email,
-          mobileNumber: signupDataEntity.mobileNumber,
-          countryCode: signupDataEntity.countryCode,
-          deviceId: deviceId,
-          deviceType: operationSystem,
-          firstName: signupDataEntity.firstName,
-          lastName: signupDataEntity.lastName,
-        );
-        final data = await BaseRepo.repoRequest(
-          request: () async {
-            return await accountsDataProvider.signup(
-              signupData: signupDataModel,
-            );
-          },
-        );
-        return data.fold((f) => Left(f), (data) => Right(data));
+    SignUpDataModel signupDataModel = SignUpDataModel(
+      fullPhoneNumber: signupDataEntity.fullPhoneNumber,
+      password: signupDataEntity.password,
+      confirmPassword: signupDataEntity.confirmPassword,
+      isCheckedTerms: signupDataEntity.isCheckedTerms,
+      email: signupDataEntity.email,
+      mobileNumber: signupDataEntity.mobileNumber,
+      countryCode: signupDataEntity.countryCode,
+      firstName: signupDataEntity.firstName,
+      lastName: signupDataEntity.lastName,
+    );
+    final data = await BaseRepo.repoRequest(
+      request: () async {
+        return await accountsDataProvider.signup(signupData: signupDataModel);
       },
     );
+    return data.fold((f) => Left(f), (data) => Right(data));
   }
 
   @override
@@ -188,12 +172,6 @@ class AccountRepoImpl extends AccountRepo {
       },
     );
     return data.fold((f) => Left(f), (data) => Right(data));
-  }
-
-  Future<Either<Failure, (String, String)>> getDeviceInfo() async {
-    String? operatingSystem = DeviceInfoApi.getOperatingSystem();
-    String? deviceId = await DeviceInfoApi.getDeviceId();
-    return Right((operatingSystem, '$deviceId'));
   }
 
   @override

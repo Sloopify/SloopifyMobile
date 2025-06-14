@@ -1,25 +1,39 @@
 import 'package:delta_to_html/delta_to_html.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_delta_from_html/parser/html_to_delta.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/entities/text_entity.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 
 import '../../managers/app_dimentions.dart';
+import '../../managers/assets_managers.dart';
 import '../../managers/color_manager.dart';
 
+class GradientBackground {
+  final Color startColor;
+  final Color endColor;
+
+  GradientBackground(this.startColor, this.endColor);
+}
+
 class TextEditorWidget extends StatefulWidget {
-  const TextEditorWidget({
+  TextEditorWidget({
     super.key,
     required this.hint,
     required this.initialValue,
     required this.onChanged,
+    required this.onChangedText,
   });
 
   final String hint;
   final String initialValue;
   final Function onChanged;
+  final Function onChangedText;
 
   @override
   State<TextEditorWidget> createState() => _TextEditorWidgetState();
@@ -27,7 +41,15 @@ class TextEditorWidget extends StatefulWidget {
 
 class _TextEditorWidgetState extends State<TextEditorWidget> {
   late final QuillController _controller;
-
+  GradientBackground? _selectedGradient;
+  bool _showGradientPicker = false;
+  final List<GradientBackground> gradients = [
+    GradientBackground(Colors.red, Colors.orange),
+    GradientBackground(Colors.blue, Colors.purple),
+    GradientBackground(Colors.green, Colors.teal),
+    GradientBackground(Colors.pink, Colors.deepOrange),
+    GradientBackground(Colors.indigo, Colors.cyan),
+  ];
   @override
   void dispose() {
     _controller.dispose();
@@ -46,9 +68,36 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
       );
     }
     _controller.document.changes.listen((event) {
-      var text = _controller.document.toDelta().toJson();
+      final delta = _controller.document.toDelta();
 
-      widget.onChanged(DeltaToHTML.encodeJson(text));
+      final plainText = _controller.document.toPlainText().trim();
+
+      widget.onChangedText(plainText);
+
+      bool hasBold = false;
+      bool hasItalic = false;
+      bool hasUnderline = false;
+      String? color;
+
+      for (final op in delta.toList()) {
+        final attrs = op.attributes;
+        if (attrs != null) {
+          print(attrs.keys);
+          if (attrs.containsKey('bold')) hasBold = true;
+          if (attrs.containsKey('italic')) hasItalic = true;
+          if (attrs.containsKey('underline')) hasUnderline = true;
+          if (attrs.containsKey('color')) color = attrs['color'];
+        }
+      }
+
+      widget.onChanged(
+        TextPropertyEntity(
+          isUnderLine: hasUnderline,
+          isItalic: hasItalic,
+          isBold: hasBold,
+          color: color,
+        ),
+      );
     });
     super.initState();
   }
@@ -63,6 +112,15 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
           padding: EdgeInsetsDirectional.all(AppPadding.p4),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
+            gradient:
+                _selectedGradient != null
+                    ? LinearGradient(
+                      colors: [
+                        _selectedGradient!.startColor,
+                        _selectedGradient!.endColor,
+                      ],
+                    )
+                    : null,
             border: Border.all(
               color: ColorManager.disActive.withOpacity(0.2),
               width: AppSize.s2,
@@ -97,6 +155,87 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
         ),
         QuillToolbar.simple(
           configurations: QuillSimpleToolbarConfigurations(
+            // customButtons: [
+            //   QuillToolbarCustomButtonOptions(
+            //     childBuilder: (_, _) {
+            //       return Row(
+            //         mainAxisSize: MainAxisSize.min,
+            //         children: [
+            //           GestureDetector(
+            //             onTap: () {
+            //               setState(
+            //                 () => _showGradientPicker = !_showGradientPicker,
+            //               );
+            //               context.read<CreatePostCubit>().setVerticalHorizontalOption(false);
+            //
+            //             },
+            //             child:
+            //                 _showGradientPicker
+            //                     ? Container(
+            //                       padding: const EdgeInsets.all(6),
+            //                       width: 35,
+            //                       height: 35,
+            //                       decoration: BoxDecoration(
+            //                         gradient:
+            //                             _selectedGradient != null
+            //                                 ? LinearGradient(
+            //                                   colors: [
+            //                                     _selectedGradient!.startColor,
+            //                                     _selectedGradient!.endColor,
+            //                                   ],
+            //                                 )
+            //                                 : null,
+            //                         borderRadius: BorderRadius.circular(10),
+            //                       ),
+            //                     )
+            //                     : SvgPicture.asset(
+            //                       _showGradientPicker
+            //                           ? AssetsManager.addBgColor
+            //                           : AssetsManager.changeBgColor,
+            //                     ),
+            //           ),
+            //           if (_showGradientPicker)
+            //             Row(
+            //               children: [
+            //                 const SizedBox(width: 8),
+            //                 ...gradients.map(
+            //                   (gradient) => GestureDetector(
+            //                     onTap: () {
+            //                       setState(() {
+            //                         _selectedGradient = gradient;
+            //                         _showGradientPicker = false;
+            //                         context
+            //                             .read<CreatePostCubit>()
+            //                             .setBackGroundGradiant(gradient);
+            //
+            //                       });
+            //                     },
+            //                     child: Container(
+            //                       margin: const EdgeInsets.symmetric(
+            //                         horizontal: 4,
+            //                       ),
+            //                       width: 35,
+            //                       height: 35,
+            //                       decoration: BoxDecoration(
+            //                         gradient: LinearGradient(
+            //                           colors: [
+            //                             gradient.startColor,
+            //                             gradient.endColor,
+            //                           ],
+            //                         ),
+            //                         borderRadius: BorderRadius.circular(10),
+            //                         border: Border.all(color: Colors.black26),
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ],
+            //             ),
+            //         ],
+            //       );
+            //     },
+            //   ),
+            // ],
             buttonOptions: QuillSimpleToolbarButtonOptions(
               base: QuillToolbarColorButtonOptions(
                 iconTheme: QuillIconTheme(

@@ -23,6 +23,23 @@ static const String verifyCodeForForgetPassword="auth/forgot-password/verify-otp
 static const String changePassword="auth/forgot-password/reset-password";
 
 
+////////////////////***************create post apis***************** ///////////////////////////
+  static const String getFriends="post/get-friends";
+  static const String searchFriends="post/search-friends";
+  static const String searchActivityByName="post/search-activity";
+  static const String searchActivityCategoryByName="post/search-activity-by-category";
+  static const String searchFeelingName="post/search-feeling";
+  static const String getActivityByCategoryName="post/get-activity-by-category-name";
+  static const String getCategoriesActivities="post/get-activity-category";
+  static const String getFeelings="post/get-feeling";
+  static const String getPlaces="post/get-user-places";
+  static const String getPlaceById="post/get-user-place-by-id";
+  static const String searchPlaces="post/search-user-places";
+  static const String createPlace="post/create-user-place";
+  static const String updatePlace="post/update-user-place";
+
+
+
 
 
 

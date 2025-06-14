@@ -16,7 +16,8 @@ PreferredSizeWidget getCustomAppBar({
   Color arrowBackColor = Colors.black,
   bool centerTitle=false,
   final Function()? onArrowBack,
-  final List<Widget>? actions
+  final List<Widget>? actions,
+  PreferredSize ?bottom,
 }) {
   final _popupMenu = GlobalKey<PopupMenuButtonState>();
   return AppBar(
@@ -53,5 +54,6 @@ PreferredSizeWidget getCustomAppBar({
       textAlign: TextAlign.right,
       textDirection: TextDirection.rtl,
     ),
+    bottom: bottom,
   );
 }
