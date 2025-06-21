@@ -37,6 +37,7 @@ static const String changePassword="auth/forgot-password/reset-password";
   static const String searchPlaces="post/search-user-places";
   static const String createPlace="post/create-user-place";
   static const String updatePlace="post/update-user-place";
+  static const String createPost="post/create-post";
 
 
 

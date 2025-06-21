@@ -47,17 +47,14 @@ class RegularPostEntity extends PostEntity {
     List<int>? specificFriends,
     List<MediaEntity>? updatedMediaFiles,
 
-
   }) {
-
-
     return RegularPostEntity(
       specificFriends: specificFriends ?? this.specificFriends,
       postAudience: postAudience ?? this.postAudience,
       backGroundColor: backGroundColor ?? this.backGroundColor,
       friendsExcept: friendsExcept ?? this.friendsExcept,
       mediaFiles: updatedMediaFiles ?? mediaFiles,
-      mention: mention?.copyWith(
+      mention:mention?.copyWith(
         placeId: placeId ?? mention?.placeId,
         feeling: feeling ?? mention?.feeling,
         activity: activity ?? mention?.activity,
@@ -80,7 +77,7 @@ class RegularPostEntity extends PostEntity {
         content: "",
         textPropertyEntity: TextPropertyEntity.empty(),
         specificFriends: null,
-        mention: null,
+        mention: MentionEntity(),
         mediaFiles: null,
         friendsExcept: null,
         backGroundColor: null,
@@ -88,19 +85,39 @@ class RegularPostEntity extends PostEntity {
   }
 
   @override
-  Map<String, dynamic> toJson() =>
-      {
-        'type': 'regular',
-        'content': content,
-        'privacy': postAudience.getValueForApi(),
-        'disappears_24h': disappears24h,
-        if (backGroundColor != null) 'background_color': backGroundColor,
-        'text_properties': textPropertyEntity.toJson(),
-        if (mention != null) 'mentions': mention!.toJson(),
-        if (friendsExcept != null) 'friend_except': friendsExcept,
-        if (specificFriends != null) 'specific_friends': specificFriends,
-        if(mediaFiles!=null) "media": mediaFiles!.map((e)=>e.toJson()).toList(),
-      };
+  Future<Map<String, dynamic>> toJson() async {
+    final Map<String, dynamic> data = {
+      'type': 'regular',
+      'content': content,
+      'privacy': postAudience.getValueForApi(),
+      'disappears_24h': mediaFiles!=null && mediaFiles!.isNotEmpty? boolToInt(disappears24h): disappears24h,
+      'text_properties': textPropertyEntity.toJson(withMedia: mediaFiles!=null && mediaFiles!.isNotEmpty),
+    };
 
+    if (backGroundColor != null) {
+      data['background_color'] = backGroundColor;
+    }
+
+    if (mention != null) {
+      data['mentions'] = mention!.toJson();
+    }
+
+    if (friendsExcept != null) {
+      data['friend_except'] = friendsExcept;
+    }
+
+    if (specificFriends != null) {
+      data['specific_friends'] = specificFriends;
+    }
+
+    if (mediaFiles != null) {
+      // Wait for all media files to be converted to JSON
+      final mediaList = await Future.wait(mediaFiles!.map((e) => e.toJson()));
+      data['media'] = mediaList;
+    }
+
+    return data;
+  }
+  int boolToInt(bool? value) => (value ?? false) ? 1 : 0;
 
 }

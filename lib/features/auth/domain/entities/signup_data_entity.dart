@@ -64,10 +64,9 @@ class SignupDataEntity extends Equatable {
     return SignupDataEntity(
       firstName: firstName ?? this.firstName,
       fullPhoneNumber: fullPhoneNumber ?? this.fullPhoneNumber,
-
       countryCode: countryCode ?? this.countryCode,
       mobileNumber: mobileNumber ?? this.mobileNumber,
-      lastName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
       email: email ?? this.email,
       password: password ?? this.password,
       confirmPassword: confirmPassword ?? this.confirmPassword,

@@ -42,12 +42,13 @@ class TextPropertyEntity extends Equatable {
     );
   }
 
-  toJson() {
+  toJson({bool withMedia=false}) {
     return {
-      "bold": isBold,
-      "italic": isItalic,
-      "underline": isUnderLine,
-      if (color != null) "color": color,
+      "bold": withMedia? boolToInt(isBold): isBold,
+      "italic":withMedia? boolToInt(isItalic):isItalic ,
+      "underline": withMedia? boolToInt(isUnderLine):isUnderLine,
+      if (color != null && color!.isNotEmpty && color!="#null") "color": color,
     };
   }
+  int boolToInt(bool? value) => (value ?? false) ? 1 : 0;
 }

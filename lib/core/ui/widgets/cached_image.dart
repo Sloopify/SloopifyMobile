@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 
 import 'shimmer_widget.dart';
 
@@ -26,12 +27,11 @@ class CachedImage extends StatelessWidget {
             height: height??100,
             width: width??100,
           ),
-      errorWidget: (context, url, error) => SizedBox(
+      errorWidget: (context, url, error) => Container(
+        padding: EdgeInsets.all(AppPadding.p8),
         width: width,
         height: height,
-        child: const Icon(
-          Icons.error,
-        ),
+        child: placeholder
       ),
       imageUrl: imageUrl ?? '',
       fit: fit ?? BoxFit.cover,

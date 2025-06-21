@@ -14,13 +14,19 @@ class PersonalOccasionPost extends PostEntity {
   }):super(postType: PostType.personalOccasion);
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      "type": "personal_occasion",
-      "privacy": postAudience.getValueForApi(),
-      if (specificFriends != null) "specific_friends": specificFriends,
-      if (friendsExcept != null) "friend_except": friendsExcept,
-      "occasion": personalOccasion.toJson(),
-    };
+  Future<Map<String, dynamic>> toJson() {
+    // TODO: implement toJson
+    throw UnimplementedError();
   }
+
+  // @override
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     "type": "personal_occasion",
+  //     "privacy": postAudience.getValueForApi(),
+  //     if (specificFriends != null) "specific_friends": specificFriends,
+  //     if (friendsExcept != null) "friend_except": friendsExcept,
+  //     "occasion": personalOccasion.toJson(),
+  //   };
+  // }
 }

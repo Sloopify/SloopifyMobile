@@ -23,6 +23,7 @@ abstract class BaseApiService {
     String? cookieName,
     String? filesAttributeName,
     List<File>? files,
+    bool isContainsMedia=false
   });
 
   Future<dynamic> deleteRequest({required String url});

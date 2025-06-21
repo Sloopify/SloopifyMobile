@@ -9,7 +9,7 @@ abstract class PostEntity{
 
   PostEntity({required this.postAudience,required this.postType,this.specificFriends,this.friendsExcept});
 
-  Map<String,dynamic> toJson();
+ Future <Map<String,dynamic>> toJson();
 
 
 }

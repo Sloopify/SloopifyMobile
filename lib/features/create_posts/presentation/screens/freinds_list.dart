@@ -193,7 +193,7 @@ class FriendsList extends StatelessWidget {
               color: ColorManager.white,
               child: CustomElevatedButton(
                 label: "Done",
-                onPressed: () {},
+                onPressed: () =>Navigator.of(context).pop(),
                 width: MediaQuery.of(context).size.width * 0.7,
                 borderSide: BorderSide(
                   color: ColorManager.primaryColor.withOpacity(0.3),

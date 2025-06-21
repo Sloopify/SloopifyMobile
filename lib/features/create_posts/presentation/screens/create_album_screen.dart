@@ -7,6 +7,7 @@ import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'dart:typed_data';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_media_cubit/edit_media_cubit.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/ui/widgets/custom_elevated_button.dart';
@@ -22,6 +23,7 @@ class AlbumPhotosScreen extends StatefulWidget {
 
 class _AlbumPhotosScreenState extends State<AlbumPhotosScreen> {
   final List<AssetEntity> _media = [];
+  final List<AssetEntity> _selectedOrdered = [];
   final ScrollController _scrollController = ScrollController();
   final List<AssetPathEntity> _albums = [];
   AssetPathEntity? _selectedAlbum;
@@ -137,10 +139,21 @@ class _AlbumPhotosScreenState extends State<AlbumPhotosScreen> {
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: ColorManager.primaryColor,width: 2),
+                      border: Border.all(
+                        color: ColorManager.primaryColor,
+                        width: 2,
+                      ),
                     ),
                     child: Text(
-                      (context.read<CreatePostCubit>().state.selectedMedia.indexOf(asset)+1).toString(),
+                      isSelected
+                          ? (context
+                                      .read<CreatePostCubit>()
+                                      .state
+                                      .selectedMedia
+                                      .indexOf(asset) +
+                                  1)
+                              .toString()
+                          : 0.toString(),
                       style: AppTheme.bodyText3.copyWith(
                         color: ColorManager.primaryColor,
                       ),
@@ -150,7 +163,7 @@ class _AlbumPhotosScreenState extends State<AlbumPhotosScreen> {
               if (asset.type == AssetType.video)
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Icon(Icons.videocam,color: ColorManager.white,)
+                  child: Icon(Icons.videocam, color: ColorManager.white),
                 ),
             ],
           );
@@ -206,7 +219,7 @@ class _AlbumPhotosScreenState extends State<AlbumPhotosScreen> {
               ),
             ),
             context: context,
-            title: "select thumbnail",
+            title: "Select Photo/Video",
           ),
           body: Stack(
             children: [
@@ -253,19 +266,30 @@ class _AlbumPhotosScreenState extends State<AlbumPhotosScreen> {
                           ),
                           child: CustomElevatedButton(
                             label: "Done",
-                            onPressed: () {
-                              context.read<CreatePostCubit>().setSelectedMedia(
-                                context
-                                    .read<CreatePostCubit>()
-                                    .state
-                                    .selectedMedia,
+                            onPressed: () async {
+                              final previousMediaList =
+                                  context
+                                      .read<EditMediaCubit>()
+                                      .state
+                                      .mediaList;
+                              final updatedMediaList = context
+                                  .read<EditMediaCubit>()
+                                  .convertToOrderedMediaEntities(
+                                    context
+                                        .read<CreatePostCubit>()
+                                        .selectedAssets,
+                                    previousMediaList,
+                                  );
+
+                              context.read<EditMediaCubit>().updateMediaList(
+                                await updatedMediaList,
                               );
-                              print(   context
+                              context
                                   .read<CreatePostCubit>()
-                                  .state
-                                  .regularPostEntity.mediaFiles);
+                                  .setFinalListOfMediaFiles(await updatedMediaList);
+                              context.read<CreatePostCubit>().toggleVerticalOption(false);
                               Navigator.of(context).pop();
-                            },
+                              },
                             backgroundColor: ColorManager.primaryColor,
                             width: MediaQuery.of(context).size.width * 0.5,
                           ),

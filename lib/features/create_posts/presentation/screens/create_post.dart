@@ -13,26 +13,26 @@ import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_elevated_button.dart';
 import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
+import 'package:sloopify_mobile/core/utils/helper/toast_utils.dart';
 import 'package:sloopify_mobile/features/auth/domain/reposritory/auth_repo.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/text_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_media_cubit/edit_media_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/create_album_screen.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/feelings_activities_screen.dart';
-import 'package:sloopify_mobile/features/create_posts/presentation/screens/freinds_list.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/places/all_user_places_screen.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/post_audience_screen.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/post_vertical_option.dart';
-import 'package:sloopify_mobile/features/create_posts/presentation/screens/video_player_screen.dart';
-import 'package:sloopify_mobile/features/create_posts/presentation/widgets/selected_video_thumbnail.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/ship_selection.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/ui/widgets/text_editor_widget.dart';
+import '../../../../core/utils/helper/snackbar.dart';
 import 'edit_media/edit_media_screen.dart';
-import 'places/location_map_screen.dart';
 import 'horizental_post_option.dart';
 import 'mention_friends.dart';
 
@@ -49,102 +49,96 @@ class CreatePost extends StatelessWidget {
         BlocProvider(create: (context) => locator<PostFriendsCubit>()),
         BlocProvider(create: (context) => locator<FeelingsActivitiesCubit>()),
         BlocProvider(create: (context) => locator<AddLocationCubit>()),
+        BlocProvider(create: (context) => EditMediaCubit([])),
       ],
-      child: BlocBuilder<CreatePostCubit, CreatePostState>(
-        builder: (context, state) {
-          return Scaffold(
-            appBar: getCustomAppBar(
-              context: context,
-              title: "create post",
-              // actions: [
-              //   Container(
-              //     height: 35,
-              //     margin: EdgeInsets.symmetric(horizontal: AppPadding.p10),
-              //     child: CustomElevatedButton(
-              //       label: "schedule",
-              //       onPressed: () {},
-              //       backgroundColor: ColorManager.primaryColor,
-              //       width: MediaQuery.of(context).size.width * 0.2,
-              //       isBold: true,
-              //     ),
-              //   ),
-              // ],
-            ),
-            body: Stack(
-              children: [
-                SafeArea(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.only(bottom: 150),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppPadding.p20,
-                        vertical: AppPadding.p10,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GeneralImage.circular(
-                                image:
-                                    context
-                                        .read<AuthRepo>()
-                                        .getUserInfo()
-                                        ?.image,
-                                isNetworkImage: true,
-                                radius: 55,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: ColorManager.primaryColor,
-                                    width: 1.5,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: AppPadding.p8,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      context.read<AuthRepo>().getName() ?? "",
-                                      style: AppTheme.headline4.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+      child: BlocListener<CreatePostCubit, CreatePostState>(
+        listener: (context, state) {
+          buildListener(context, state);
+        },
+        child: BlocBuilder<CreatePostCubit, CreatePostState>(
+          builder: (context, state) {
+            return Scaffold(
+              appBar: getCustomAppBar(
+                context: context,
+                title: "create post",
+                actions: [
+                  Container(
+                    height: 35,
+                    margin: EdgeInsets.symmetric(horizontal: AppPadding.p10),
+                    child: CustomElevatedButton(
+                      label: "Create Post",
+                      isLoading:
+                          state.createPostStatus == CreatePostStatus.loading,
+                      onPressed:
+                          state.createPostStatus == CreatePostStatus.loading
+                              ? () {}
+                              : () =>
+                                  context
+                                      .read<CreatePostCubit>()
+                                      .createRegularPost(),
+                      backgroundColor: ColorManager.primaryColor,
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      isBold: true,
+                    ),
+                  ),
+                ],
+              ),
+              body: Stack(
+                children: [
+                  SafeArea(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(bottom: 150),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppPadding.p20,
+                          vertical: AppPadding.p10,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                GeneralImage.circular(
+                                  image:
+                                      context
+                                          .read<AuthRepo>()
+                                          .getUserInfo()
+                                          ?.image,
+                                  isNetworkImage: true,
+                                  radius: 60,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: ColorManager.primaryColor,
+                                      width: 1.5,
                                     ),
-                                    Gaps.vGap1,
-                                    Row(
-                                      children: [
-                                        ShipSelection(
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              PostAudienceScreen.routeName,
-                                              arguments: {
-                                                "create_post_cubit":
-                                                    context
-                                                        .read<
-                                                          CreatePostCubit
-                                                        >(),
-                                                "post_friends_cubit":
-                                                    context
-                                                        .read<
-                                                          PostFriendsCubit
-                                                        >(),
-                                              },
-                                            );
-                                          },
-                                          text: "Friends",
-                                          svgAssets: AssetsManager.friendShip,
+                                  ),
+                                  placeHolder: SvgPicture.asset(AssetsManager.user),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: AppPadding.p8,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        context.read<AuthRepo>().getName() ??
+                                            "",
+                                        style: AppTheme.headline4.copyWith(
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        ShipSelection(
-                                          onTap:
-                                              () => Navigator.pushNamed(
+                                      ),
+                                      Gaps.vGap1,
+                                      Row(
+                                        children: [
+                                          ShipSelection(
+                                            onTap: () {
+                                              Navigator.pushNamed(
                                                 context,
-                                                MentionFriends.routeName,
+                                                PostAudienceScreen.routeName,
                                                 arguments: {
                                                   "create_post_cubit":
                                                       context
@@ -157,130 +151,163 @@ class CreatePost extends StatelessWidget {
                                                             PostFriendsCubit
                                                           >(),
                                                 },
-                                              ),
-                                          text: "Mentions",
-                                          svgAssets: AssetsManager.postMention,
-                                        ),
-                                        ShipSelection(
-                                          onTap: () {},
-                                          text: "",
-                                          svgAssets: AssetsManager.postTime,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                              );
+                                            },
+                                            text: "Friends",
+                                            svgAssets: AssetsManager.friendShip,
+                                          ),
+                                          ShipSelection(
+                                            onTap:
+                                                () => Navigator.pushNamed(
+                                                  context,
+                                                  MentionFriends.routeName,
+                                                  arguments: {
+                                                    "create_post_cubit":
+                                                        context
+                                                            .read<
+                                                              CreatePostCubit
+                                                            >(),
+                                                    "post_friends_cubit":
+                                                        context
+                                                            .read<
+                                                              PostFriendsCubit
+                                                            >()..getFriendsList(),
+                                                  },
+                                                ),
+                                            text: "Mentions",
+                                            svgAssets:
+                                                AssetsManager.postMention,
+                                          ),
+                                          _buildPostDisappear24Hours(context),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Gaps.vGap1,
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              ShipSelection(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    FeelingsActivitiesScreen.routeName,
-                                    arguments: {
-                                      "create_post_cubit":
-                                          context.read<CreatePostCubit>(),
-                                      "feelings_activities_cubit":
-                                          context
-                                              .read<FeelingsActivitiesCubit>(),
-                                    },
-                                  );
-                                },
-                                text: "Feelings",
-                                svgAssets: AssetsManager.feelings,
-                              ),
-                              ShipSelection(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    AllUserPlacesScreen.routeName,
-                                    arguments: {
-                                      "create_post_cubit":
-                                          context.read<CreatePostCubit>(),
-                                      "add_location_cubit":
-                                          context.read<AddLocationCubit>(),
-                                    },
-                                  );
-                                },
-                                text: "Location",
-                                svgAssets: AssetsManager.location,
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                            Gaps.vGap1,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                ShipSelection(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      FeelingsActivitiesScreen.routeName,
+                                      arguments: {
+                                        "create_post_cubit":
+                                            context.read<CreatePostCubit>(),
+                                        "feelings_activities_cubit":
+                                            context
+                                                .read<
+                                                  FeelingsActivitiesCubit
+                                                >(),
+                                      },
+                                    );
+                                  },
+                                  text: "Feelings",
+                                  svgAssets: AssetsManager.feelings,
+                                ),
+                                ShipSelection(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AllUserPlacesScreen.routeName,
+                                      arguments: {
+                                        "create_post_cubit":
+                                            context.read<CreatePostCubit>(),
+                                        "add_location_cubit":
+                                            context.read<AddLocationCubit>(),
+                                      },
+                                    );
+                                  },
+                                  text: "Location",
+                                  svgAssets: AssetsManager.location,
+                                ),
+                              ],
+                            ),
 
-                          Gaps.vGap3,
-                          TextEditorWidget(
-                            hint: 'what is in your mind?',
-                            initialValue: "",
-                            onChangedText: (String content) {
-                              context.read<CreatePostCubit>().setPostText(
-                                content,
-                              );
-                            },
-                            onChanged: (value) {
-                              context.read<CreatePostCubit>().setPostTextBold(
-                                (value as TextPropertyEntity).isBold,
-                              );
-                              context.read<CreatePostCubit>().setPostTextItalic(
-                                value.isItalic,
-                              );
-                              context
-                                  .read<CreatePostCubit>()
-                                  .setPostTextUnderLine(value.isUnderLine);
-                              context.read<CreatePostCubit>().setTextColor(
-                                value.color,
-                              );
-                              //  context.read<CreatePostCubit>().toggleVerticalOption(!state.showVerticalOption);
-                            },
-                          ),
-                          if (state.selectedMedia.isNotEmpty)
-                            _buildMediaGallery(context, state.selectedMedia),
-                        ],
+                            Gaps.vGap3,
+                            TextEditorWidget(
+                              hint: 'what is in your mind?',
+                              initialValue: state.regularPostEntity.content,
+                              onChangedText: (String content) {
+                                context.read<CreatePostCubit>().setPostText(
+                                  content,
+                                );
+                                context
+                                    .read<CreatePostCubit>()
+                                    .toggleVerticalOption(false);
+                              },
+                              onChanged: (value) {
+                                context.read<CreatePostCubit>().setPostTextBold(
+                                  (value as TextPropertyEntity).isBold,
+                                );
+                                context
+                                    .read<CreatePostCubit>()
+                                    .setPostTextItalic(value.isItalic);
+                                context
+                                    .read<CreatePostCubit>()
+                                    .setPostTextUnderLine(value.isUnderLine);
+                                context.read<CreatePostCubit>().setTextColor(
+                                  value.color,
+                                );
+                              },
+                            ),
+                            if (state
+                                    .regularPostEntity
+                                    .mediaFiles
+                                    ?.isNotEmpty ??
+                                false) ...[
+                              Gaps.vGap2,
+                              _buildMediaGallery(
+                                context,
+                                state.regularPostEntity.mediaFiles ?? [],
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                if (state.showVerticalOption) ...[
-                  PostVerticalOption(),
-                ] else ...[
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      width: double.infinity,
-                      height: 60,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppPadding.p50,
-                        vertical: AppPadding.p8,
+                  if (state.showVerticalOption) ...[
+                    PostVerticalOption(),
+                  ] else ...[
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        width: double.infinity,
+                        height: 60,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppPadding.p50,
+                          vertical: AppPadding.p8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: ColorManager.white,
+                          boxShadow: [
+                            BoxShadow(
+                              offset: Offset(0, 4),
+                              spreadRadius: 0,
+                              blurRadius: 6,
+                              color: ColorManager.black.withOpacity(0.25),
+                            ),
+                          ],
+                        ),
+                        child: HorizontalPostOption(),
                       ),
-                      decoration: BoxDecoration(
-                        color: ColorManager.white,
-                        boxShadow: [
-                          BoxShadow(
-                            offset: Offset(0, 4),
-                            spreadRadius: 0,
-                            blurRadius: 6,
-                            color: ColorManager.black.withOpacity(0.25),
-                          ),
-                        ],
-                      ),
-                      child: HorizontalPostOption(),
                     ),
-                  ),
+                  ],
                 ],
-              ],
-            ),
-          );
-        },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildMediaGallery(BuildContext context, List<AssetEntity> assets) {
+  Widget _buildMediaGallery(BuildContext context, List<MediaEntity> assets) {
     int count = assets.length;
     if (count == 0) return const SizedBox.shrink();
 
@@ -377,11 +404,21 @@ class CreatePost extends StatelessWidget {
                 assetName: AssetsManager.editPhotos,
                 onTap:
                     () => {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => EditMediaScreen(mediaAssets: assets,initialIndex: 0,),
-                        ),
+                      Navigator.of(context).pushNamed(
+                        EditMediaScreen.routeName,
+                        arguments: {
+                          "create_post_cubit": context.read<CreatePostCubit>(),
+                          "initialIndex": 0,
+                          "edit_media_cubit":
+                              context.read<EditMediaCubit>()..updateMediaList(
+                                context
+                                        .read<CreatePostCubit>()
+                                        .state
+                                        .regularPostEntity
+                                        .mediaFiles ??
+                                    [],
+                              ),
+                        },
                       ),
                     },
               ),
@@ -399,6 +436,7 @@ class CreatePost extends StatelessWidget {
                           arguments: {
                             "create_post_cubit":
                                 context.read<CreatePostCubit>(),
+                            "edit_media_cubit": context.read<EditMediaCubit>(),
                           },
                         ),
                       },
@@ -417,88 +455,106 @@ class CreatePost extends StatelessWidget {
     return GestureDetector(onTap: onTap, child: SvgPicture.asset(assetName));
   }
 
-  Widget _buildAssetItem(BuildContext context, AssetEntity asset) {
-    return FutureBuilder<Uint8List?>(
-      future: asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          return GestureDetector(
-            onTap: () {
-              if (asset.type == AssetType.video) {
-                // Navigate to video player screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => VideoPlayerScreen(video: asset),
-                  ),
-                );
-              } else {
-                // For images: show full image or preview
-              }
-            },
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.memory(
-                  snapshot.data!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 200,
-                ),
-                if (asset.type == AssetType.video)
-                  const Icon(
-                    Icons.play_circle_fill,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-              ],
+  Widget _buildAssetItem(BuildContext context, MediaEntity asset) {
+    if (asset.isVideoFile) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(
+            child: FutureBuilder<Uint8List?>(
+              future: context.read<EditMediaCubit>().generateVideoThumbnail(
+                asset.file!,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Image.memory(snapshot.data!);
+                }
+                return const CircularProgressIndicator();
+              },
             ),
-          );
-        } else {
-          return Container(color: Colors.grey[300]);
-        }
-      },
-    );
+          ),
+          Icon(Icons.play_arrow, color: ColorManager.white),
+        ],
+      );
+    } else {
+      return Transform(
+        alignment: Alignment.center,
+        transform:
+            Matrix4.identity()
+              ..rotateZ((asset.rotateAngle ?? 0.0) * 3.1415926535 / 180)
+              ..scale(
+                (asset.isFlipHorizontal ?? false) ? -1.0 : 1.0,
+                (asset.isFlipVertical ?? false) ? -1.0 : 1.0,
+              ),
+        child: Image.file(
+          asset.file!,
+          fit: BoxFit.cover,
+          height: 200,
+          width: double.infinity,
+        ),
+      );
+    }
   }
 
   Widget _buildStackedAsset(
-    AssetEntity asset,
+    MediaEntity asset,
     int remainingCount,
     BuildContext context,
   ) {
-    return FutureBuilder<Uint8List?>(
-      future: asset.thumbnailDataWithSize(const ThumbnailSize(300, 300)),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          return GestureDetector(
-            onTap: () {
-              if (asset.type == AssetType.video) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => VideoPlayerScreen(video: asset),
-                  ),
-                );
-              }
-            },
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.memory(
-                  snapshot.data!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 200,
+    if (asset.isVideoFile) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(
+            child: FutureBuilder<Uint8List?>(
+              future: context.read<EditMediaCubit>().generateVideoThumbnail(
+                asset.file!,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Image.memory(snapshot.data!);
+                }
+                return const CircularProgressIndicator();
+              },
+            ),
+          ),
+          Icon(Icons.play_arrow, color: ColorManager.white),
+          Container(
+            color: Colors.black45,
+            alignment: Alignment.center,
+            child: Text(
+              '+$remainingCount',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return asset.file != null
+          ? Stack(
+            children: [
+              Positioned.fill(
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform:
+                      Matrix4.identity()
+                        ..rotateZ(
+                          (asset.rotateAngle ?? 0.0) * 3.1415926535 / 180,
+                        )
+                        ..scale(
+                          (asset.isFlipHorizontal ?? false) ? -1.0 : 1.0,
+                          (asset.isFlipVertical ?? false) ? -1.0 : 1.0,
+                        ),
+                  child: Image.file(asset.file!, fit: BoxFit.contain),
                 ),
-                if (asset.type == AssetType.video)
-                  const Icon(
-                    Icons.play_circle_fill,
-                    size: 40,
-                    color: Colors.black12,
-                  ),
-                Container(
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Container(
                   color: Colors.black45,
                   alignment: Alignment.center,
                   child: Text(
@@ -510,13 +566,31 @@ class CreatePost extends StatelessWidget {
                     ),
                   ),
                 ),
-              ],
-            ),
-          );
-        } else {
-          return Container(color: Colors.grey[300]);
-        }
-      },
+              ),
+            ],
+          )
+          : Center(child: CircularProgressIndicator());
+    }
+  }
+
+  Widget _buildPostDisappear24Hours(BuildContext context) {
+    return InkWell(
+      onTap: () => context.read<CreatePostCubit>().setPostAvailableFor24Hours(),
+      child: SvgPicture.asset(
+        context.read<CreatePostCubit>().state.regularPostEntity.disappears24h
+            ? AssetsManager.postTimeActive
+            : AssetsManager.postTime,
+      ),
     );
+  }
+
+  void buildListener(BuildContext context, CreatePostState state) {
+    if (state.createPostStatus == CreatePostStatus.success) {
+      ToastUtils.showSusToastMessage("your post created successfully");
+      Navigator.of(context).pop();
+    } else if (state.createPostStatus == CreatePostStatus.offline ||
+        state.createPostStatus == CreatePostStatus.error) {
+      showSnackBar(context, state.errorMessage);
+    }
   }
 }

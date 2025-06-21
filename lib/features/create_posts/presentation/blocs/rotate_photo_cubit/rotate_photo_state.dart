@@ -1,23 +1,16 @@
-class RotateEditState {
-  final double rotationAngle; // in degrees
-  final bool isFlippedHorizontal;
-  final bool isFlippedVertical;
+import 'package:equatable/equatable.dart';
 
-  const RotateEditState({
-    this.rotationAngle = 0,
-    this.isFlippedHorizontal = false,
-    this.isFlippedVertical = false,
-  });
+import '../../../domain/entities/media_entity.dart';
 
-  RotateEditState copyWith({
-    double? rotationAngle,
-    bool? isFlippedHorizontal,
-    bool? isFlippedVertical,
-  }) {
-    return RotateEditState(
-      rotationAngle: rotationAngle ?? this.rotationAngle,
-      isFlippedHorizontal: isFlippedHorizontal ?? this.isFlippedHorizontal,
-      isFlippedVertical: isFlippedVertical ?? this.isFlippedVertical,
-    );
+class RotateMediaState extends Equatable {
+  final MediaEntity mediaEntity;
+
+  const RotateMediaState({required this.mediaEntity});
+
+  RotateMediaState copyWith({MediaEntity? mediaEntity}) {
+    return RotateMediaState(mediaEntity: mediaEntity ?? this.mediaEntity);
   }
+
+  @override
+  List<Object?> get props => [mediaEntity];
 }

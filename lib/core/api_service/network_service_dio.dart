@@ -103,9 +103,11 @@ class NetworkServiceDio implements BaseApiService {
     String? cookieName,
     String? filesAttributeName,
     List<File>? files,
+    bool isContainsMedia=false
   }) async {
     print('API $url');
     Logger().i(jsonBody);
+    FormData? formData;
     Dio _dio = await dio;
     try {
       if (filesAttributeName != null && files != null) {
@@ -128,21 +130,15 @@ class NetworkServiceDio implements BaseApiService {
         print('Headers${headers}');
 
       }
+      if(isContainsMedia){
+         formData = FormData.fromMap(jsonBody);
+         print("fffffffffffffffff${formData.fields}");
+      }
       final response = await _dio.post(
         url,
-        data: jsonBody,
+        data: isContainsMedia? formData:jsonBody,
       );
 
-      // //save specific cookie if the user send saveCookies as true
-      // if (saveCookies) {
-      //   final setCookieHeader = response.headers['Set-Cookie'];
-      //   if (setCookieHeader != null) {
-      //     final cookieValue = extractSpecificCookieValue(
-      //         cookiesList: setCookieHeader, cookieName: cookieName!);
-      //    // PreferenceUtils.setString(cookieName, cookieValue!);
-      //     print('Stored value: $cookieValue');
-      //   }
-      // }
       if (response.headers.value("Authorization") != null) {
         await PreferenceUtils.setString(SharedPrefsKey.accessToken,
             response.headers.value("Authorization")!);

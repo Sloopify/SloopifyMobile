@@ -15,17 +15,23 @@ class PollPost extends PostEntity {
       {required this.textPropertyEntity, required this.content, required this.disappears24h, required this.poll, required super.postAudience})
       :super(postType: PostType.poll);
 
-
-
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      "type": "poll",
-      "privacy": postAudience.getValueForApi(),
-      if (specificFriends != null) "specific_friends": specificFriends,
-      if (friendsExcept != null) "friend_except": friendsExcept,
-      "poll": poll.toJson(),
-    };
+  Future<Map<String, dynamic>> toJson() {
+    // TODO: implement toJson
+    throw UnimplementedError();
   }
+
+
+  //
+  // @override
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     "type": "poll",
+  //     "privacy": postAudience.getValueForApi(),
+  //     if (specificFriends != null) "specific_friends": specificFriends,
+  //     if (friendsExcept != null) "friend_except": friendsExcept,
+  //     "poll": poll.toJson(),
+  //   };
+  // }
 
 }

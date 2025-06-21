@@ -311,7 +311,7 @@ class SignupScreen extends StatelessWidget {
         context,
         VerifyAccountScreen.routeName,
         arguments: {
-          "signUpCubit": context.read<SignUpCubit>(),
+          "signUpCubit": sl.locator<SignUpCubit>(),
           "fromPassword": false,
         },
       );

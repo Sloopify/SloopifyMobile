@@ -35,11 +35,11 @@ class MediaEntity extends Equatable {
       applyToDownload: null,
       autoPlay: null,
       filterName: null,
-      isFlipHorizontal: null,
-      isFlipVertical: null,
+      isFlipHorizontal: false,
+      isFlipVertical: false,
       isRotate: null,
       order: null,
-      rotateAngle: null,
+      rotateAngle: 0.0,
     );
   }
 
@@ -84,21 +84,24 @@ class MediaEntity extends Equatable {
     );
   }
 
-  Future<Map<String, dynamic>> toJson() async {
+   toJson() async {
+
     Map<String, dynamic> data = <String, dynamic>{};
    if(order!=null)   data.putIfAbsent('order', () => order);
-    if (applyToDownload != null && isVideoFile) data.putIfAbsent('apply_to_download', () => applyToDownload);
-    if (autoPlay != null && isVideoFile) data.putIfAbsent('auto_play', () => autoPlay);
-    if (isRotate != null ) data.putIfAbsent('is_rotate', () => isRotate);
-    if (rotateAngle != null ) data.putIfAbsent('rotate_angle', () => isRotate);
-    if (isFlipHorizontal != null ) data.putIfAbsent('is_flip_horizontal', () => isFlipHorizontal);
-    if (isFlipVertical != null ) data.putIfAbsent('is_flip_vertical', () => isFlipVertical);
+    if (applyToDownload != null && isVideoFile) data.putIfAbsent('apply_to_download', () => boolToInt(applyToDownload));
+    if (autoPlay != null && isVideoFile) data.putIfAbsent('auto_play', () => boolToInt(autoPlay));
+    if (isRotate != null ) data.putIfAbsent('is_rotate', () => boolToInt(isRotate));
+    if (rotateAngle != null ) data.putIfAbsent('rotate_angle', () => rotateAngle);
+    if (isFlipHorizontal != null ) data.putIfAbsent('is_flip_horizontal', () => boolToInt(isFlipHorizontal));
+    if (isFlipVertical != null ) data.putIfAbsent('is_flip_vertical', () => boolToInt(isFlipHorizontal));
     if (filterName != null ) data.putIfAbsent('filter_name', () => filterName);
     if (file != null) {
       data['file'] = await MultipartFile.fromFile(
         file!.path,
       );
     }
+    print(data);
     return data;
   }
+  int boolToInt(bool? value) => (value ?? false) ? 1 : 0;
 }

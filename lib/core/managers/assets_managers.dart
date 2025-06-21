@@ -103,6 +103,7 @@ class AssetsManager{
 
   static const String baseCreatePostIcons = '${baseIconsURI}create_post/';
   static const String postTime = '${baseCreatePostIcons}24hours.svg';
+  static const String postTimeActive = '${baseCreatePostIcons}24Hours_active.svg';
   static const String album = '${baseCreatePostIcons}album.svg';
   static const String feelings = '${baseCreatePostIcons}fellings.svg';
   static const String location = '${baseCreatePostIcons}location.svg';
@@ -132,6 +133,15 @@ class AssetsManager{
   static const String rotate = '${baseCreatePostIcons}rotate.svg';
   static const String effects = '${baseCreatePostIcons}effects.svg';
   static const String deleteImage = '${baseCreatePostIcons}delete_image.svg';
+  static const String flipHorizontal = '${baseCreatePostIcons}flip_horizontal.svg';
+  static const String flipVertical = '${baseCreatePostIcons}flip_vertical.svg';
+  static const String rotateLeft = '${baseCreatePostIcons}rotate_left.svg';
+  static const String rotateRight = '${baseCreatePostIcons}rotate_right.svg';
+  static const String square = '${baseCreatePostIcons}square.svg';
+  static const String rectangular = '${baseCreatePostIcons}rectangular.svg';
+  static const String sixteenNine = '${baseCreatePostIcons}sixteenNine.svg';
+  static const String towThree = '${baseCreatePostIcons}towThree.svg';
+  static const String customCrop = '${baseCreatePostIcons}custom_crop.svg';
 
 
   ////////////////***************create post images ********************

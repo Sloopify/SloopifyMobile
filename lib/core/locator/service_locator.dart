@@ -29,12 +29,14 @@ import 'package:sloopify_mobile/features/auth/presentation/blocs/signup_cubit/si
 import 'package:sloopify_mobile/features/auth/presentation/blocs/social_media_login/social_media_login_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/upload_photo_cubit/upload_photo_cubit.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/verify_account/verify_account_cubit.dart';
+import 'package:sloopify_mobile/features/auth/presentation/blocs/verify_account_by_signup_cubit.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/chat_bloc/chat_bloc.dart';
 import 'package:sloopify_mobile/features/chat_system/presentation/blocs/message_bloc/messages_bloc.dart';
 import 'package:sloopify_mobile/features/create_posts/data/create_post_data_provider/create_post_data_provider.dart';
 import 'package:sloopify_mobile/features/create_posts/data/create_post_repo/create_post_repo_impl.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/repositories/create_post_repo.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/use_cases/create_place_use_case.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/use_cases/create_post_use_case.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/use_cases/get_all_user_places_use_case.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/use_cases/search_places.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/use_cases/update_place_use_caes.dart';
@@ -76,8 +78,12 @@ Future<void> setupLocator() async {
   );
   locator.registerFactory(
     () => SignUpCubit(
-      registerOtpUseCase: locator(),
       signupUseCase: locator(),
+    ),
+  );
+  locator.registerFactory(
+        () => VerifyAccountBySignupCubit(
+      registerOtpUseCase: locator(),
       verifyOtpRegisterUseCase: locator(),
     ),
   );
@@ -108,7 +114,7 @@ Future<void> setupLocator() async {
       searchFriendsListUseCase: locator(),
     ),
   );
-  locator.registerFactory(() => CreatePostCubit());
+  locator.registerFactory(() => CreatePostCubit(createPostUseCase: locator()));
   locator.registerFactory(
     () => FeelingsActivitiesCubit(
       getActivitiesByCategoriesName: locator(),
@@ -242,6 +248,9 @@ Future<void> setupLocator() async {
   );
   locator.registerLazySingleton(
     () => UpdatePlaceUseCase(createPostRepo: locator()),
+  );
+  locator.registerLazySingleton(
+        () => CreatePostUseCase(createPostRepo: locator()),
   );
 
   ///

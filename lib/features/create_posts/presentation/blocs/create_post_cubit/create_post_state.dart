@@ -8,12 +8,14 @@ class CreatePostState extends Equatable {
   final CreatePostStatus createPostStatus;
   final bool showVerticalOption;
   final List<AssetEntity> selectedMedia;
+  final String errorMessage;
 
   CreatePostState({
     required this.createPostStatus,
     required this.regularPostEntity,
     required this.showVerticalOption,
     required this.selectedMedia,
+    required this.errorMessage
   });
 
   @override
@@ -23,10 +25,12 @@ class CreatePostState extends Equatable {
     regularPostEntity,
     showVerticalOption,
     selectedMedia,
+    errorMessage
   ];
 
   factory CreatePostState.empty() {
     return CreatePostState(
+      errorMessage: "",
       showVerticalOption: true,
       selectedMedia: [],
       createPostStatus: CreatePostStatus.init,
@@ -55,9 +59,11 @@ class CreatePostState extends Equatable {
     List<AssetEntity>? selectedMedia,
     bool? showVerticalOption,
     List<MediaEntity>? mediaFiles,
+    String? errorMessage,
 
   }) {
     return CreatePostState(
+      errorMessage: errorMessage??this.errorMessage,
       showVerticalOption: showVerticalOption ?? this.showVerticalOption,
       selectedMedia: selectedMedia ?? this.selectedMedia,
       createPostStatus: createPostStatus ?? this.createPostStatus,

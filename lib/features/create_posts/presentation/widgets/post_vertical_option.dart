@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_media_cubit/edit_media_cubit.dart';
 
 import '../../../../core/managers/assets_managers.dart';
 import '../../../../core/managers/color_manager.dart';
@@ -45,6 +46,7 @@ class PostVerticalOption extends StatelessWidget {
                         AlbumPhotosScreen.routeName,
                         arguments: {
                           "create_post_cubit": context.read<CreatePostCubit>(),
+                          "edit_media_cubit":context.read<EditMediaCubit>()
                         },
                       );
                     }),

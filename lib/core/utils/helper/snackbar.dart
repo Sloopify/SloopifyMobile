@@ -14,16 +14,13 @@ void showSnackBar(
       SnackBar(
         content: Text(
           message,
-          style: AppTheme.headline4.copyWith(color: ColorManager.black),
+          style: AppTheme.headline4.copyWith(color: ColorManager.white,fontWeight: FontWeight.w500),
         ),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: ColorManager.white,
+        behavior: SnackBarBehavior.fixed,
+        backgroundColor: ColorManager.primaryColor,
         shape: ContinuousRectangleBorder(
             borderRadius: BorderRadius.circular(8.r),
-            side: BorderSide(
-              color: ColorManager.primaryColor,
-              width: 2,
-            )),
-        duration: const Duration(seconds: 3),
+         ),
+        duration: const Duration(seconds: 2),
       ));
 }

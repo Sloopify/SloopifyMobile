@@ -71,40 +71,45 @@ class PostFriendsCubit extends Cubit<PostFriendsState> {
   }
 
   void toggleSelectSpecificFriends(int friendId) {
-    if (!(state.selectedSpecificFriends.contains(friendId))) {
-      state.selectedSpecificFriends.add(friendId);
+    List<int> newSelectedSpecificFrineds = List.from(state.selectedSpecificFriends);
+
+    if (!(newSelectedSpecificFrineds.contains(friendId))) {
+      newSelectedSpecificFrineds.add(friendId);
     } else {
-      state.selectedSpecificFriends.remove(friendId);
+      newSelectedSpecificFrineds.remove(friendId);
     }
     emit(
       state.copyWith(
-        selectedSpecificFriends: state.selectedSpecificFriends,
+        selectedSpecificFriends: newSelectedSpecificFrineds,
         getAllFriendStatus: GetAllFriendStatus.init,
       ),
     );
   }
   void toggleSelectionMentionFriends(int friendId) {
-    if (!(state.selectedMentionFriends.contains(friendId))) {
-      state.selectedMentionFriends.add(friendId);
+    List<int> mentionedListFriends= List.from(state.selectedMentionFriends);
+
+    if (!(mentionedListFriends.contains(friendId))) {
+      mentionedListFriends.add(friendId);
     } else {
-      state.selectedMentionFriends.remove(friendId);
+      mentionedListFriends.remove(friendId);
     }
     emit(
       state.copyWith(
-        selectedMentionFriends: state.selectedMentionFriends,
+        selectedMentionFriends: mentionedListFriends,
         getAllFriendStatus: GetAllFriendStatus.init,
       ),
     );
   }
   void toggleSelectFriendsExcept(int friendId) {
-    if (!(state.selectedFriendsExcept.contains(friendId))) {
-      state.selectedFriendsExcept.add(friendId);
+    List<int> newSelectedFriendsExcept = List.from(state.selectedFriendsExcept);
+    if (!(newSelectedFriendsExcept.contains(friendId))) {
+      newSelectedFriendsExcept.add(friendId);
     } else {
-      state.selectedFriendsExcept.remove(friendId);
+      newSelectedFriendsExcept.remove(friendId);
     }
     emit(
       state.copyWith(
-        selectedFriendsExcept: state.selectedSpecificFriends,
+        selectedFriendsExcept:newSelectedFriendsExcept,
         getAllFriendStatus: GetAllFriendStatus.init,
       ),
     );

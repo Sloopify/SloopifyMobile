@@ -9,6 +9,7 @@ import '../../../../core/api_service/api_urls.dart';
 import '../../../../core/api_service/base_api_service.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/create_place_entity.dart';
+import '../../domain/entities/regular_post_entity.dart';
 
 abstract class CreatePostDataProvider {
   Future<List<UserModel>> getFriendsList();
@@ -37,13 +38,11 @@ abstract class CreatePostDataProvider {
 
   Future<List<PlaceModel>> searchPlaces({required String search});
 
-  Future<Unit> createPlace({
-    required CreatePlaceEntity createPlaceEntity,
-  });
+  Future<Unit> createPlace({required CreatePlaceEntity createPlaceEntity});
 
-  Future<Unit> updateUserPlace({
-    required CreatePlaceEntity createPlaceEntity,
-  });
+  Future<Unit> updateUserPlace({required CreatePlaceEntity createPlaceEntity});
+
+  Future<Unit> createPost({required RegularPostEntity regularPostEntity});
 }
 
 class CreatePosDataProviderImpl extends CreatePostDataProvider {
@@ -173,8 +172,13 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
   }
 
   @override
-  Future<Unit> createPlace({required CreatePlaceEntity createPlaceEntity}) async {
-    final res = await client.multipartRequest(url: ApiUrls.createPlace,jsonBody: createPlaceEntity.toJson());
+  Future<Unit> createPlace({
+    required CreatePlaceEntity createPlaceEntity,
+  }) async {
+    final res = await client.multipartRequest(
+      url: ApiUrls.createPlace,
+      jsonBody: createPlaceEntity.toJson(),
+    );
     if (res["success"] == true) {
       return unit;
     } else {
@@ -184,7 +188,10 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
 
   @override
   Future<PlaceModel> getUserPlaceById({required String placeId}) async {
-    final res = await client.multipartRequest(url: ApiUrls.getPlaceById,jsonBody: {"place_id":placeId});
+    final res = await client.multipartRequest(
+      url: ApiUrls.getPlaceById,
+      jsonBody: {"place_id": placeId},
+    );
     if (res["success"] == true) {
       return PlaceModel.fromJson(res["data"]);
     } else {
@@ -198,7 +205,7 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
     if (res["success"] == true) {
       return List.generate(
         (res["data"] as List).length,
-            (e) => PlaceModel.fromJson(res["data"][e]),
+        (e) => PlaceModel.fromJson(res["data"][e]),
       );
     } else {
       throw NetworkErrorFailure(message: res['message']);
@@ -207,11 +214,14 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
 
   @override
   Future<List<PlaceModel>> searchPlaces({required String search}) async {
-    final res = await client.multipartRequest(url: ApiUrls.searchPlaces,jsonBody: {"search":search});
+    final res = await client.multipartRequest(
+      url: ApiUrls.searchPlaces,
+      jsonBody: {"search": search},
+    );
     if (res["success"] == true) {
       return List.generate(
         (res["data"] as List).length,
-            (e) => PlaceModel.fromJson(res["data"][e]),
+        (e) => PlaceModel.fromJson(res["data"][e]),
       );
     } else {
       throw NetworkErrorFailure(message: res['message']);
@@ -219,8 +229,29 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
   }
 
   @override
-  Future<Unit> updateUserPlace({required CreatePlaceEntity createPlaceEntity}) async {
-    final res = await client.multipartRequest(url: ApiUrls.updatePlace,jsonBody: createPlaceEntity.toJson());
+  Future<Unit> updateUserPlace({
+    required CreatePlaceEntity createPlaceEntity,
+  }) async {
+    final res = await client.multipartRequest(
+      url: ApiUrls.updatePlace,
+      jsonBody: createPlaceEntity.toJson(),
+    );
+    if (res["success"] == true) {
+      return unit;
+    } else {
+      throw NetworkErrorFailure(message: res['message']);
+    }
+  }
+
+  @override
+  Future<Unit> createPost({
+    required RegularPostEntity regularPostEntity,
+  }) async {
+    final res = await client.multipartRequest(
+      url: ApiUrls.createPost,
+      jsonBody: await regularPostEntity.toJson(),
+      isContainsMedia: regularPostEntity.mediaFiles!=null && regularPostEntity.mediaFiles!.isNotEmpty?true:false,
+    );
     if (res["success"] == true) {
       return unit;
     } else {

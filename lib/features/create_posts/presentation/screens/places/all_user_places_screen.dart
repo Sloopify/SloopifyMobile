@@ -162,6 +162,7 @@ class AllUserPlacesScreen extends StatelessWidget {
                       label: "Done",
                       onPressed: () {
                         Navigator.of(context).pop();
+                        context.read<CreatePostCubit>().setLocationId(state.selectedLocationId);
                       },
                       backgroundColor: ColorManager.primaryColor,
                       width: MediaQuery.of(context).size.width * 0.5,
@@ -178,7 +179,9 @@ class AllUserPlacesScreen extends StatelessWidget {
 
   Widget _buildPlaceItem(PlaceEntity place, BuildContext context) {
     return GestureDetector(
-      onTap: () => context.read<AddLocationCubit>().selectLocation(place.id),
+      onTap: () {
+        context.read<AddLocationCubit>().selectLocation(place.id);
+      },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

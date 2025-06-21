@@ -6,6 +6,7 @@ import 'package:sloopify_mobile/features/create_posts/domain/entities/activiity_
 import 'package:sloopify_mobile/features/create_posts/domain/entities/create_place_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/feeling_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/place_entity.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/entities/regular_post_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/repositories/create_post_repo.dart';
 
 import '../../../../core/api_service/base_repo.dart';
@@ -171,6 +172,18 @@ class CreatePostRepoImpl extends CreatePostRepo {
       request: () async {
         return await createPostDataProvider.updateUserPlace(
           createPlaceEntity: createPlaceEntity,
+        );
+      },
+    );
+    return data.fold((f) => Left(f), (data) => Right(data));
+  }
+
+  @override
+  Future<Either<Failure, Unit>> createPost({required RegularPostEntity regularPostEntity}) async {
+    final data = await BaseRepo.repoRequest(
+      request: () async {
+        return await createPostDataProvider.createPost(
+          regularPostEntity: regularPostEntity,
         );
       },
     );

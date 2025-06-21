@@ -16,12 +16,8 @@ part 'sign_up_state.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
   final SignupUseCase signupUseCase;
-  final RegisterOtpUseCase registerOtpUseCase;
-  final VerifyOtpRegisterUseCase verifyOtpRegisterUseCase;
 
   SignUpCubit({
-    required this.verifyOtpRegisterUseCase,
-    required this.registerOtpUseCase,
     required this.signupUseCase,
   }) : super(SignUpState.empty());
 
@@ -54,13 +50,8 @@ class SignUpCubit extends Cubit<SignUpState> {
     );
   }
 
-  void setOtpType(OtpSendType otpType) {
-    emit(state.copyWith(otpSendType: otpType, signupStatus: SignupStatus.init));
-  }
 
-  void setOtpCode(String code) {
-    emit(state.copyWith(otpCode: code, signupStatus: SignupStatus.init,otpRegisterStatus: OtpRegisterStatus.init));
-  }
+
 
   void setFullPhoneNumber(String fullPhoneNumber) {
     emit(
@@ -115,39 +106,6 @@ class SignUpCubit extends Cubit<SignUpState> {
     );
   }
 
-  void registerOtp() async {
-    emit(state.copyWith(otpRegisterStatus: OtpRegisterStatus.loading));
-    final res = await registerOtpUseCase(otpDataEntity: state.otpDataEntity);
-    res.fold(
-      (f) {
-        _mapRegisterOtpStatus(emit, f, state);
-      },
-      (data) async {
-        emit(state.copyWith(otpRegisterStatus: OtpRegisterStatus.success));
-      },
-    );
-  }
-
-  Future<void> verifyOtpLogin() async {
-    VerifyOtpEntity verifyOtpEntity = VerifyOtpEntity(
-      otp: state.otpCode,
-      otpSendType: state.otpSendType,
-      email: state.signupDataEntity.email,
-      phone: state.signupDataEntity.fullPhoneNumber,
-    );
-    emit(state.copyWith(verifyRegisterOtpStatus: VerifyRegisterOtpStatus.loading));
-    final res = await verifyOtpRegisterUseCase(verifyOtpEntity: verifyOtpEntity);
-    res.fold(
-      (f) {
-        _mapVerifyRegisterOtpStatus(emit, f, state);
-      },
-      (data) async {
-        emit(
-          state.copyWith(verifyRegisterOtpStatus: VerifyRegisterOtpStatus.success),
-        );
-      },
-    );
-  }
 }
 
 _mapFailureToState(emit, Failure f, SignUpState state) {
@@ -170,42 +128,3 @@ _mapFailureToState(emit, Failure f, SignUpState state) {
   }
 }
 
-_mapRegisterOtpStatus(emit, Failure f, SignUpState state) {
-  switch (f) {
-    case OfflineFailure():
-      emit(
-        state.copyWith(
-          otpRegisterStatus: OtpRegisterStatus.offline,
-          errorMessage: 'no_internet_connection'.tr(),
-        ),
-      );
-
-    case NetworkErrorFailure f:
-      emit(
-        state.copyWith(
-          otpRegisterStatus: OtpRegisterStatus.error,
-          errorMessage: f.message,
-        ),
-      );
-  }
-}
-
-  _mapVerifyRegisterOtpStatus(emit, Failure f, SignUpState state) {
-    switch (f) {
-      case OfflineFailure():
-        emit(
-          state.copyWith(
-            verifyRegisterOtpStatus: VerifyRegisterOtpStatus.offline,
-            errorMessage: 'no_internet_connection'.tr(),
-          ),
-        );
-
-      case NetworkErrorFailure f:
-        emit(
-          state.copyWith(
-            verifyRegisterOtpStatus: VerifyRegisterOtpStatus.error,
-            errorMessage: f.message,
-          ),
-        );
-    }
-}

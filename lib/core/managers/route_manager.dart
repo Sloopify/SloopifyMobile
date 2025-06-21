@@ -14,7 +14,10 @@ import 'package:sloopify_mobile/features/auth/presentation/screens/verify_accoun
 import 'package:sloopify_mobile/features/auth/presentation/screens/write_otp_code_screen.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/crop_image_cubit/crop_image_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_media_cubit/edit_media_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/rotate_photo_cubit/rotate_photo_cubit.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
 import '../../features/app_wrapper/presentation/screens/app_wrapper.dart';
@@ -34,6 +37,9 @@ import '../../features/create_posts/presentation/blocs/feeling_activities_post_c
 import '../../features/create_posts/presentation/screens/activities_by_categories.dart';
 import '../../features/create_posts/presentation/screens/create_post.dart';
 import '../../features/create_posts/presentation/screens/create_album_screen.dart';
+import '../../features/create_posts/presentation/screens/edit_media/crop_image_options.dart';
+import '../../features/create_posts/presentation/screens/edit_media/edit_media_screen.dart';
+import '../../features/create_posts/presentation/screens/edit_media/rotate_photo_screen.dart';
 import '../../features/create_posts/presentation/screens/feelings_activities_screen.dart';
 import '../../features/create_posts/presentation/screens/freinds_list.dart';
 import '../../features/create_posts/presentation/screens/mention_friends.dart';
@@ -81,8 +87,8 @@ class AppRouter {
         final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
           builder: (context) {
-            return BlocProvider.value(
-              value: arg["signUpCubit"] as SignUpCubit,
+            return BlocProvider(
+              create:(context)=> arg["signUpCubit"] as SignUpCubit,
               child: VerifyAccountScreen(
                 fromForgetPassword: arg['fromPassword'],
               ),
@@ -150,7 +156,9 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) {
             return BlocProvider(
-              create: (context) => locator<InterestCubit>()..getAllCategories(),
+              create: (context) =>
+              locator<InterestCubit>()
+                ..getAllCategories(),
               child: UserInterests(),
             );
           },
@@ -198,8 +206,15 @@ class AppRouter {
         final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
           builder: (context) {
-            return BlocProvider.value(
-              value: arg["create_post_cubit"] as CreatePostCubit,
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["edit_media_cubit"] as EditMediaCubit,
+                ),
+              ],
               child: AlbumPhotosScreen(),
             );
           },
@@ -249,8 +264,8 @@ class AppRouter {
                 ),
                 BlocProvider.value(
                   value:
-                      arg["feelings_activities_cubit"]
-                          as FeelingsActivitiesCubit,
+                  arg["feelings_activities_cubit"]
+                  as FeelingsActivitiesCubit,
                 ),
               ],
               child: FeelingsActivitiesScreen(),
@@ -274,7 +289,6 @@ class AppRouter {
               ],
               child: ActivitiesByCategories(name: arg["categoryName"],),
             );
-
           },
         );
       case MentionFriends.routeName:
@@ -304,7 +318,8 @@ class AppRouter {
                   value: arg["create_post_cubit"] as CreatePostCubit,
                 ),
                 BlocProvider.value(
-                  value: (arg["add_location_cubit"] as AddLocationCubit)..getAllUserPlaces(),
+                  value: (arg["add_location_cubit"] as AddLocationCubit)
+                    ..getAllUserPlaces(),
                 ),
               ],
               child: AllUserPlacesScreen(),
@@ -331,7 +346,6 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-
                 BlocProvider.value(
                   value: arg["add_location_cubit"] as AddLocationCubit,
                 ),
@@ -340,6 +354,55 @@ class AppRouter {
             );
           },
         );
+      case EditMediaScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["edit_media_cubit"] as EditMediaCubit,
+                ),
+
+              ],
+              child: EditMediaScreen(initialIndex: arg["initialIndex"],),
+            );
+          },
+        );
+      case CropScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["edit_media_cubit"] as EditMediaCubit,
+                ),
+               BlocProvider(create:(context)=> arg ["CropCubit"] as CropCubit),
+              ],
+              child: CropScreen(index: arg["initialIndex"],),
+            );
+          },
+        );
+    case RotateImageScreen.routeName:
+      final arg = routeSettings.arguments as Map;
+      return MaterialPageRoute(
+        builder: (context) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: arg["edit_media_cubit"] as EditMediaCubit,
+              ),
+              BlocProvider(create: (context)=>arg["rotate_cubit"] as RotateMediaCubit),
+
+            ],
+            child: RotateImageScreen(index: arg["initialIndex"],),
+          );
+        },
+      );
       case HomeNavigationScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
@@ -354,7 +417,8 @@ class AppRouter {
   Route<dynamic> unDefinedRoute() {
     return MaterialPageRoute(
       builder:
-          (_) => Scaffold(
+          (_) =>
+          Scaffold(
             appBar: AppBar(title: Text('no_route'.tr())),
             body: Center(child: Text('no_route'.tr())),
           ),
