@@ -207,24 +207,22 @@ class _UserInterestsState extends State<UserInterests> {
                             onLoading:
                                 () =>
                                     context.read<InterestCubit>().onLoadMore(),
-                            footer: CustomFooter(
+                            footer: CustomFooter(height: 100,
+                              loadStyle: LoadStyle.ShowAlways,
                               builder: (context, mode) {
                                 if (mode == LoadStatus.loading) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 100),
-                                    child: Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
+                                  return Center(
+                                    child: CircularProgressIndicator(),
                                   );
                                 } else if (mode == LoadStatus.noMore) {
-                                  return Center(child: Text("No more data"));
+                                  return  SizedBox.shrink();
                                 } else {
                                   return SizedBox.shrink();
                                 }
                               },
                             ),
                             child: GridView.builder(
-                              padding: const EdgeInsets.all(16),
+                              padding:  EdgeInsets.only(left: AppPadding.p16,right: AppPadding.p16,top: AppPadding.p16,bottom: AppPadding.p50),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
@@ -254,6 +252,7 @@ class _UserInterestsState extends State<UserInterests> {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
+                      margin: EdgeInsets.only(top: 100),
                       width: double.infinity,
                       height: 60,
                       padding: EdgeInsets.symmetric(

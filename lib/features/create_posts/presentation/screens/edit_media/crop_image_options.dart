@@ -170,8 +170,8 @@ class _CropScreenState extends State<CropScreen> {
                                       onTap: () {
                                         _cropWithAspectRatio(
                                           const CropAspectRatio(
-                                            ratioX: 16,
-                                            ratioY: 9,
+                                            ratioX: 9,
+                                            ratioY: 16,
                                           ),
                                         );
                                       },

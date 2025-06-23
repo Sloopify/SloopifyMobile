@@ -49,7 +49,7 @@ class _FeelingsActivitiesScreenState extends State<FeelingsActivitiesScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getCustomAppBar(context: context, title: "How are you feeling?"),
+      appBar: getCustomAppBar(context: context, title: "How are you feeling ?"),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -62,6 +62,7 @@ class _FeelingsActivitiesScreenState extends State<FeelingsActivitiesScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildTabBar(),
+                  Gaps.vGap2,
                   Expanded(
                     child: TabBarView(physics: BouncingScrollPhysics(),
                       controller: _tabController,
@@ -88,6 +89,7 @@ class _FeelingsActivitiesScreenState extends State<FeelingsActivitiesScreen>
           _onTabSelected(index);
         },
         controller: _tabController,
+        physics: NeverScrollableScrollPhysics(),
         isScrollable: true,
         dividerColor: ColorManager.disActive,
         labelPadding: EdgeInsets.symmetric(horizontal: 50),

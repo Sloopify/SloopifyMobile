@@ -90,7 +90,7 @@ class ActivitiesByCategories extends StatelessWidget {
                                   context
                                     .read<FeelingsActivitiesCubit>()
                                     .selectActivityName(
-                                      state.activities[index].name,
+                                     state.selectedActivity== state.activities[index].name?"":state.activities[index].name,
                                     );
                                   context.read<CreatePostCubit>().setActivityName(
                                       state.selectedActivity);
@@ -103,6 +103,7 @@ class ActivitiesByCategories extends StatelessWidget {
                                   isNetworkImage: true,
                                   width: 50,
                                   height: 50,
+                                  placeHolder: Icon(Icons.error),
                                 ),
                                 Gaps.hGap1,
                                 Text(

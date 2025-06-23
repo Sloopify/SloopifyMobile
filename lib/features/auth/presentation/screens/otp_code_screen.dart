@@ -11,13 +11,23 @@ import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_elevated_button.dart';
 import 'package:sloopify_mobile/features/app_wrapper/presentation/screens/app_wrapper.dart';
 import 'package:sloopify_mobile/features/auth/domain/entities/otp_data_entity.dart';
+import 'package:sloopify_mobile/features/auth/domain/reposritory/auth_repo.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/authentication_bloc/authentication_bloc.dart';
 import 'package:sloopify_mobile/features/auth/presentation/blocs/verify_account_by_signup_cubit.dart';
 
 import '../../../../core/utils/helper/snackbar.dart';
 
 class OtpCodeScreen extends StatelessWidget {
-  const OtpCodeScreen({super.key});
+  final String? email;
+  final String? phoneNumber;
+  final bool fromSignUp;
+
+  const OtpCodeScreen({
+    super.key,
+    this.phoneNumber,
+    this.email,
+    this.fromSignUp = false,
+  });
 
   static const routeName = "otp_screen";
 
@@ -25,7 +35,10 @@ class OtpCodeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: getCustomAppBar(context: context),
-      body: BlocConsumer<VerifyAccountBySignupCubit, VerifyAccountBySignupState>(
+      body: BlocConsumer<
+        VerifyAccountBySignupCubit,
+        VerifyAccountBySignupState
+      >(
         listener: (context, state) {
           _buildVerifyCodeListener(state, context);
         },
@@ -104,7 +117,9 @@ class OtpCodeScreen extends StatelessWidget {
                           ),
                         ],
                         onCompleted: (v) {
-                          context.read<VerifyAccountBySignupCubit>().setOtpCode(v);
+                          context.read<VerifyAccountBySignupCubit>().setOtpCode(
+                            v,
+                          );
                         },
                         onChanged: (value) {},
                       ),
@@ -152,8 +167,23 @@ class OtpCodeScreen extends StatelessWidget {
                                   VerifyRegisterOtpStatus.loading
                               ? () {}
                               : () {
-                        context.read<VerifyAccountBySignupCubit>().verifyOtpLogin(context);
-                          },
+                                context
+                                    .read<VerifyAccountBySignupCubit>()
+                                    .verifyOtpLogin(
+                                      email:
+                                          fromSignUp
+                                              ? email ?? ""
+                                              : context
+                                                      .read<AuthRepo>()
+                                                      .getUserInfo()
+                                                      ?.email ??
+                                                  "",
+                                      phoneNumber:
+                                          fromSignUp
+                                              ? phoneNumber ?? ""
+                                              : "${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.code}${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.phoneNumber}",
+                                    );
+                              },
                       isBold: true,
                       backgroundColor: ColorManager.primaryColor,
                       padding: EdgeInsets.symmetric(vertical: 4),
@@ -169,7 +199,10 @@ class OtpCodeScreen extends StatelessWidget {
     );
   }
 
-  void _buildVerifyCodeListener(VerifyAccountBySignupState state, BuildContext context) {
+  void _buildVerifyCodeListener(
+    VerifyAccountBySignupState state,
+    BuildContext context,
+  ) {
     if (state.verifyRegisterOtpStatus == VerifyRegisterOtpStatus.success) {
       context.read<AuthenticationBloc>().add(UpdateEvent());
       Navigator.pushNamedAndRemoveUntil(

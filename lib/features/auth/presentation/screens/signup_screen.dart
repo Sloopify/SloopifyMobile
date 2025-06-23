@@ -70,7 +70,7 @@ class SignupScreen extends StatelessWidget {
                             context.read<SignUpCubit>().setFirstName(value);
                           },
                           withTitle: true,
-                          hintText: 'first_name2'.tr(),
+                          hintText: 'Nour'.tr(),
                           /*icon: Icons.email,*/
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.next,
@@ -83,7 +83,7 @@ class SignupScreen extends StatelessWidget {
                           initialValue: state.signupDataEntity.lastName,
                           labelText: 'last_name'.tr(),
                           withTitle: true,
-                          hintText: "last_name2".tr(),
+                          hintText: "Alkhalil".tr(),
                           onChanged: (value) {
                             context.read<SignUpCubit>().setLastName(value);
                           },
@@ -98,7 +98,7 @@ class SignupScreen extends StatelessWidget {
                           initialValue: state.signupDataEntity.email,
                           labelText: 'email'.tr(),
                           withTitle: true,
-                          hintText: "email2".tr(),
+                          hintText: "nour@test2025.com".tr(),
                           onChanged: (value) {
                             context.read<SignUpCubit>().setEmail(value);
                           },
@@ -146,7 +146,7 @@ class SignupScreen extends StatelessWidget {
                                     );
                                   },
                                   withTitle: true,
-                                  hintText: 'mobile_number2'.tr(),
+                                  hintText: '938139179'.tr(),
                                   /*icon: Icons.email,*/
                                   keyboardType: TextInputType.number,
                                   textInputAction: TextInputAction.next,
@@ -170,7 +170,7 @@ class SignupScreen extends StatelessWidget {
                           initialValue: state.signupDataEntity.password,
                           labelText: 'password'.tr(),
                           withTitle: true,
-                          hintText: "password2".tr(),
+                          hintText: "Password123!".tr(),
                           obscureText: true,
                           onChanged: (value) {
                             context.read<SignUpCubit>().setPassword(value);
@@ -186,7 +186,7 @@ class SignupScreen extends StatelessWidget {
                           initialValue: state.signupDataEntity.confirmPassword,
                           labelText: 'confirm_password'.tr(),
                           withTitle: true,
-                          hintText: "confirm_password2".tr(),
+                          hintText: "Password123!".tr(),
                           obscureText: true,
                           onChanged: (value) {
                             context.read<SignUpCubit>().setConfirmPassword(
@@ -311,8 +311,9 @@ class SignupScreen extends StatelessWidget {
         context,
         VerifyAccountScreen.routeName,
         arguments: {
-          "signUpCubit": sl.locator<SignUpCubit>(),
-          "fromPassword": false,
+          "fromSignUp": true,
+          "phoneNumber":state.signupDataEntity.fullPhoneNumber,
+          "email":state.signupDataEntity.email
         },
       );
     } else if (state.signupStatus == SignupStatus.noInternet) {

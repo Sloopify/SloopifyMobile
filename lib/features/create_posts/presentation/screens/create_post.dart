@@ -63,19 +63,42 @@ class CreatePost extends StatelessWidget {
                 title: "create post",
                 actions: [
                   Container(
-                    height: 35,
+                    height: 40,
                     margin: EdgeInsets.symmetric(horizontal: AppPadding.p10),
-                    child: CustomElevatedButton(
+                    child: state.createPostStatus==CreatePostStatus.loading? CircularProgressIndicator():CustomElevatedButton(
                       label: "Create Post",
-                      isLoading:
-                          state.createPostStatus == CreatePostStatus.loading,
                       onPressed:
                           state.createPostStatus == CreatePostStatus.loading
                               ? () {}
-                              : () =>
+                              : () {
+                                if (context
+                                        .read<CreatePostCubit>()
+                                        .state
+                                        .regularPostEntity
+                                        .content
+                                        .isEmpty &&
+                                    (context
+                                                .read<CreatePostCubit>()
+                                                .state
+                                                .regularPostEntity
+                                                .mediaFiles ==
+                                            null ||
+                                        context
+                                            .read<CreatePostCubit>()
+                                            .state
+                                            .regularPostEntity
+                                            .mediaFiles!
+                                            .isEmpty)) {
+                                  showSnackBar(
+                                    context,
+                                    "You should write your post or choose media",
+                                  );
+                                } else {
                                   context
                                       .read<CreatePostCubit>()
-                                      .createRegularPost(),
+                                      .createRegularPost();
+                                }
+                              },
                       backgroundColor: ColorManager.primaryColor,
                       width: MediaQuery.of(context).size.width * 0.2,
                       isBold: true,
@@ -114,7 +137,9 @@ class CreatePost extends StatelessWidget {
                                       width: 1.5,
                                     ),
                                   ),
-                                  placeHolder: SvgPicture.asset(AssetsManager.user),
+                                  placeHolder: SvgPicture.asset(
+                                    AssetsManager.user,
+                                  ),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
@@ -171,7 +196,8 @@ class CreatePost extends StatelessWidget {
                                                         context
                                                             .read<
                                                               PostFriendsCubit
-                                                            >()..getFriendsList(),
+                                                            >()
+                                                          ..getFriendsList(),
                                                   },
                                                 ),
                                             text: "Mentions",
@@ -576,10 +602,27 @@ class CreatePost extends StatelessWidget {
   Widget _buildPostDisappear24Hours(BuildContext context) {
     return InkWell(
       onTap: () => context.read<CreatePostCubit>().setPostAvailableFor24Hours(),
-      child: SvgPicture.asset(
-        context.read<CreatePostCubit>().state.regularPostEntity.disappears24h
-            ? AssetsManager.postTimeActive
-            : AssetsManager.postTime,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppPadding.p4,
+          vertical: AppPadding.p4,
+        ),
+        decoration: BoxDecoration(
+          color:
+              context
+                      .read<CreatePostCubit>()
+                      .state
+                      .regularPostEntity
+                      .disappears24h
+                  ? ColorManager.white
+                  : ColorManager.primaryShade1.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: SvgPicture.asset(
+          context.read<CreatePostCubit>().state.regularPostEntity.disappears24h
+              ? AssetsManager.postTimeActive
+              : AssetsManager.postTime,
+        ),
       ),
     );
   }

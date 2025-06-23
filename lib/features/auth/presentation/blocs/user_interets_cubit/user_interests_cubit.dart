@@ -125,7 +125,7 @@ class InterestCubit extends Cubit<InterestState> {
 
   void toggleInterest(int id) {
     final selected = [...state.selectedInterestIds];
-    selected.contains(id) ? selected.remove(id) : selected.add(id);
+    selected.contains(id) ? selected.remove(id) : state.selectedInterestIds.length<=3?selected.add(id):selected;
     emit(state.copyWith(selectedInterestIds: selected.toSet()));
   }
 

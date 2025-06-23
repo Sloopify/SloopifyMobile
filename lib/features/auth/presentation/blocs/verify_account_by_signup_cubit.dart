@@ -39,11 +39,14 @@ class VerifyAccountBySignupCubit extends Cubit<VerifyAccountBySignupState> {
     );
   }
 
-  void registerOtp(BuildContext context) async {
+  void registerOtp(
+ {
+    required String phoneNumber,
+    required String email,
+  }) async {
     OtpDataEntity otpDataEntity = state.otpDataEntity.copyWith(
-      fullPhoneNumber:
-          '${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.code}${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.phoneNumber}',
-      email: context.read<AuthRepo>().getUserInfo()?.email,
+      fullPhoneNumber: phoneNumber,
+      email: email,
     );
 
     emit(state.copyWith(otpRegisterStatus: OtpRegisterStatus.loading));
@@ -58,14 +61,15 @@ class VerifyAccountBySignupCubit extends Cubit<VerifyAccountBySignupState> {
     );
   }
 
-  Future<void> verifyOtpLogin(BuildContext context) async {
+  Future<void> verifyOtpLogin({
+    required String phoneNumber,
+    required String email,
+  }) async {
     VerifyOtpEntity verifyOtpEntity = VerifyOtpEntity(
       otp: state.otpCode,
       otpSendType: state.otpSendType,
-      email: context.read<AuthRepo>().getUserInfo()?.email ?? "",
-      phone:
-          '${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.code}${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.phoneNumber}',
-    );
+      email: email,
+      phone: phoneNumber);
     emit(
       state.copyWith(verifyRegisterOtpStatus: VerifyRegisterOtpStatus.loading),
     );

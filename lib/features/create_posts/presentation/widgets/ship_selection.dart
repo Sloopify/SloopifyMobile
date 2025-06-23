@@ -16,7 +16,7 @@ class ShipSelection extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: AppPadding.p4,vertical: AppPadding.p2),
+        padding: EdgeInsets.symmetric(horizontal: AppPadding.p4,vertical: AppPadding.p4),
         margin: EdgeInsets.symmetric(horizontal: AppPadding.p4),
         decoration: BoxDecoration(
           color: ColorManager.primaryShade1.withOpacity(0.3),

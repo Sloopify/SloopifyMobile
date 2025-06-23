@@ -23,7 +23,7 @@ class AllUserPlacesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getCustomAppBar(context: context, title: "Where are you?"),
+      appBar: getCustomAppBar(context: context, title: "Where are you ?"),
       body: SafeArea(
         child: BlocBuilder<AddLocationCubit, AddLocationState>(
           builder: (context, state) {

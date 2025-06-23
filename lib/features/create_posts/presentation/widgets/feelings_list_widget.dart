@@ -100,7 +100,6 @@ class _FeelingsListWidgetState extends State<FeelingsListWidget> {
                     ),
               ],
             ),
-            if(state.selectedFeeling.isNotEmpty)
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -148,10 +147,16 @@ class _FeelingsListWidgetState extends State<FeelingsListWidget> {
       bool isSelected,) {
     return InkWell(
       onTap:
-          () =>
+          () {
+        if(context.read<FeelingsActivitiesCubit>().state.selectedFeeling==feeling.name){
+          context.read<FeelingsActivitiesCubit>().setFeelingName("");
+        }else{
           context.read<FeelingsActivitiesCubit>().selectFeelings(
             feeling.name,
-          ),
+          );
+        }
+
+          },
       child: BlocBuilder<FeelingsActivitiesCubit, FeelingsActivitiesState>(
           builder: (context, state) {
             print(state.selectedFeeling);

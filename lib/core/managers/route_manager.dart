@@ -87,18 +87,23 @@ class AppRouter {
         final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
           builder: (context) {
-            return BlocProvider(
-              create:(context)=> arg["signUpCubit"] as SignUpCubit,
-              child: VerifyAccountScreen(
-                fromForgetPassword: arg['fromPassword'],
-              ),
+            return VerifyAccountScreen(
+              email: arg["email"] as String? ,
+              phoneNumber: arg["phoneNumber"] as String?,
+              fromSignUp: arg["fromSignUp"] as bool,
+
             );
           },
         );
       case OtpCodeScreen.routeName:
+        final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
           builder: (context) {
-            return OtpCodeScreen();
+            return OtpCodeScreen(
+              email: arg["email"] as String? ,
+              phoneNumber: arg["phoneNumber"] as String?,
+              fromSignUp: arg["fromSignUp"] as bool,
+            );
           },
         );
       case SignInScreen.routeName:

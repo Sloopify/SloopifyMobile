@@ -86,6 +86,7 @@ class RegularPostEntity extends PostEntity {
 
   @override
   Future<Map<String, dynamic>> toJson() async {
+    print(backGroundColor);
     final Map<String, dynamic> data = {
       'type': 'regular',
       'content': content,
@@ -94,8 +95,15 @@ class RegularPostEntity extends PostEntity {
       'text_properties': textPropertyEntity.toJson(withMedia: mediaFiles!=null && mediaFiles!.isNotEmpty),
     };
 
-    if (backGroundColor != null) {
-      data['background_color'] = backGroundColor;
+    if (backGroundColor != null ) {
+      if(mediaFiles==null || mediaFiles!.isEmpty) {
+        data['background_color'] = backGroundColor!.toList();
+      }else{
+        List<String> colors= backGroundColor!;
+        for(int i=0;i<colors.length;i++){
+          data["background_color[$i]"]=colors[i];
+        }
+      }
     }
 
     if (mention != null) {
@@ -115,9 +123,10 @@ class RegularPostEntity extends PostEntity {
       final mediaList = await Future.wait(mediaFiles!.map((e) => e.toJson()));
       data['media'] = mediaList;
     }
-
+print('dataaaaaaaaaaaaaa${data}');
     return data;
   }
+
   int boolToInt(bool? value) => (value ?? false) ? 1 : 0;
 
 }

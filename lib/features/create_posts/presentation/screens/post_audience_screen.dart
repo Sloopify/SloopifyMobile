@@ -17,7 +17,9 @@ enum PostAudience { public, friends, friendsExcept, specificFriends, onlyMe }
 
 class PostAudienceScreen extends StatelessWidget {
   const PostAudienceScreen({super.key});
-static const routeName="post_Audience_screen";
+
+  static const routeName = "post_Audience_screen";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,46 +85,64 @@ Your default audience is set to Friends, but you can change the audience of this
                   style: AppTheme.bodyText3,
                 ),
               ),
-              title: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    audience.getSvg(),
-                    color:
-                        audience == PostAudience.friends
-                            ? ColorManager.black
-                            : null,
-                  ),
-                  Gaps.hGap2,
-                  Text(
-                    audience.getText(),
-                    style: AppTheme.bodyText3.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+              title: InkWell(
+                onTap: () {
                   if (audience == PostAudience.friendsExcept ||
-                      audience == PostAudience.specificFriends) ...[
-                    Spacer(),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 12,
-                      color: ColorManager.black,
+                      audience == PostAudience.specificFriends) {
+                    Navigator.pushNamed(
+                      context,
+                      FriendsList.routeName,
+                      arguments: {
+                        "create_post_cubit": context.read<CreatePostCubit>(),
+                        "post_friends_cubit":
+                            context.read<PostFriendsCubit>()..getFriendsList(),
+                      },
+                    );
+                  }
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      audience.getSvg(),
+                      color:
+                          audience == PostAudience.friends
+                              ? ColorManager.black
+                              : null,
                     ),
+                    Gaps.hGap2,
+                    Text(
+                      audience.getText(),
+                      style: AppTheme.bodyText3.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (audience == PostAudience.friendsExcept ||
+                        audience == PostAudience.specificFriends) ...[
+                      Spacer(),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 12,
+                        color: ColorManager.black,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
               value: audience,
               groupValue: state.regularPostEntity.postAudience,
               selected: state.regularPostEntity.postAudience == audience,
               onChanged: (value) {
                 context.read<CreatePostCubit>().setPostAudience(value!);
-                if (audience == PostAudience.friendsExcept || audience==PostAudience.specificFriends) {
+                if (audience == PostAudience.friendsExcept ||
+                    audience == PostAudience.specificFriends) {
                   Navigator.pushNamed(
                     context,
                     FriendsList.routeName,
                     arguments: {
                       "create_post_cubit": context.read<CreatePostCubit>(),
-                      "post_friends_cubit": context.read<PostFriendsCubit>()..getFriendsList(),
+                      "post_friends_cubit":
+                          context.read<PostFriendsCubit>()..getFriendsList(),
                     },
                   );
                 }

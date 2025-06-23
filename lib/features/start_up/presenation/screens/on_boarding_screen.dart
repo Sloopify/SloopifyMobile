@@ -76,7 +76,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               child: Row(
                 children: [
                   CustomElevatedButton(
-                    padding: EdgeInsets.zero,
+                    padding: EdgeInsets.symmetric(vertical: AppPadding.p8),
                     width: MediaQuery.of(context).size.width * 0.7,
                     label:  'next'.tr(),
                     onPressed: () async {

@@ -292,7 +292,7 @@ class _EditMediaScreenState extends State<EditMediaScreen> {
                                               (context) => PhotoFilterSelector(
                                                 circleShape: false,
                                                 title: const Text(
-                                                  "Photo Filter Example",
+                                                  "Photo Filter effects",
                                                 ),
                                                 image: image!,
                                                 filters: presetFiltersList,

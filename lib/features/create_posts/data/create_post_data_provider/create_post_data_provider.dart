@@ -255,7 +255,19 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
     if (res["success"] == true) {
       return unit;
     } else {
-      throw NetworkErrorFailure(message: res['message']);
+      String errorMessage = '';
+      final errors = res['errors'] ?? res["message"];
+      if (errors is String) {
+        errorMessage = errors;
+      } else if (errors is Map<String, dynamic>) {
+        List<String> keys = (errors).keys.toList();
+        keys.forEach((e) {
+          if ((errors[e] as List<dynamic>).isNotEmpty) {
+            errorMessage += errors[e].first + '\n';
+          }
+        });
+      }
+      throw NetworkErrorFailure(message:errorMessage);
     }
   }
 }

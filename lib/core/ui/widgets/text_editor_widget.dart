@@ -11,6 +11,7 @@ import 'package:sloopify_mobile/features/create_posts/domain/entities/text_entit
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 
 import '../../managers/app_dimentions.dart';
+import '../../managers/app_gaps.dart';
 import '../../managers/assets_managers.dart';
 import '../../managers/color_manager.dart';
 
@@ -299,6 +300,7 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
             ),
           ),
         ),
+        Gaps.vGap1,
         Container(
           height: context
               .read<CreatePostCubit>()

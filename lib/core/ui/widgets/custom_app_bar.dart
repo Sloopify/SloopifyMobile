@@ -51,8 +51,8 @@ PreferredSizeWidget getCustomAppBar({
     title: Text(
       title,
       style: AppTheme.headline2.copyWith(color: titleColor),
-      textAlign: TextAlign.right,
-      textDirection: TextDirection.rtl,
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
     ),
     bottom: bottom,
   );
