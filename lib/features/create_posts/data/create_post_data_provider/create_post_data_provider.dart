@@ -2,41 +2,79 @@ import 'package:dartz/dartz.dart';
 import 'package:sloopify_mobile/features/auth/data/models/user_model.dart';
 import 'package:sloopify_mobile/features/auth/domain/entities/user_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/data/models/activity_model.dart';
+import 'package:sloopify_mobile/features/create_posts/data/models/activity_result_model.dart';
 import 'package:sloopify_mobile/features/create_posts/data/models/feeling_model.dart';
+import 'package:sloopify_mobile/features/create_posts/data/models/feelings_result_model.dart';
+import 'package:sloopify_mobile/features/create_posts/data/models/friends_result_model.dart';
 import 'package:sloopify_mobile/features/create_posts/data/models/place_model.dart';
+import 'package:sloopify_mobile/features/create_posts/data/models/user_places_result_model.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/entities/categories_activity_entity.dart';
 
 import '../../../../core/api_service/api_urls.dart';
 import '../../../../core/api_service/base_api_service.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/create_place_entity.dart';
 import '../../domain/entities/regular_post_entity.dart';
+import '../models/categories_activitiy_result_model.dart';
 
 abstract class CreatePostDataProvider {
-  Future<List<UserModel>> getFriendsList();
-
-  Future<List<UserModel>> searchFriendsList({required String friendName});
-
-  Future<List<FeelingModel>> searchFeeling({required String feelingName});
-
-  Future<List<FeelingModel>> getFeelings();
-
-  Future<List<dynamic>> getActivityCategories();
-
-  Future<List<ActivityModel>> searchActivities({required String name});
-
-  Future<List<ActivityModel>> getActivitiesByCategoryName({
-    required String categoryName,
+  Future<FriendsResultModel> getFriendsList({
+    required int page,
+    required int perPage,
   });
 
-  Future<List<dynamic>> searchActivitiesCategoriesByName({
+  Future<FriendsResultModel> searchFriendsList({
+    required String friendName,
+    required int page,
+    required int perPage,
+  });
+
+  Future<FeelingsResultModel> searchFeeling({
+    required String feelingName,
+    required int page,
+    required int perPage,
+  });
+
+  Future<FeelingsResultModel> getFeelings({
+    required int page,
+    required int perPage,
+  });
+
+  Future<CategoriesActivityResultModel> getActivityCategories({
+    required int page,
+    required int perPage,
+  });
+
+  Future<ActivityResultModel> searchActivities({
     required String name,
+    required int page,
+    required int perPage,
   });
 
-  Future<List<PlaceModel>> getUserPlaces();
+  Future<ActivityResultModel> getActivitiesByCategoryName({
+    required String categoryName,
+    required int page,
+    required int perPage,
+  });
+
+  Future<CategoriesActivityResultModel> searchActivitiesCategoriesByName({
+    required String name,
+    required int page,
+    required int perPage,
+  });
+
+  Future<UserPlacesResultModel> getUserPlaces({
+    required int page,
+    required int perPage,
+  });
 
   Future<PlaceModel> getUserPlaceById({required String placeId});
 
-  Future<List<PlaceModel>> searchPlaces({required String search});
+  Future<UserPlacesResultModel> searchPlaces({
+    required String search,
+    required int page,
+    required int perPage,
+  });
 
   Future<Unit> createPlace({required CreatePlaceEntity createPlaceEntity});
 
@@ -51,121 +89,123 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
   CreatePosDataProviderImpl({required this.client});
 
   @override
-  Future<List<ActivityModel>> getActivitiesByCategoryName({
+  Future<ActivityResultModel> getActivitiesByCategoryName({
     required String categoryName,
+    required int page,
+    required int perPage,
   }) async {
     final res = await client.multipartRequest(
       url: ApiUrls.getActivityByCategoryName,
-      jsonBody: {"category": categoryName},
+      jsonBody: {"category": categoryName,"page":page,"per_page":perPage},
     );
     if (res["success"] == true) {
-      return List.generate(
-        (res["data"] as List).length,
-        (e) => ActivityModel.fromJson(res["data"][e]),
-      );
+      return ActivityResultModel.fromJson(res["data"]);
     } else {
       throw NetworkErrorFailure(message: res['message']);
     }
   }
 
   @override
-  Future<List<dynamic>> getActivityCategories() async {
-    final res = await client.getRequest(url: ApiUrls.getCategoriesActivities);
-    if (res["success"] == true) {
-      return res["data"];
-    } else {
-      throw NetworkErrorFailure(message: res['message']);
-    }
-  }
-
-  @override
-  Future<List<UserModel>> getFriendsList() async {
-    final res = await client.getRequest(url: ApiUrls.getFriends);
-    if (res["success"] == true) {
-      return List.generate(
-        (res["data"] as List).length,
-        (e) => UserModel.fromJson(res["data"][e]),
-      );
-    } else {
-      throw NetworkErrorFailure(message: res['message']);
-    }
-  }
-
-  @override
-  Future<List<ActivityModel>> searchActivities({required String name}) async {
-    final res = await client.multipartRequest(
-      url: ApiUrls.searchActivityByName,
-      jsonBody: {"search": name},
-    );
-    if (res["success"] == true) {
-      return List.generate(
-        (res["data"] as List).length,
-        (e) => ActivityModel.fromJson(res["data"][e]),
-      );
-    } else {
-      throw NetworkErrorFailure(message: res['message']);
-    }
-  }
-
-  @override
-  Future<List<dynamic>> searchActivitiesCategoriesByName({
-    required String name,
+  Future<CategoriesActivityResultModel> getActivityCategories({
+    required int page,
+    required int perPage,
   }) async {
     final res = await client.multipartRequest(
       url: ApiUrls.getCategoriesActivities,
-      jsonBody: {"search": name},
+      jsonBody: {"page": page, "per_page": perPage},
     );
     if (res["success"] == true) {
-      return res["data"];
+      return CategoriesActivityResultModel.fromJson(res["data"]);
     } else {
       throw NetworkErrorFailure(message: res['message']);
     }
   }
 
   @override
-  Future<List<FeelingModel>> searchFeeling({
+  Future<FriendsResultModel> getFriendsList({
+    required int page,
+    required int perPage,
+  }) async {
+    final res = await client.multipartRequest(
+      url: ApiUrls.getFriends,
+      jsonBody: {"page": page, "per_page": perPage},
+    );
+    if (res["success"] == true) {
+      return FriendsResultModel.fromJson(res["data"]);
+    } else {
+      throw NetworkErrorFailure(message: res['message']);
+    }
+  }
+
+  @override
+  Future<ActivityResultModel> searchActivities({required String name,required int page,required int perPage}) async {
+    final res = await client.multipartRequest(
+      url: ApiUrls.searchActivityByName,
+      jsonBody: {"search": name,"page":page,"per_page":perPage},
+    );
+    if (res["success"] == true) {
+      return ActivityResultModel.fromJson(res["data"]);
+    } else {
+      throw NetworkErrorFailure(message: res['message']);
+    }
+  }
+
+  @override
+  Future<CategoriesActivityResultModel> searchActivitiesCategoriesByName({
+    required String name,
+    required int page,
+    required int perPage
+  }) async {
+    final res = await client.multipartRequest(
+      url: ApiUrls.getCategoriesActivities,
+      jsonBody: {"search": name,"page":page,"per_page":perPage},
+    );
+    if (res["success"] == true) {
+      return CategoriesActivityResultModel.fromJson(res["data"]);
+    } else {
+      throw NetworkErrorFailure(message: res['message']);
+    }
+  }
+
+  @override
+  Future<FeelingsResultModel> searchFeeling({
     required String feelingName,
+    required int page,
+    required int perPage
   }) async {
     final res = await client.multipartRequest(
       url: ApiUrls.searchFeelingName,
-      jsonBody: {"search": feelingName},
+      jsonBody: {"search": feelingName,"page":page,"per_page":perPage},
     );
     if (res["success"] == true) {
-      return List.generate(
-        (res["data"] as List).length,
-        (e) => FeelingModel.fromJson(res["data"][e]),
-      );
+      return FeelingsResultModel.fromJson(res["data"]);
     } else {
       throw NetworkErrorFailure(message: res['message']);
     }
   }
 
   @override
-  Future<List<UserModel>> searchFriendsList({
+  Future<FriendsResultModel> searchFriendsList({
     required String friendName,
+    required int page,
+    required int perPage,
   }) async {
     final res = await client.multipartRequest(
       url: ApiUrls.searchFriends,
-      jsonBody: {"search": friendName},
+      jsonBody: {"search": friendName, "page": page, "per_page": perPage},
     );
     if (res["success"] == true) {
-      return List.generate(
-        (res["data"] as List).length,
-        (e) => UserModel.fromJson(res["data"][e]),
-      );
+      return FriendsResultModel.fromJson(res["data"]);
     } else {
       throw NetworkErrorFailure(message: res['message']);
     }
   }
 
   @override
-  Future<List<FeelingModel>> getFeelings() async {
-    final res = await client.getRequest(url: ApiUrls.getFeelings);
+  Future<FeelingsResultModel> getFeelings({required int page,required int perPage}) async {
+    final res = await client.multipartRequest(url: ApiUrls.getFeelings,jsonBody: {"page":page,"per_page":perPage});
     if (res["success"] == true) {
-      return List.generate(
-        (res["data"] as List).length,
-        (e) => FeelingModel.fromJson(res["data"][e]),
-      );
+      return FeelingsResultModel.fromJson(res["data"]);
     } else {
       throw NetworkErrorFailure(message: res['message']);
     }
@@ -200,29 +240,33 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
   }
 
   @override
-  Future<List<PlaceModel>> getUserPlaces() async {
-    final res = await client.getRequest(url: ApiUrls.getPlaces);
+  Future<UserPlacesResultModel> getUserPlaces({
+    required int page,
+    required int perPage,
+  }) async {
+    final res = await client.multipartRequest(
+      url: ApiUrls.getPlaces,
+      jsonBody: {"page": page, "per_page": perPage},
+    );
     if (res["success"] == true) {
-      return List.generate(
-        (res["data"] as List).length,
-        (e) => PlaceModel.fromJson(res["data"][e]),
-      );
+      return UserPlacesResultModel.fromJson(res["data"]);
     } else {
       throw NetworkErrorFailure(message: res['message']);
     }
   }
 
   @override
-  Future<List<PlaceModel>> searchPlaces({required String search}) async {
+  Future<UserPlacesResultModel> searchPlaces({
+    required String search,
+    required int page,
+    required int perPage,
+  }) async {
     final res = await client.multipartRequest(
       url: ApiUrls.searchPlaces,
-      jsonBody: {"search": search},
+      jsonBody: {"search": search, "page": page, "per_page": perPage},
     );
     if (res["success"] == true) {
-      return List.generate(
-        (res["data"] as List).length,
-        (e) => PlaceModel.fromJson(res["data"][e]),
-      );
+      return UserPlacesResultModel.fromJson(res["data"]);
     } else {
       throw NetworkErrorFailure(message: res['message']);
     }
@@ -250,7 +294,11 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
     final res = await client.multipartRequest(
       url: ApiUrls.createPost,
       jsonBody: await regularPostEntity.toJson(),
-      isContainsMedia: regularPostEntity.mediaFiles!=null && regularPostEntity.mediaFiles!.isNotEmpty?true:false,
+      isContainsMedia:
+          regularPostEntity.mediaFiles != null &&
+                  regularPostEntity.mediaFiles!.isNotEmpty
+              ? true
+              : false,
     );
     if (res["success"] == true) {
       return unit;
@@ -267,7 +315,7 @@ class CreatePosDataProviderImpl extends CreatePostDataProvider {
           }
         });
       }
-      throw NetworkErrorFailure(message:errorMessage);
+      throw NetworkErrorFailure(message: errorMessage);
     }
   }
 }

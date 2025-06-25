@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
+import 'package:sloopify_mobile/core/ui/widgets/custom_footer.dart';
 import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
 
@@ -67,8 +69,11 @@ class ActivitiesByCategories extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (state.getActivityStatus == GetActivityStatus.loading) ...[
-                    Center(child: CircularProgressIndicator()),
+                  if (state.getActivityStatus == GetActivityStatus.loading &&state.activities.isEmpty) ...[
+                    Center(child: Padding(
+                      padding:  EdgeInsets.only(top: AppPadding.p20),
+                      child: CircularProgressIndicator(),
+                    )),
                   ] else if (state.getActivityStatus ==
                           GetActivityStatus.offline ||
                       state.getActivityStatus == GetActivityStatus.error) ...[
@@ -82,51 +87,86 @@ class ActivitiesByCategories extends StatelessWidget {
                     ),
                   ] else ...[
                     Expanded(
-                      child: ListView.separated(
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap:
-                                () {
-                                  context
+                      child: SmartRefresher(
+                        controller:
+                        context
+                            .read<FeelingsActivitiesCubit>()
+                            .activitiesRefreshController,
+                        enablePullUp: true,
+                        enablePullDown: true,
+                        onRefresh:
+                            () =>
+                            context
+                                .read<FeelingsActivitiesCubit>()
+                                .onRefreshActivities(),
+                        onLoading:
+                            () =>
+                            context
+                                .read<FeelingsActivitiesCubit>()
+                                .onLoadMoreActivities(),
+                        footer: customFooter,
+                        child: ListView.separated(
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap:
+                                  () {
+                                context
                                     .read<FeelingsActivitiesCubit>()
                                     .selectActivityName(
-                                     state.selectedActivity== state.activities[index].name?"":state.activities[index].name,
-                                    );
-                                  context.read<CreatePostCubit>().setActivityName(
-                                      state.selectedActivity);
-                                },
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                GeneralImage.rectangle(
-                                  image: state.activities[index].mobileIcon,
-                                  isNetworkImage: true,
-                                  width: 50,
-                                  height: 50,
-                                  placeHolder: Icon(Icons.error),
-                                ),
-                                Gaps.hGap1,
-                                Text(
-                                  state.activities[index].name,
-                                  style: AppTheme.headline4.copyWith(
-                                    color:
-                                        state.activities[index].name ==
-                                                state.selectedActivity
-                                            ? ColorManager.primaryColor
-                                            : ColorManager.gray600,
-                                    fontWeight: FontWeight.bold,
+                                  state.selectedActivity== state.activities[index].name?"":state.activities[index].name,
+                                );
+                                context.read<CreatePostCubit>().setActivityName(
+                                    state.selectedActivity);
+                              },
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  GeneralImage.rectangle(
+                                    image: state.activities[index].mobileIcon,
+                                    isNetworkImage: true,
+                                    width: 50,
+                                    height: 50,
+                                    placeHolder: Icon(Icons.error),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          return Gaps.vGap2;
-                        },
-                        itemCount: state.activities.length,
+                                  Gaps.hGap1,
+                                  Text(
+                                    state.activities[index].name,
+                                    style: AppTheme.headline4.copyWith(
+                                      color:
+                                      state.activities[index].name ==
+                                          state.selectedActivity
+                                          ? ColorManager.primaryColor
+                                          : ColorManager.gray600,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return Gaps.vGap2;
+                          },
+                          itemCount: state.activities.length,
+                        ),
                       ),
                     ),
+                    Container(
+                      height: 50,
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      width: double.infinity,
+                      color: ColorManager.white,
+                      child: CustomElevatedButton(
+                        label: "Done",
+                        onPressed: () => Navigator.of(context).pop(),
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        borderSide: BorderSide(
+                          color: ColorManager.primaryColor.withOpacity(0.3),
+                        ),
+                        backgroundColor: ColorManager.primaryColor.withOpacity(0.3),
+                      ),
+                    ),
+
                   ],
                 ],
               ),

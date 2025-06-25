@@ -31,10 +31,27 @@ class MentionEntity extends Equatable {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    if (friends != null &&friends!.isNotEmpty) "friends": friends,
-    if (placeId != null) "place": placeId,
-    if (activity != null &&activity!.isNotEmpty) "activity": activity,
-    if (feeling != null &&feeling!.isNotEmpty) "feeling": feeling,
-  };
+  toJson(bool withMedia) {
+    final Map<String, dynamic> data = {};
+    if (placeId != null) {
+      data["place"] = placeId;
+    }
+    if (activity != null && activity!.isNotEmpty) {
+      data["activity"] = activity;
+    }
+    if (feeling != null && feeling!.isNotEmpty) {
+      data["feeling"] = feeling;
+    }
+    if (friends != null && friends!.isNotEmpty) {
+      if (!withMedia) {
+        data['friends'] = friends!;
+      } else {
+        List<int> friendsList = friends!;
+        for (int i = 0; i < friendsList.length; i++) {
+          data["friends[$i]"] = friendsList[i];
+        }
+      }
+    }
+    return data;
+  }
 }

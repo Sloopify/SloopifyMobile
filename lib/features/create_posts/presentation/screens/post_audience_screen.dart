@@ -85,49 +85,33 @@ Your default audience is set to Friends, but you can change the audience of this
                   style: AppTheme.bodyText3,
                 ),
               ),
-              title: InkWell(
-                onTap: () {
+              title: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    audience.getSvg(),
+                    color:
+                        audience == PostAudience.friends
+                            ? ColorManager.black
+                            : null,
+                  ),
+                  Gaps.hGap2,
+                  Text(
+                    audience.getText(),
+                    style: AppTheme.bodyText3.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   if (audience == PostAudience.friendsExcept ||
-                      audience == PostAudience.specificFriends) {
-                    Navigator.pushNamed(
-                      context,
-                      FriendsList.routeName,
-                      arguments: {
-                        "create_post_cubit": context.read<CreatePostCubit>(),
-                        "post_friends_cubit":
-                            context.read<PostFriendsCubit>()..getFriendsList(),
-                      },
-                    );
-                  }
-                },
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      audience.getSvg(),
-                      color:
-                          audience == PostAudience.friends
-                              ? ColorManager.black
-                              : null,
+                      audience == PostAudience.specificFriends) ...[
+                    Spacer(),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 12,
+                      color: ColorManager.black,
                     ),
-                    Gaps.hGap2,
-                    Text(
-                      audience.getText(),
-                      style: AppTheme.bodyText3.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    if (audience == PostAudience.friendsExcept ||
-                        audience == PostAudience.specificFriends) ...[
-                      Spacer(),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: ColorManager.black,
-                      ),
-                    ],
                   ],
-                ),
+                ],
               ),
               value: audience,
               groupValue: state.regularPostEntity.postAudience,

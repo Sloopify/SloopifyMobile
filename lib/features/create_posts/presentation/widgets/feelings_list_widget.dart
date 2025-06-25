@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
+import 'package:sloopify_mobile/core/ui/widgets/custom_footer.dart';
 import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/feeling_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
@@ -30,54 +32,78 @@ class _FeelingsListWidgetState extends State<FeelingsListWidget> {
   Widget build(BuildContext context) {
     return BlocBuilder<FeelingsActivitiesCubit, FeelingsActivitiesState>(
       builder: (context, state) {
-        return Stack(
+        return Column(
           children: [
-            Column(
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomTextField(
-                        hintText: "Serach for a friend",
-                        withTitle: false,
-                        onChanged: (value) {
-                          context
-                              .read<FeelingsActivitiesCubit>()
-                              .setFeelingName(
-                            value,
-                          );
-                        },
-                      ),
-                    ),
-                    Gaps.hGap2,
-                    SizedBox(
-                      width: 70,
-                      height: 50,
-                      child: CustomElevatedButton(
-                        label: "Find",
-                        onPressed: () {
-                          context
-                              .read<FeelingsActivitiesCubit>()
-                              .searchFeelings();
-                        },
-                        backgroundColor: ColorManager.primaryColor.withOpacity(
-                            0.3),
-                        borderSide: BorderSide(
-                          color: ColorManager.primaryColor.withOpacity(0.3),
-                        ),
-                      ),
-                    ),
-                  ],
+                Expanded(
+                  child: CustomTextField(
+                    hintText: "Serach for a friend",
+                    withTitle: false,
+                    onChanged: (value) {
+                      context
+                          .read<FeelingsActivitiesCubit>()
+                          .setFeelingName(
+                        value,
+                      );
+                    },
+                  ),
                 ),
-                if(state.getFeelingStatus == GetFeelingStatus.loading)...[
-                  Center(child: CircularProgressIndicator(),),
-                ] else
-                  if(state.getFeelingStatus == GetFeelingStatus.offline)...[
-                    Center(child: Text("no internet connection",
-                      style: AppTheme.headline4.copyWith(
-                          color: ColorManager.black),),),
-                  ] else
-                    Expanded(
+                Gaps.hGap2,
+                SizedBox(
+                  width: 70,
+                  height: 50,
+                  child: CustomElevatedButton(
+                    label: "Find",
+                    onPressed: () {
+                      context
+                          .read<FeelingsActivitiesCubit>()
+                          .searchFeelings();
+                    },
+                    backgroundColor: ColorManager.primaryColor.withOpacity(
+                        0.3),
+                    borderSide: BorderSide(
+                      color: ColorManager.primaryColor.withOpacity(0.3),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if(state.getFeelingStatus == GetFeelingStatus.loading && state.allFeelings.isEmpty)...[
+              Center(child: Padding(
+                padding:  EdgeInsets.only(top: AppPadding.p20),
+                child: CircularProgressIndicator(),
+              ),),
+            ] else
+              if(state.getFeelingStatus == GetFeelingStatus.offline)...[
+                Center(child: Text("no internet connection",
+                  style: AppTheme.headline4.copyWith(
+                      color: ColorManager.black),),),
+              ] else
+                if(state.getFeelingStatus == GetFeelingStatus.error)...[
+                  Center(child: Text(state.errorMessage,
+                    style: AppTheme.headline4.copyWith(
+                        color: ColorManager.black),),),
+                ] else...[
+                  Expanded(
+                    child: SmartRefresher(
+                      controller:
+                      context
+                          .read<FeelingsActivitiesCubit>()
+                          .feelingRefreshController,
+                      enablePullUp: true,
+                      enablePullDown: true,
+                      onRefresh:
+                          () =>
+                          context
+                              .read<FeelingsActivitiesCubit>()
+                              .onRefreshFeelings(),
+                      onLoading:
+                          () =>
+                          context
+                              .read<FeelingsActivitiesCubit>()
+                              .onLoadMoreFeelings(),
+                      footer: customFooter,
                       child: GridView.builder(
                         padding: EdgeInsets.symmetric(vertical: AppPadding.p10),
                         physics: BouncingScrollPhysics(),
@@ -98,44 +124,27 @@ class _FeelingsListWidgetState extends State<FeelingsListWidget> {
                         ),
                       ),
                     ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: double.infinity,
-                height: 60,
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.p50,
-                  vertical: AppPadding.p8,
-                ),
-                decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  boxShadow: [
-                    BoxShadow(
-                      offset: Offset(0, 4),
-                      spreadRadius: 0,
-                      blurRadius: 6,
-                      color: ColorManager.black.withOpacity(0.25),
+                  ),
+                  Container(
+                    height: 50,
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    width: double.infinity,
+                    color: ColorManager.white,
+                    child: CustomElevatedButton(
+                      label: "Done",
+                      onPressed: () {
+                        context.read<CreatePostCubit>().setFeelingName(
+                            state.selectedFeeling);
+                        Navigator.of(context).pop();
+                      },
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      borderSide: BorderSide(
+                        color: ColorManager.primaryColor.withOpacity(0.3),
+                      ),
+                      backgroundColor: ColorManager.primaryColor.withOpacity(0.3),
                     ),
-                  ],
-                ),
-                child: CustomElevatedButton(
-                  label: "Done",
-                  onPressed: () {
-                    context.read<CreatePostCubit>().setFeelingName(
-                        state.selectedFeeling);
-                    Navigator.of(context).pop();
-                  },
-                  backgroundColor: ColorManager.primaryColor,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.5,
-
-                ),
-              ),
-            ),
+                  ),
+                ]
           ],
         );
       },
@@ -149,7 +158,7 @@ class _FeelingsListWidgetState extends State<FeelingsListWidget> {
       onTap:
           () {
         if(context.read<FeelingsActivitiesCubit>().state.selectedFeeling==feeling.name){
-          context.read<FeelingsActivitiesCubit>().setFeelingName("");
+          context.read<FeelingsActivitiesCubit>().selectFeelings("");
         }else{
           context.read<FeelingsActivitiesCubit>().selectFeelings(
             feeling.name,

@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/activiity_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/feeling_entity.dart';
 
@@ -32,6 +33,9 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
     required this.searchCategoriesActivitiesByName,
     required this.searchFeelingsUseCase,
   }) : super(FeelingsActivitiesState());
+  final RefreshController feelingRefreshController = RefreshController();
+  final RefreshController categoriesRefreshController = RefreshController();
+  final RefreshController activitiesRefreshController = RefreshController();
 
   setSearchCategoryName(String value) {
     emit(
@@ -87,140 +91,325 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
     );
   }
 
-  getFeelings() async {
-    emit(state.copyWith(getFeelingStatus: GetFeelingStatus.loading));
-    final res = await getFeelingsUseCase.call();
+  getFeelings({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          feelingsPage: 1,
+          hasFeelingsReachedEnd: false,
+          allFeelings: [],
+          getFeelingStatus: GetFeelingStatus.loading,
+        ),
+      );
+    }
+    final res = await getFeelingsUseCase.call(
+      page: state.feelingsPage,
+      perPage: 10,
+    );
     res.fold(
       (l) {
+        feelingRefreshController.loadFailed();
         _mapFailureGetFeelingsToState(emit, l, state);
       },
       (r) {
+        final newList = [...state.allFeelings, ...r.feelings];
         emit(
           state.copyWith(
+            allFeelings: newList,
+            feelingsPage: state.feelingsPage + 1,
+            hasFeelingsReachedEnd: !r.paginationData.hasMorePages,
             getFeelingStatus: GetFeelingStatus.success,
-            allFeelings: r,
           ),
         );
+
+        if (r.paginationData.hasMorePages) {
+          feelingRefreshController.loadComplete();
+        } else {
+          feelingRefreshController.loadNoData();
+        }
       },
     );
   }
 
-  searchFeelings() async {
-    emit(state.copyWith(getFeelingStatus: GetFeelingStatus.loading));
-    final res = await searchFeelingsUseCase.call(name: state.searchFeelingName);
+  searchFeelings({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          feelingsPage: 1,
+          hasFeelingsReachedEnd: false,
+          allFeelings: [],
+          getFeelingStatus: GetFeelingStatus.loading,
+        ),
+      );
+    }
+    final res = await searchFeelingsUseCase.call(
+      name: state.searchFeelingName,
+      perPage: 10,
+      page: state.feelingsPage,
+    );
     res.fold(
       (l) {
+        feelingRefreshController.loadFailed();
         _mapFailureGetFeelingsToState(emit, l, state);
       },
       (r) {
+        final newList = [...state.allFeelings, ...r.feelings];
         emit(
           state.copyWith(
+            allFeelings: newList,
+            feelingsPage: state.feelingsPage + 1,
+            hasFeelingsReachedEnd: !r.paginationData.hasMorePages,
             getFeelingStatus: GetFeelingStatus.success,
-            allFeelings: r,
           ),
         );
+
+        if (r.paginationData.hasMorePages) {
+          feelingRefreshController.loadComplete();
+        } else {
+          feelingRefreshController.loadNoData();
+        }
       },
     );
   }
 
-  getAllCategoriesActivities() async {
+  void onLoadMoreFeelings() {
+    if (!state.hasFeelingsReachedEnd) {
+      state.searchFeelingName.isEmpty
+          ? getFeelings(isLoadMore: true)
+          : searchFeelings(isLoadMore: true);
+    } else {
+      feelingRefreshController.loadNoData();
+    }
+  }
+
+  void onRefreshFeelings() async {
     emit(
       state.copyWith(
-        getFeelingStatus: GetFeelingStatus.init,
-        getCategoriesActivityStatus: GetCategoriesActivityStatus.loading,
+        feelingsPage: 1,
+        allFeelings: [],
+        hasFeelingsReachedEnd: false,
       ),
     );
-    final res = await getCategoriesActivities.call();
+    state.searchFeelingName.isEmpty ? getFeelings() : searchFeelings();
+    feelingRefreshController.refreshCompleted();
+  }
+
+  getAllCategoriesActivities({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          categoriesPage: 1,
+          hasCategoriesReachedEnd: false,
+          categoriesActivity: [],
+          getCategoriesActivityStatus: GetCategoriesActivityStatus.loading,
+          getFeelingStatus: GetFeelingStatus.init,
+        ),
+      );
+    }
+
+    final res = await getCategoriesActivities.call(
+      page: state.categoriesPage,
+      perPage: 10,
+    );
     res.fold(
       (l) {
+        categoriesRefreshController.loadFailed();
         _mapFailureGetCategoriesActivitiesToState(emit, l, state);
       },
       (r) {
+        final newList = [...state.categoriesActivity, ...r.categories];
         emit(
           state.copyWith(
+            categoriesActivity: newList,
+            categoriesPage: state.categoriesPage + 1,
+            hasCategoriesReachedEnd: !r.paginationData.hasMorePages,
             getCategoriesActivityStatus: GetCategoriesActivityStatus.success,
-            categoriesActivity: r,
           ),
         );
+
+        if (r.paginationData.hasMorePages) {
+          categoriesRefreshController.loadComplete();
+        } else {
+          categoriesRefreshController.loadNoData();
+        }
       },
     );
   }
 
-  searchCategoriesActivitiesByNameCategory() async {
-    emit(
-      state.copyWith(
-        getFeelingStatus: GetFeelingStatus.init,
-        getCategoriesActivityStatus: GetCategoriesActivityStatus.loading,
-      ),
-    );
+  searchCategoriesActivitiesByNameCategory({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          categoriesPage: 1,
+          hasCategoriesReachedEnd: false,
+          categoriesActivity: [],
+          getCategoriesActivityStatus: GetCategoriesActivityStatus.loading,
+          getFeelingStatus: GetFeelingStatus.init,
+        ),
+      );
+    }
     final res = await searchCategoriesActivitiesByName.call(
+      page: state.categoriesPage,
+      perPage: 10,
       name: state.searchCategoryName,
     );
     res.fold(
       (l) {
+        categoriesRefreshController.loadFailed();
         _mapFailureGetCategoriesActivitiesToState(emit, l, state);
       },
       (r) {
+        final newList = [...state.categoriesActivity, ...r.categories];
         emit(
           state.copyWith(
+            categoriesActivity: newList,
+            categoriesPage: state.categoriesPage + 1,
+            hasCategoriesReachedEnd: !r.paginationData.hasMorePages,
             getCategoriesActivityStatus: GetCategoriesActivityStatus.success,
-            categoriesActivity: r,
           ),
         );
+
+        if (r.paginationData.hasMorePages) {
+          categoriesRefreshController.loadComplete();
+        } else {
+          categoriesRefreshController.loadNoData();
+        }
       },
     );
   }
 
-  getActivityByCategoryName() async {
+  void onLoadMoreCategories() {
+    if (!state.hasCategoriesReachedEnd) {
+      state.searchCategoryName.isEmpty
+          ? getAllCategoriesActivities(isLoadMore: true)
+          : searchCategoriesActivitiesByNameCategory(isLoadMore: true);
+    } else {
+      categoriesRefreshController.loadNoData();
+    }
+  }
+
+  void onRefreshCategories() async {
     emit(
       state.copyWith(
-        getFeelingStatus: GetFeelingStatus.init,
-        getCategoriesActivityStatus: GetCategoriesActivityStatus.init,
-        getActivityStatus: GetActivityStatus.loading,
+        categoriesPage: 1,
+        categoriesActivity: [],
+        hasCategoriesReachedEnd: false,
       ),
     );
+    state.searchCategoryName.isEmpty
+        ? getAllCategoriesActivities()
+        : searchCategoriesActivitiesByNameCategory();
+    categoriesRefreshController.refreshCompleted();
+  }
+
+  getActivityByCategoryName({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          activitiesPage: 1,
+          hasActivitiesReachedEnd: false,
+          activities: [],
+          getActivityStatus: GetActivityStatus.loading,
+          getFeelingStatus: GetFeelingStatus.init,
+          getCategoriesActivityStatus: GetCategoriesActivityStatus.init,
+        ),
+      );
+    }
     final res = await getActivitiesByCategoriesName.call(
+      perPage: 10,
+      page: state.activitiesPage,
       categoryName: state.selectedCategoryName,
     );
     res.fold(
       (l) {
         _mapFailureGetActivitiesToState(emit, l, state);
+        activitiesRefreshController.loadFailed();
       },
       (r) {
+        final newList = [...state.activities, ...r.activities];
         emit(
           state.copyWith(
+            activities: newList,
+            activitiesPage: state.activitiesPage + 1,
+            hasActivitiesReachedEnd: !r.paginationData.hasMorePages,
             getActivityStatus: GetActivityStatus.success,
-            activities: r,
           ),
         );
+
+        if (r.paginationData.hasMorePages) {
+          activitiesRefreshController.loadComplete();
+        } else {
+          activitiesRefreshController.loadNoData();
+        }
       },
     );
   }
 
-  searchActivityByCategoryName() async {
-    emit(
-      state.copyWith(
-        getFeelingStatus: GetFeelingStatus.init,
-        getCategoriesActivityStatus: GetCategoriesActivityStatus.init,
-        getActivityStatus: GetActivityStatus.loading,
-      ),
-    );
+  searchActivityByCategoryName({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          activitiesPage: 1,
+          hasActivitiesReachedEnd: false,
+          activities: [],
+          getActivityStatus: GetActivityStatus.loading,
+          getFeelingStatus: GetFeelingStatus.init,
+          getCategoriesActivityStatus: GetCategoriesActivityStatus.init,
+        ),
+      );
+    }
     final res = await searchActivitiesByNameUseCase.call(
+      page: state.activitiesPage,
+      perPage: 10,
       name: state.searchActivityName,
     );
     res.fold(
       (l) {
+        activitiesRefreshController.loadFailed();
         _mapFailureGetActivitiesToState(emit, l, state);
       },
       (r) {
+        final newList = [...state.activities, ...r.activities];
         emit(
           state.copyWith(
+            activities: newList,
+            activitiesPage: state.activitiesPage + 1,
+            hasActivitiesReachedEnd: !r.paginationData.hasMorePages,
             getActivityStatus: GetActivityStatus.success,
-            activities: r,
           ),
         );
+
+        if (r.paginationData.hasMorePages) {
+          activitiesRefreshController.loadComplete();
+        } else {
+          activitiesRefreshController.loadNoData();
+        }
+
       },
     );
+  }
+  void onLoadMoreActivities() {
+    if (!state.hasActivitiesReachedEnd) {
+      state.searchActivityName.isEmpty
+          ? getActivityByCategoryName(isLoadMore: true)
+          : searchActivityByCategoryName(isLoadMore: true);
+    } else {
+      activitiesRefreshController.loadNoData();
+    }
+  }
+
+  void onRefreshActivities() async {
+    emit(
+      state.copyWith(
+        activitiesPage: 1,
+        activities: [],
+        hasActivitiesReachedEnd: false,
+      ),
+    );
+    state.searchActivityName.isEmpty
+        ? getActivityByCategoryName()
+        : searchActivityByCategoryName();
+    activitiesRefreshController.refreshCompleted();
   }
 
   _mapFailureGetFeelingsToState(

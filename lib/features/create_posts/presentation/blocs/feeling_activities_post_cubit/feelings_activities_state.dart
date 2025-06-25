@@ -20,6 +20,12 @@ class FeelingsActivitiesState extends Equatable {
   final String searchActivityName;
   final String errorMessage;
   final String selectedCategoryName;
+  final int feelingsPage;
+  final int categoriesPage;
+  final int activitiesPage;
+  final bool hasFeelingsReachedEnd;
+  final bool hasCategoriesReachedEnd;
+  final bool hasActivitiesReachedEnd;
 
   const FeelingsActivitiesState({
     this.activities = const [],
@@ -35,6 +41,12 @@ class FeelingsActivitiesState extends Equatable {
     this.searchActivityName = "",
     this.searchCategoryName = "",
     this.errorMessage = "",
+    this.activitiesPage = 1,
+    this.categoriesPage = 1,
+    this.feelingsPage = 1,
+    this.hasActivitiesReachedEnd = false,
+    this.hasCategoriesReachedEnd = false,
+    this.hasFeelingsReachedEnd = false,
   });
 
   @override
@@ -53,6 +65,12 @@ class FeelingsActivitiesState extends Equatable {
     searchFeelingName,
     errorMessage,
     selectedCategoryName,
+    feelingsPage,
+    categoriesPage,
+    activitiesPage,
+    hasFeelingsReachedEnd,
+    hasCategoriesReachedEnd,
+    hasActivitiesReachedEnd,
   ];
 
   FeelingsActivitiesState copyWith({
@@ -69,10 +87,24 @@ class FeelingsActivitiesState extends Equatable {
     String? searchCategoryName,
     String? searchActivityName,
     String? errorMessage,
+    int? feelingsPage,
+    int? categoriesPage,
+    int? activitiesPage,
+    bool? hasFeelingsReachedEnd,
+    bool? hasCategoriesReachedEnd,
+    bool? hasActivitiesReachedEnd,
   }) {
     return FeelingsActivitiesState(
       selectedCategoryName: selectedCategoryName ?? this.selectedCategoryName,
-
+      activitiesPage: activitiesPage ?? this.activitiesPage,
+      categoriesPage: categoriesPage ?? this.categoriesPage,
+      feelingsPage: feelingsPage ?? this.feelingsPage,
+      hasActivitiesReachedEnd:
+          hasActivitiesReachedEnd ?? this.hasActivitiesReachedEnd,
+      hasCategoriesReachedEnd:
+          hasCategoriesReachedEnd ?? this.hasCategoriesReachedEnd,
+      hasFeelingsReachedEnd:
+          hasFeelingsReachedEnd ?? this.hasFeelingsReachedEnd,
       activities: activities ?? this.activities,
       allFeelings: allFeelings ?? this.allFeelings,
       categoriesActivity: categoriesActivity ?? this.categoriesActivity,

@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/features/auth/domain/entities/user_entity.dart';
 
 import '../../../../../core/errors/failures.dart';
@@ -18,60 +19,114 @@ class PostFriendsCubit extends Cubit<PostFriendsState> {
     required this.getFriendsListUseCase,
     required this.searchFriendsListUseCase,
   }) : super(PostFriendsState());
+  final RefreshController refreshController = RefreshController();
 
   setSearchFriendName(String value) {
     emit(
       state.copyWith(
         searchName: value,
-        getAllFriendStatus: GetAllFriendStatus.init,
+        getAllFriendStatus: GetAllFriendStatus.loading,
       ),
     );
   }
 
-  getFriendsList() async {
-    emit(state.copyWith(getAllFriendStatus: GetAllFriendStatus.loading));
-    final res = await getFriendsListUseCase.call();
+  getFriendsList({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          page: 1,
+          hasReachedEnd: false,
+          allFriends: [],
+          getAllFriendStatus: GetAllFriendStatus.loading,
+        ),
+      );
+    }
+    final res = await getFriendsListUseCase.call(perPage: 10, page: state.page);
     res.fold(
       (l) {
+        refreshController.loadFailed();
         _mapFailureGetFriendsToState(emit, l, state);
       },
       (r) {
+        final newList = [...state.allFriends, ...r.friends];
         emit(
           state.copyWith(
+            allFriends: newList,
+            page: state.page + 1,
+            hasReachedEnd: !r.paginationData.hasMorePages,
             getAllFriendStatus: GetAllFriendStatus.success,
-            allFriends: r,
           ),
         );
+
+        if (r.paginationData.hasMorePages) {
+          refreshController.loadComplete();
+        } else {
+          refreshController.loadNoData();
+        }
       },
     );
   }
 
-  searchFriendsList() async {
-    emit(state.copyWith(getAllFriendStatus: GetAllFriendStatus.loading));
+  void onLoadMore() {
+    if (!state.hasReachedEnd) {
+     state.searchName.isEmpty? getFriendsList(isLoadMore: true) : searchFriendsList(isLoadMore: true);
+    } else {
+      refreshController.loadNoData();
+    }
+  }
+
+  void onRefresh() async {
+    emit(state.copyWith(page: 1, allFriends: [], hasReachedEnd: false));
+    state.searchName.isEmpty ? getFriendsList() : searchFriendsList();
+    refreshController.refreshCompleted();
+  }
+
+  searchFriendsList({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          page: 1,
+          hasReachedEnd: false,
+          allFriends: [],
+          getAllFriendStatus: GetAllFriendStatus.loading,
+        ),
+      );
+    }
     final res = await searchFriendsListUseCase.call(
       friendName: state.searchName,
+      page: state.page,
+      perPage: 10,
     );
     res.fold(
       (l) {
         _mapFailureGetFriendsToState(emit, l, state);
+        refreshController.loadFailed();
       },
       (r) {
+        final newList = [...state.allFriends, ...r.friends];
+
         emit(
           state.copyWith(
+            allFriends: newList,
+            page: state.page + 1,
+            hasReachedEnd: !r.paginationData.hasMorePages,
             getAllFriendStatus: GetAllFriendStatus.success,
-            allFriends: r,
-            selectedSpecificFriends:
-                r.where((e) => e.isSpecificFriend!).map((e) => e.id).toList(),
-            selectedFriendsExcept:
-                r.where((e) => e.friendsExcept!).map((e) => e.id).toList(),
           ),
         );
+
+        if (r.paginationData.hasMorePages) {
+          refreshController.loadComplete();
+        } else {
+          refreshController.loadNoData();
+        }
       },
     );
   }
 
   void toggleSelectSpecificFriends(int friendId) {
-    List<int> newSelectedSpecificFrineds = List.from(state.selectedSpecificFriends);
+    List<int> newSelectedSpecificFrineds = List.from(
+      state.selectedSpecificFriends,
+    );
 
     if (!(newSelectedSpecificFrineds.contains(friendId))) {
       newSelectedSpecificFrineds.add(friendId);
@@ -81,12 +136,12 @@ class PostFriendsCubit extends Cubit<PostFriendsState> {
     emit(
       state.copyWith(
         selectedSpecificFriends: newSelectedSpecificFrineds,
-        getAllFriendStatus: GetAllFriendStatus.init,
       ),
     );
   }
+
   void toggleSelectionMentionFriends(int friendId) {
-    List<int> mentionedListFriends= List.from(state.selectedMentionFriends);
+    List<int> mentionedListFriends = List.from(state.selectedMentionFriends);
 
     if (!(mentionedListFriends.contains(friendId))) {
       mentionedListFriends.add(friendId);
@@ -96,10 +151,10 @@ class PostFriendsCubit extends Cubit<PostFriendsState> {
     emit(
       state.copyWith(
         selectedMentionFriends: mentionedListFriends,
-        getAllFriendStatus: GetAllFriendStatus.init,
       ),
     );
   }
+
   void toggleSelectFriendsExcept(int friendId) {
     List<int> newSelectedFriendsExcept = List.from(state.selectedFriendsExcept);
     if (!(newSelectedFriendsExcept.contains(friendId))) {
@@ -109,8 +164,7 @@ class PostFriendsCubit extends Cubit<PostFriendsState> {
     }
     emit(
       state.copyWith(
-        selectedFriendsExcept:newSelectedFriendsExcept,
-        getAllFriendStatus: GetAllFriendStatus.init,
+        selectedFriendsExcept: newSelectedFriendsExcept,
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/create_place_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/place_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/use_cases/create_place_use_case.dart';
@@ -32,6 +33,7 @@ class AddLocationCubit extends Cubit<AddLocationState> {
     required this.getUserPlaceByIdUseCase,
     required this.getAllUserPlacesUseCase,
   }) : super(AddLocationState.empty());
+  final RefreshController refreshController = RefreshController();
 
   setSearchPlaces(String value) {
     emit(
@@ -94,54 +96,120 @@ class AddLocationCubit extends Cubit<AddLocationState> {
     );
   }
 
-  getAllUserPlaces() async {
-    emit(state.copyWith(getUserPlacesStatus: GetUserPlacesStatus.loading));
-    final res = await getAllUserPlacesUseCase.call();
+  getAllUserPlaces({bool isLoadMore = false}) async {
+    if (state.getUserPlacesStatus == GetUserPlacesStatus.loading) return;
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          page: 1,
+          hasReachedEnd: false,
+          places: [],
+          getUserPlacesStatus: GetUserPlacesStatus.loading,
+        ),
+      );
+    }
+    final res = await getAllUserPlacesUseCase.call(
+      page: state.page,
+      perPage: 10,
+    );
     res.fold(
       (l) {
+        refreshController.loadFailed();
         _mapFailureGetPlacesToState(emit, l, state);
       },
       (data) {
+        final newList = [...state.places, ...data.places];
+
         emit(
           state.copyWith(
-            places: data,
+            places: newList,
+            page: state.page + 1,
+            hasReachedEnd: !data.paginationData.hasMorePages,
             getUserPlacesStatus: GetUserPlacesStatus.success,
           ),
         );
+
+        if (data.paginationData.hasMorePages) {
+          refreshController.loadComplete();
+        } else {
+          refreshController.loadNoData();
+        }
       },
     );
   }
 
-  searchUserPlaces() async {
-    emit(state.copyWith(getUserPlacesStatus: GetUserPlacesStatus.loading));
-    final res = await searchPlaces.call(search: state.searchKeyWord);
+  void onLoadMore() {
+    if (!state.hasReachedEnd) {
+      state.searchKeyWord.isEmpty
+          ? getAllUserPlaces(isLoadMore: true)
+          : searchUserPlaces(isLoadMore: true);
+    } else {
+      refreshController.loadNoData();
+    }
+  }
+
+  void onRefresh() async {
+    emit(state.copyWith(page: 1, places: [], hasReachedEnd: false));
+    state.searchKeyWord.isEmpty ? getAllUserPlaces() : searchUserPlaces();
+    refreshController.refreshCompleted();
+  }
+
+  searchUserPlaces({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      emit(
+        state.copyWith(
+          page: 1,
+          hasReachedEnd: false,
+          places: [],
+          getUserPlacesStatus: GetUserPlacesStatus.loading,
+        ),
+      );
+    }
+    final res = await searchPlaces.call(
+      search: state.searchKeyWord,
+      page: state.page,
+      perPage: 10,
+    );
     res.fold(
       (l) {
         _mapFailureGetPlacesToState(emit, l, state);
+        refreshController.loadFailed();
       },
       (data) {
+        final newList = [...state.places, ...data.places];
+
         emit(
           state.copyWith(
-            places: data,
+            places: newList,
+            page: state.page + 1,
+            hasReachedEnd: !data.paginationData.hasMorePages,
             getUserPlacesStatus: GetUserPlacesStatus.success,
           ),
         );
+
+        if (data.paginationData.hasMorePages) {
+          refreshController.loadComplete();
+        } else {
+          refreshController.loadNoData();
+        }
       },
     );
   }
 
   createUserPlace() async {
     emit(state.copyWith(addNewPlaceStatus: AddNewPlaceStatus.loading));
-    final res = await createPlaceUseCase.call(createPlaceEntity:state.createPlaceEntity);
+    final res = await createPlaceUseCase.call(
+      createPlaceEntity: state.createPlaceEntity,
+    );
     res.fold(
-          (l) {
-            _mapFailureCreatePlacesToState(emit, l, state);
+      (l) {
+        _mapFailureCreatePlacesToState(emit, l, state);
       },
-          (data) {
+      (data) {
         emit(
           state.copyWith(
             getUserPlacesStatus: GetUserPlacesStatus.init,
-            addNewPlaceStatus: AddNewPlaceStatus.success
+            addNewPlaceStatus: AddNewPlaceStatus.success,
           ),
         );
       },
@@ -190,6 +258,7 @@ class AddLocationCubit extends Cubit<AddLocationState> {
         );
     }
   }
+
   _mapFailureCreatePlacesToState(emit, Failure f, AddLocationState state) {
     switch (f) {
       case OfflineFailure():

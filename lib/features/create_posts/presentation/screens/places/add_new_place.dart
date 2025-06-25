@@ -39,6 +39,16 @@ class _AddNewPlaceState extends State<AddNewPlace> {
     );
     super.initState();
   }
+  @override
+  void didChangeDependencies() {
+    final state = context.read<AddLocationCubit>().state;
+    cityNameController = TextEditingController(
+      text: state.createPlaceEntity.city,
+    );
+    countryNameController = TextEditingController(
+      text: state.createPlaceEntity.country,
+    );    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +215,7 @@ class _AddNewPlaceState extends State<AddNewPlace> {
 
   void buildListener(BuildContext context, AddLocationState state) {
     if (state.addNewPlaceStatus == AddNewPlaceStatus.success) {
-      context.read<AddLocationCubit>().getAllUserPlaces();
+      Navigator.of(context).pop();
     } else if (state.addNewPlaceStatus == AddNewPlaceStatus.offline ||
         state.addNewPlaceStatus == AddNewPlaceStatus.error) {
       showSnackBar(context, state.errorMessage);

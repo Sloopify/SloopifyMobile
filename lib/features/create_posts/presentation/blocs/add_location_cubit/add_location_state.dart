@@ -12,6 +12,8 @@ class AddLocationState extends Equatable {
   final List<PlaceEntity> places;
   final String searchKeyWord;
   final int selectedLocationId;
+  final int page;
+  final bool hasReachedEnd;
 
   const AddLocationState({
     required this.addNewPlaceStatus,
@@ -21,10 +23,14 @@ class AddLocationState extends Equatable {
     required this.places,
     required this.searchKeyWord,
     required this.selectedLocationId,
+    required this.page,
+    required this.hasReachedEnd
   });
 
   factory AddLocationState.empty() {
     return AddLocationState(
+      hasReachedEnd: true,
+        page: 1,
       addNewPlaceStatus: AddNewPlaceStatus.init,
       getUserPlacesStatus: GetUserPlacesStatus.init,
       places: [],
@@ -45,6 +51,8 @@ class AddLocationState extends Equatable {
     places,
     searchKeyWord,
     selectedLocationId,
+    hasReachedEnd,
+    page
   ];
 
   AddLocationState copyWith({
@@ -61,8 +69,12 @@ class AddLocationState extends Equatable {
     List<PlaceEntity>? places,
     String? searchKeyWord,
     int? selectedLocationId,
+    int ? page,
+    bool ? hasReachedEnd
   }) {
     return AddLocationState(
+      hasReachedEnd: hasReachedEnd??this.hasReachedEnd,
+      page: page??this.page,
       selectedLocationId: selectedLocationId ?? this.selectedLocationId,
       searchKeyWord: searchKeyWord ?? this.searchKeyWord,
       addNewPlaceStatus: addNewPlaceStatus ?? this.addNewPlaceStatus,

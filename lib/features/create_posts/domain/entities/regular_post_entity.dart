@@ -99,23 +99,37 @@ class RegularPostEntity extends PostEntity {
       if(mediaFiles==null || mediaFiles!.isEmpty) {
         data['background_color'] = backGroundColor!.toList();
       }else{
-        List<String> colors= backGroundColor!;
-        for(int i=0;i<colors.length;i++){
-          data["background_color[$i]"]=colors[i];
-        }
+        // List<String> colors= backGroundColor!;
+        // for(int i=0;i<colors.length;i++){
+        //   data["background_color[$i]"]=colors[i];
+        // }
       }
     }
 
     if (mention != null) {
-      data['mentions'] = mention!.toJson();
+      data['mentions'] = mention!.toJson(mediaFiles!=null &&mediaFiles!.isNotEmpty);
     }
 
     if (friendsExcept != null) {
-      data['friend_except'] = friendsExcept;
+      if(mediaFiles==null || mediaFiles!.isEmpty) {
+        data['friend_except'] =friendsExcept;
+      }else{
+        List<int> friendsExceptList= friendsExcept!;
+        for(int i=0;i<friendsExceptList.length;i++){
+          data["friend_except[$i]"]=friendsExceptList[i];
+        }
+      }
     }
 
     if (specificFriends != null) {
-      data['specific_friends'] = specificFriends;
+      if(mediaFiles==null || mediaFiles!.isEmpty) {
+        data['specific_friends'] =specificFriends;
+      }else{
+        List<int> specificFriendsList= specificFriends!;
+        for(int i=0;i<specificFriendsList.length;i++){
+          data["specific_friends[$i]"]=specificFriendsList[i];
+        }
+      }
     }
 
     if (mediaFiles != null) {
@@ -123,7 +137,6 @@ class RegularPostEntity extends PostEntity {
       final mediaList = await Future.wait(mediaFiles!.map((e) => e.toJson()));
       data['media'] = mediaList;
     }
-print('dataaaaaaaaaaaaaa${data}');
     return data;
   }
 

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
+import 'package:sloopify_mobile/core/ui/widgets/custom_footer.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/place_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 
@@ -27,149 +29,157 @@ class AllUserPlacesScreen extends StatelessWidget {
       body: SafeArea(
         child: BlocBuilder<AddLocationCubit, AddLocationState>(
           builder: (context, state) {
-            return Stack(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppPadding.p20,
-                    vertical: AppPadding.p10,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: AppPadding.p20,
+                  vertical: AppPadding.p10,
+                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CustomTextField(
-                              hintText: "Search for places",
-                              withTitle: false,
-                              onChanged: (value) {
-                                context
-                                    .read<AddLocationCubit>()
-                                    .setSearchPlaces(value);
-                              },
-                            ),
-                          ),
-                          Gaps.hGap2,
-                          SizedBox(
-                            width: 70,
-                            height: 50,
-                            child: CustomElevatedButton(
-                              label: "Find",
-                              onPressed: () {
-                                context
-                                    .read<AddLocationCubit>()
-                                    .searchUserPlaces();
-                              },
-                              backgroundColor: ColorManager.primaryColor
-                                  .withOpacity(0.3),
-                              borderSide: BorderSide(
-                                color: ColorManager.primaryColor.withOpacity(
-                                  0.3,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Gaps.vGap3,
-                      GestureDetector(
-                        onTap:
-                            () => Navigator.pushNamed(
-                              context,
-                              AddNewPlace.routeName,
-                              arguments: {
-                                "add_location_cubit":
-                                    context.read<AddLocationCubit>(),
-                              },
-                            ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(AssetsManager.addNewLocation),
-                            Text(
-                              "Add specific location",
-                              style: AppTheme.headline4.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                      Expanded(
+                        child: CustomTextField(
+                          hintText: "Search for places",
+                          withTitle: false,
+                          onChanged: (value) {
+                            context
+                                .read<AddLocationCubit>()
+                                .setSearchPlaces(value);
+                          },
                         ),
                       ),
-                      Gaps.vGap3,
-                      if (state.getUserPlacesStatus ==
-                          GetUserPlacesStatus.loading) ...[
-                        Center(child: CircularProgressIndicator()),
-                      ] else if (state.getUserPlacesStatus ==
-                          GetUserPlacesStatus.offline) ...[
-                        Center(
-                          child: Text(
-                            "you are offline",
-                            style: AppTheme.headline4,
+                      Gaps.hGap2,
+                      SizedBox(
+                        width: 70,
+                        height: 50,
+                        child: CustomElevatedButton(
+                          label: "Find",
+                          onPressed: () {
+                            context
+                                .read<AddLocationCubit>()
+                                .searchUserPlaces();
+                          },
+                          backgroundColor: ColorManager.primaryColor
+                              .withOpacity(0.3),
+                          borderSide: BorderSide(
+                            color: ColorManager.primaryColor.withOpacity(
+                              0.3,
+                            ),
                           ),
                         ),
-                      ] else if (state.getUserPlacesStatus ==
-                          GetUserPlacesStatus.error) ...[
-                        Center(
-                          child: Text(
-                            "some thing went error, please try again later!",
-                            style: AppTheme.headline4,
-                          ),
-                        ),
-                      ] else
-                        Expanded(
-                          child: ListView.separated(
-                            physics: BouncingScrollPhysics(),
-                            itemCount: state.places.length,
-                            itemBuilder: (context, index) {
-                              return _buildPlaceItem(
-                                state.places[index],
-                                context,
-                              );
-                            },
-                            separatorBuilder: (
-                              BuildContext context,
-                              int index,
-                            ) {
-                              return Gaps.vGap2;
-                            },
-                          ),
-                        ),
-                      Gaps.vGap8,
+                      ),
                     ],
                   ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    width: double.infinity,
-                    height: 60,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppPadding.p50,
-                      vertical: AppPadding.p8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: ColorManager.white,
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 4),
-                          spreadRadius: 0,
-                          blurRadius: 6,
-                          color: ColorManager.black.withOpacity(0.25),
+                  Gaps.vGap3,
+                  GestureDetector(
+                    onTap:
+                        () => Navigator.pushNamed(
+                          context,
+                          AddNewPlace.routeName,
+                          arguments: {
+                            "add_location_cubit":
+                                context.read<AddLocationCubit>(),
+                          },
+                        ),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(AssetsManager.addNewLocation),
+                        Text(
+                          "Add specific location",
+                          style: AppTheme.headline4.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
-                    child: CustomElevatedButton(
-                      label: "Done",
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        context.read<CreatePostCubit>().setLocationId(state.selectedLocationId);
-                      },
-                      backgroundColor: ColorManager.primaryColor,
-                      width: MediaQuery.of(context).size.width * 0.5,
-                    ),
                   ),
-                ),
-              ],
+                  Gaps.vGap3,
+                  if (state.getUserPlacesStatus ==
+                      GetUserPlacesStatus.loading &&state.places.isEmpty) ...[
+                    Padding(
+                      padding:  EdgeInsets.only(top: AppPadding.p20),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ] else if (state.getUserPlacesStatus ==
+                      GetUserPlacesStatus.offline) ...[
+                    Center(
+                      child: Text(
+                        "you are offline",
+                        style: AppTheme.headline4,
+                      ),
+                    ),
+                  ] else if (state.getUserPlacesStatus ==
+                      GetUserPlacesStatus.error) ...[
+                    Center(
+                      child: Text(
+                       state.errorMessage,
+                        style: AppTheme.headline4,
+                      ),
+                    ),
+                  ] else...[
+                    Expanded(
+                      child: SmartRefresher(
+                        controller:
+                        context
+                            .read<AddLocationCubit>()
+                            .refreshController,
+                        enablePullUp: true,
+                        enablePullDown: true,
+                        onRefresh:
+                            () =>
+                            context
+                                .read<AddLocationCubit>()
+                                .onRefresh(),
+                        onLoading:
+                            () =>
+                            context
+                                .read<AddLocationCubit>()
+                                .onLoadMore(),
+                        footer: customFooter,
+                        child:  ListView.separated(
+                          physics: BouncingScrollPhysics(),
+                          itemCount: state.places.length,
+                          itemBuilder: (context, index) {
+                            return _buildPlaceItem(
+                              state.places[index],
+                              context,
+                            );
+                          },
+                          separatorBuilder: (
+                              BuildContext context,
+                              int index,
+                              ) {
+                            return Gaps.vGap2;
+                          },
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        width: double.infinity,
+                        height: 60,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppPadding.p50,
+                          vertical: AppPadding.p8,
+                        ),
+                        child: CustomElevatedButton(
+                          label: "Done",
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            context.read<CreatePostCubit>().setLocationId(state.selectedLocationId);
+                          },
+                          backgroundColor: ColorManager.primaryColor,
+                          width: MediaQuery.of(context).size.width * 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+
+                ],
+              ),
             );
           },
         ),

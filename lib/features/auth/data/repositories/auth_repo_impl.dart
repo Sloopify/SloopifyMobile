@@ -22,10 +22,10 @@ class AuthRepoImpl extends AuthRepo {
       return null;
     }
     Map<String, dynamic> mappedData = data as Map<String, dynamic>;
-    Logger().i(mappedData);
+    //Logger().i(mappedData);
 
     UserEntity userEntity = UserModel.fromJson(mappedData);
-    Logger().i(userEntity.toString());
+  //  Logger().i(userEntity.toString());
     //Logger().i(userEntity.image);
     return userEntity;
   }

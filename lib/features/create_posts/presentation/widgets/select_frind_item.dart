@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
+import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/features/auth/domain/entities/user_entity.dart';
 
@@ -37,6 +39,7 @@ class _SelectFriendItemState extends State<SelectFriendItem> {
     return Row(
       children: [
         GeneralImage.circular(
+          placeHolder: SvgPicture.asset(AssetsManager.user),
           isNetworkImage: true,
           image: widget.friendEntity.image,
           radius: 50,

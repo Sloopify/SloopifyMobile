@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
@@ -11,6 +12,7 @@ import 'package:sloopify_mobile/features/create_posts/presentation/screens/post_
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/select_frind_item.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
+import '../../../../core/ui/widgets/custom_footer.dart';
 import '../blocs/post_friends_cubit/post_freinds_cubit.dart';
 
 class FriendsList extends StatelessWidget {
@@ -33,17 +35,18 @@ class FriendsList extends StatelessWidget {
                 ? "Friends except"
                 : "Specific friends",
       ),
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          SafeArea(
-            child: Padding(
+      body: SafeArea(
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: AppPadding.p20,
                 vertical: AppPadding.p10,
               ),
               child: BlocBuilder<PostFriendsCubit, PostFriendsState>(
                 builder: (context, state) {
+                  print(state.getAllFriendStatus);
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -84,8 +87,12 @@ class FriendsList extends StatelessWidget {
                       ),
                       Gaps.vGap3,
                       if (state.getAllFriendStatus ==
-                          GetAllFriendStatus.loading) ...[
-                        Center(child: CircularProgressIndicator()),
+                              GetAllFriendStatus.loading &&
+                          state.allFriends.isEmpty) ...[
+                        Padding(
+                          padding: EdgeInsets.only(top: AppPadding.p20),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
                       ] else if (state.getAllFriendStatus ==
                           GetAllFriendStatus.offline) ...[
                         Center(
@@ -98,111 +105,171 @@ class FriendsList extends StatelessWidget {
                           GetAllFriendStatus.error) ...[
                         Center(
                           child: Text(
-                            "some thing went error, please try again later!",
+                            state.errorMessage,
                             style: AppTheme.headline4,
                           ),
                         ),
-                      ] else if (context
-                              .read<CreatePostCubit>()
-                              .state
-                              .regularPostEntity
-                              .postAudience ==
-                          PostAudience.specificFriends) ...[
-                        Expanded(
-                          child: ListView.separated(
-                            itemCount: state.allFriends.length,
-                            itemBuilder: (context, index) {
-                              bool isSelcetd = state.selectedSpecificFriends
-                                  .contains(state.allFriends[index].id);
-                              return SelectFriendItem(
-                                friendEntity: state.allFriends[index],
-                                onChanged: (value) {
+                      ] else ...[
+                        if (context
+                                    .read<CreatePostCubit>()
+                                    .state
+                                    .regularPostEntity
+                                    .postAudience ==
+                                PostAudience.specificFriends) ...[
+                          Expanded(
+                            child: SmartRefresher(
+                              controller:
                                   context
                                       .read<PostFriendsCubit>()
-                                      .toggleSelectSpecificFriends(
-                                        state.allFriends[index].id,
-                                      );
-                                  context
-                                      .read<CreatePostCubit>()
-                                      .setSpecificFriends(
-                                        state.selectedSpecificFriends,
-                                      );
+                                      .refreshController,
+                              enablePullUp: true,
+                              enablePullDown: true,
+                              onRefresh:
+                                  () =>
+                                      context
+                                          .read<PostFriendsCubit>()
+                                          .onRefresh(),
+                              onLoading:
+                                  () =>
+                                      context
+                                          .read<PostFriendsCubit>()
+                                          .onLoadMore(),
+                              footer: customFooter,
+                              child: ListView.separated(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                itemCount: state.allFriends.length,
+                                itemBuilder: (context, index) {
+                                  bool isSelcetd = state.selectedSpecificFriends
+                                      .contains(state.allFriends[index].id);
+                                  return SelectFriendItem(
+                                    friendEntity: state.allFriends[index],
+                                    onChanged: (value) {
+                                      context
+                                          .read<PostFriendsCubit>()
+                                          .toggleSelectSpecificFriends(
+                                            state.allFriends[index].id,
+                                          );
+                                      context
+                                          .read<CreatePostCubit>()
+                                          .setSpecificFriends(
+                                            state.selectedSpecificFriends,
+                                          );
+                                    },
+                                    initValue: isSelcetd,
+                                  );
                                 },
-                                initValue: isSelcetd,
-                              );
-                            },
-                            separatorBuilder: (
-                              BuildContext context,
-                              int index,
-                            ) {
-                              return Gaps.vGap2;
-                            },
+                                separatorBuilder: (
+                                  BuildContext context,
+                                  int index,
+                                ) {
+                                  return Gaps.vGap2;
+                                },
+                              ),
+                            ),
                           ),
-                        ),
-                      ] else if (context
-                              .read<CreatePostCubit>()
-                              .state
-                              .regularPostEntity
-                              .postAudience ==
-                          PostAudience.friendsExcept) ...[
-                        Expanded(
-                          child: ListView.separated(
-                            itemCount: state.allFriends.length,
-                            itemBuilder: (context, index) {
-                              bool isSelcetd = state.selectedFriendsExcept
-                                  .contains(state.allFriends[index].id);
-                              return SelectFriendItem(
-                                friendEntity: state.allFriends[index],
-                                onChanged: (value) {
+                          Container(
+                            height: 50,
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            width: double.infinity,
+                            color: ColorManager.white,
+                            child: CustomElevatedButton(
+                              label: "Done",
+                              onPressed: () => Navigator.of(context).pop(),
+                              width: MediaQuery.of(context).size.width * 0.7,
+                              borderSide: BorderSide(
+                                color: ColorManager.primaryColor.withOpacity(
+                                  0.3,
+                                ),
+                              ),
+                              backgroundColor: ColorManager.primaryColor
+                                  .withOpacity(0.3),
+                            ),
+                          ),
+                        ] else if (context
+                                    .read<CreatePostCubit>()
+                                    .state
+                                    .regularPostEntity
+                                    .postAudience ==
+                                PostAudience.friendsExcept ) ...[
+                          Expanded(
+                            child: SmartRefresher(
+                              controller:
                                   context
                                       .read<PostFriendsCubit>()
-                                      .toggleSelectFriendsExcept(
-                                        state.allFriends[index].id,
-                                      );
-                                  context
-                                      .read<CreatePostCubit>()
-                                      .setSpecificFriends(
-                                        state.selectedSpecificFriends,
-                                      );
+                                      .refreshController,
+                              enablePullUp: true,
+                              enablePullDown: true,
+                              onRefresh:
+                                  () =>
+                                      context
+                                          .read<PostFriendsCubit>()
+                                          .onRefresh(),
+                              onLoading:
+                                  () =>
+                                      context
+                                          .read<PostFriendsCubit>()
+                                          .onLoadMore(),
+                              footer: customFooter,
+                              child: ListView.separated(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                itemCount: state.allFriends.length,
+                                itemBuilder: (context, index) {
+                                  bool isSelcetd = state.selectedFriendsExcept
+                                      .contains(state.allFriends[index].id);
+                                  return SelectFriendItem(
+                                    friendEntity: state.allFriends[index],
+                                    onChanged: (value) {
+                                      context
+                                          .read<PostFriendsCubit>()
+                                          .toggleSelectFriendsExcept(
+                                            state.allFriends[index].id,
+                                          );
+                                      context
+                                          .read<CreatePostCubit>()
+                                          .setFriendsExcept(
+                                            state.selectedFriendsExcept,
+                                          );
+                                      print(state.selectedFriendsExcept);
+                                    },
+                                    initValue: isSelcetd,
+                                  );
                                 },
-                                initValue: isSelcetd,
-                              );
-                            },
-                            separatorBuilder: (
-                              BuildContext context,
-                              int index,
-                            ) {
-                              return Gaps.vGap2;
-                            },
+                                separatorBuilder: (
+                                  BuildContext context,
+                                  int index,
+                                ) {
+                                  return Gaps.vGap2;
+                                },
+                              ),
+                            ),
                           ),
-                        ),
+                          Container(
+                            height: 50,
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            width: double.infinity,
+                            color: ColorManager.white,
+                            child: CustomElevatedButton(
+                              label: "Done",
+                              onPressed: () => Navigator.of(context).pop(),
+                              width: MediaQuery.of(context).size.width * 0.7,
+                              borderSide: BorderSide(
+                                color: ColorManager.primaryColor.withOpacity(
+                                  0.3,
+                                ),
+                              ),
+                              backgroundColor: ColorManager.primaryColor
+                                  .withOpacity(0.3),
+                            ),
+                          ),
+                        ],
                       ],
                     ],
                   );
                 },
               ),
             ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: 50,
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              margin: EdgeInsets.symmetric(vertical: 20),
-              width: double.infinity,
-              color: ColorManager.white,
-              child: CustomElevatedButton(
-                label: "Done",
-                onPressed: () =>Navigator.of(context).pop(),
-                width: MediaQuery.of(context).size.width * 0.7,
-                borderSide: BorderSide(
-                  color: ColorManager.primaryColor.withOpacity(0.3),
-                ),
-                backgroundColor: ColorManager.primaryColor.withOpacity(0.3),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -64,7 +64,7 @@ class _FeelingsActivitiesScreenState extends State<FeelingsActivitiesScreen>
                   _buildTabBar(),
                   Gaps.vGap2,
                   Expanded(
-                    child: TabBarView(physics: BouncingScrollPhysics(),
+                    child: TabBarView(physics: NeverScrollableScrollPhysics(),
                       controller: _tabController,
                       children: [FeelingsListWidget(), CategoriesActivitiesWidget()],
                     ),

@@ -43,8 +43,7 @@ class InterestCubit extends Cubit<InterestState> {
 
   Future<void> fetchCategoriesInterests({bool isLoadMore = false}) async {
     if (state.getCategoriesInterestsStatus ==
-        GetCategoriesInterestsStatus.loading)
-      return;
+        GetCategoriesInterestsStatus.loading) return;
 
     if (!isLoadMore) {
       emit(
