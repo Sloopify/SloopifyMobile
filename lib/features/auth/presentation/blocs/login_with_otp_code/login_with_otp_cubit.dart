@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -18,6 +20,7 @@ class LoginWithOtpCubit extends Cubit<LoginWithOtpState> {
     required this.verifyOtpCodeLogin,
     required this.optLoginUseCase,
   }) : super(LoginWithOtpState.empty());
+  Timer? _timer;
 
   void setLoginType(OtpSendType otpType) {
     emit(state.copyWith(type: otpType, otpLoginStatus: OtpLoginStatus.init));
@@ -65,8 +68,31 @@ class LoginWithOtpCubit extends Cubit<LoginWithOtpState> {
       ),
     );
   }
-
-  void otpLogin() async {
+  Future<void> startTimer() async {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (state.timerSeconds > 0) {
+        emit(
+          state.copyWith(
+              timerSeconds: state.timerSeconds - 1,
+              isTimerFinished: false,
+              verifyOtpLoginStatus: VerifyOtpLoginStatus.init,
+              otpLoginStatus: OtpLoginStatus.init
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            timerSeconds: 0,
+            isTimerFinished: true,
+              verifyOtpLoginStatus: VerifyOtpLoginStatus.init,
+              otpLoginStatus: OtpLoginStatus.init
+          ),
+        );
+        _timer?.cancel();
+      }
+    });
+  }
+  void otpLogin({bool fromReset=false}) async {
     if (state.otpDataEntity.type == OtpSendType.phone) {
       if (state.otpDataEntity.countryCode == "+963") {
         setFullMobileNumber(
@@ -85,7 +111,7 @@ class LoginWithOtpCubit extends Cubit<LoginWithOtpState> {
         _mapFailureToState(emit, f, state);
       },
       (data) async {
-        emit(state.copyWith(otpLoginStatus: OtpLoginStatus.success));
+        emit(state.copyWith(otpLoginStatus:fromReset? OtpLoginStatus.init: OtpLoginStatus.success));
       },
     );
   }

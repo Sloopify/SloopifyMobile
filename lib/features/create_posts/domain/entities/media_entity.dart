@@ -14,22 +14,25 @@ class MediaEntity extends Equatable {
   final bool? isFlipVertical;
   final String? filterName;
   final bool isVideoFile;
+  final String id;
 
   const MediaEntity({
     required this.file,
-     this.applyToDownload,
-     this.autoPlay,
-     this.filterName,
-     this.isFlipHorizontal,
-     this.isFlipVertical,
-     this.isRotate,
+    this.applyToDownload,
+    this.autoPlay,
+    this.filterName,
+    this.isFlipHorizontal,
+    this.isFlipVertical,
+    this.isRotate,
     required this.order,
     required this.isVideoFile,
-     this.rotateAngle,
+    this.rotateAngle,
+    required this.id,
   });
 
   factory MediaEntity.fromEmpty() {
     return MediaEntity(
+      id: "",
       isVideoFile: false,
       file: null,
       applyToDownload: null,
@@ -56,6 +59,7 @@ class MediaEntity extends Equatable {
     rotateAngle,
     order,
     isVideoFile,
+    id,
   ];
 
   MediaEntity copyWith({
@@ -81,11 +85,11 @@ class MediaEntity extends Equatable {
       order: order ?? this.order,
       isVideoFile: isVideoFile ?? this.isVideoFile,
       rotateAngle: rotateAngle ?? this.rotateAngle,
+      id: id,
     );
   }
 
-   toJson() async {
-
+  toJson() async {
     Map<String, dynamic> data = <String, dynamic>{};
    if(order!=null)   data.putIfAbsent('order', () => order);
     if (applyToDownload != null && isVideoFile) data.putIfAbsent('apply_to_download', () => boolToInt(applyToDownload));
@@ -96,12 +100,11 @@ class MediaEntity extends Equatable {
     if (isFlipVertical != null ) data.putIfAbsent('is_flip_vertical', () => boolToInt(isFlipHorizontal));
     if (filterName != null ) data.putIfAbsent('filter_name', () => filterName);
     if (file != null) {
-      data['file'] = await MultipartFile.fromFile(
-        file!.path,
-      );
+      data['file'] = await MultipartFile.fromFile(file!.path);
     }
     print(data);
     return data;
   }
+
   int boolToInt(bool? value) => (value ?? false) ? 1 : 0;
 }

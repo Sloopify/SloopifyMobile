@@ -38,6 +38,7 @@ class BirthdayScreen extends StatelessWidget {
         context: context,
         title: 'what_is_birthday'.tr(),
         centerTitle: true,
+        withArrowBack: false,
       ),
       body: SafeArea(
         child: BlocListener<CompleteBirthdayCubit, CompleteBirthdayState>(
@@ -136,8 +137,15 @@ class BirthdayScreen extends StatelessWidget {
                             if (state.birthday == DateTime.now() ||
                                 state.birthday == null) {
                               showSnackBar(
+                                isWarning: true,
                                 context,
                                 'you should select a valid birthday',
+                              );
+                            }else if ( DateTime.now().difference(state.birthday!).inDays<(13*365)){
+                              showSnackBar(
+                                isError: true,
+                                context,
+                                'Sorry, you must older than 13 years old',
                               );
                             } else {
                               if (state.completeBirthDayStatus ==

@@ -207,6 +207,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
 
       mediaList.add(
         MediaEntity(
+          id: assets[i].id,
           file: file,
           order: i,
           isVideoFile: assets[i].type == AssetType.video,

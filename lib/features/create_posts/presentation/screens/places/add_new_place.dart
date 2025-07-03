@@ -30,7 +30,9 @@ class _AddNewPlaceState extends State<AddNewPlace> {
 
   @override
   void initState() {
-    final state = context.read<AddLocationCubit>().state;
+    final state = context
+        .read<AddLocationCubit>()
+        .state;
     cityNameController = TextEditingController(
       text: state.createPlaceEntity.city,
     );
@@ -39,15 +41,19 @@ class _AddNewPlaceState extends State<AddNewPlace> {
     );
     super.initState();
   }
+
   @override
   void didChangeDependencies() {
-    final state = context.read<AddLocationCubit>().state;
+    final state = context
+        .read<AddLocationCubit>()
+        .state;
     cityNameController = TextEditingController(
       text: state.createPlaceEntity.city,
     );
     countryNameController = TextEditingController(
       text: state.createPlaceEntity.country,
-    );    super.didChangeDependencies();
+    );
+    super.didChangeDependencies();
   }
 
   @override
@@ -86,7 +92,8 @@ class _AddNewPlaceState extends State<AddNewPlace> {
                             Gaps.vGap2,
                             CustomTextField(
                               validator:
-                                  (value) => Validator.requiredValidate(
+                                  (value) =>
+                                  Validator.requiredValidate(
                                     value!,
                                     context,
                                   ),
@@ -130,16 +137,20 @@ class _AddNewPlaceState extends State<AddNewPlace> {
                             Center(
                               child: GestureDetector(
                                 onTap:
-                                    () => Navigator.of(context).pushNamed(
+                                    () =>
+                                    Navigator.of(context).pushNamed(
                                       LocationMapScreen.routeName,
                                       arguments: {
                                         "add_location_cubit":
-                                            context.read<AddLocationCubit>(),
+                                        context.read<AddLocationCubit>(),
                                       },
                                     ),
                                 child: Container(
                                   width:
-                                      MediaQuery.of(context).size.width * 0.5,
+                                  MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width * 0.5,
                                   alignment: Alignment.center,
                                   padding: EdgeInsets.symmetric(
                                     horizontal: AppPadding.p8,
@@ -187,20 +198,23 @@ class _AddNewPlaceState extends State<AddNewPlace> {
                       ),
                       child: CustomElevatedButton(
                         isLoading:
-                            state.addNewPlaceStatus ==
+                        state.addNewPlaceStatus ==
                             AddNewPlaceStatus.loading,
                         label: "Done",
                         onPressed:
-                            state.addNewPlaceStatus == AddNewPlaceStatus.loading
-                                ? () {}
-                                : () {
-                                  if (!(_formKey.currentState!.validate()))  return;
-                                  context
-                                      .read<AddLocationCubit>()
-                                      .createUserPlace();
-                                },
+                        state.addNewPlaceStatus == AddNewPlaceStatus.loading
+                            ? () {}
+                            : () {
+                          if (!(_formKey.currentState!.validate())) return;
+                          context
+                              .read<AddLocationCubit>()
+                              .createUserPlace();
+                        },
                         backgroundColor: ColorManager.primaryColor,
-                        width: MediaQuery.of(context).size.width * 0.5,
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.5,
                       ),
                     ),
                   ),
@@ -216,9 +230,11 @@ class _AddNewPlaceState extends State<AddNewPlace> {
   void buildListener(BuildContext context, AddLocationState state) {
     if (state.addNewPlaceStatus == AddNewPlaceStatus.success) {
       Navigator.of(context).pop();
-    } else if (state.addNewPlaceStatus == AddNewPlaceStatus.offline ||
-        state.addNewPlaceStatus == AddNewPlaceStatus.error) {
-      showSnackBar(context, state.errorMessage);
+    } else if (state.addNewPlaceStatus == AddNewPlaceStatus.offline) {
+      showSnackBar(context, state.errorMessage, isOffline: true);
+    } else if (state.addNewPlaceStatus == AddNewPlaceStatus.error){
+      showSnackBar(context, state.errorMessage, isError: true);
+
     }
   }
 }

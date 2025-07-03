@@ -148,10 +148,10 @@ class ChangePasswordScreen extends StatelessWidget {
       );
     } else if (state.submitForgetPasswordStatus ==
         SubmitForgetPasswordStatus.offline) {
-      showSnackBar(context, 'no_internet_connection'.tr());
+      showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);
     } else if (state.submitForgetPasswordStatus ==
         SubmitForgetPasswordStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

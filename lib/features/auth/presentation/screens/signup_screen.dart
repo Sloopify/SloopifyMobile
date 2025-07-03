@@ -115,52 +115,49 @@ class SignupScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               flex: 1,
-                              child: CountryCodeWidget(
-                                onChanged: (value) {
-                                  context.read<SignUpCubit>().setCountryCode(
-                                    value,
-                                  );
-                                },
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                  state
+                                      .hssPhoneNumberError
+                                      ? 16.0
+                                      : 0.0,   ),
+                                  child: CountryCodeWidget(
+                                  onChanged: (value) {
+                                    context.read<SignUpCubit>().setCountryCode(
+                                      value,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             Gaps.hGap2,
                             Expanded(
                               flex: 3,
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  bottom:
-                                      context
-                                              .read<SignUpCubit>()
-                                              .state
-                                              .hssPhoneNumberError
-                                          ? 16.0
-                                          : 0.0,
-                                ),
-                                child: CustomTextField(
-                                  initialValue:
-                                      state.signupDataEntity.mobileNumber,
-                                  labelText: 'mobile_number'.tr(),
-                                  onChanged: (value) {
-                                    context.read<SignUpCubit>().setMobileNumber(
-                                      value,
-                                    );
-                                  },
-                                  withTitle: true,
-                                  hintText: '938139179'.tr(),
-                                  /*icon: Icons.email,*/
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                  validator: (value) {
-                                    final err = Validator.phoneNumberValidator(
-                                      value!,
-                                      context,
-                                    );
-                                    context
-                                        .read<SignUpCubit>()
-                                        .setHasPhoneNumberError(err != null);
-                                    return err;
-                                  },
-                                ),
+                              child: CustomTextField(
+                                initialValue:
+                                    state.signupDataEntity.mobileNumber,
+                                labelText: 'mobile_number'.tr(),
+                                onChanged: (value) {
+                                  context.read<SignUpCubit>().setMobileNumber(
+                                    value,
+                                  );
+                                },
+                                withTitle: true,
+                                hintText: '938139179'.tr(),
+                                /*icon: Icons.email,*/
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  final err = Validator.phoneNumberValidator(
+                                    value!,
+                                    context,
+                                  );
+                                  context
+                                      .read<SignUpCubit>()
+                                      .setHasPhoneNumberError(err != null);
+                                  return err;
+                                },
                               ),
                             ),
                           ],
@@ -317,9 +314,9 @@ class SignupScreen extends StatelessWidget {
         },
       );
     } else if (state.signupStatus == SignupStatus.noInternet) {
-      showSnackBar(context, 'no_internet_connection'.tr());
+      showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);
     } else if (state.signupStatus == SignupStatus.networkError) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

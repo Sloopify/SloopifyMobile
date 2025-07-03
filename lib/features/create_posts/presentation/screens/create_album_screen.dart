@@ -23,7 +23,6 @@ class AlbumPhotosScreen extends StatefulWidget {
 
 class _AlbumPhotosScreenState extends State<AlbumPhotosScreen> {
   final List<AssetEntity> _media = [];
-  final List<AssetEntity> _selectedOrdered = [];
   final ScrollController _scrollController = ScrollController();
   final List<AssetPathEntity> _albums = [];
   AssetPathEntity? _selectedAlbum;

@@ -301,9 +301,9 @@ class _UserInterestsState extends State<UserInterests> {
       Navigator.of(context).pushNamed(GenderIdentity.routeName);
     } else if (state.completeInterestsStatus ==
         CompleteInterestsStatus.offline) {
-      showSnackBar(context, "no_internet_connection".tr());
+      showSnackBar(context, "no_internet_connection".tr(),isOffline: true);
     } else if (state.completeInterestsStatus == CompleteInterestsStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

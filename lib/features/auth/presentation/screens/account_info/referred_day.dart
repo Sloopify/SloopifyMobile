@@ -35,13 +35,7 @@ class ReferredDay extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             appBar: getCustomAppBar(
-              onArrowBack: (){
-                if(Navigator.of(context).canPop()){
-                  Navigator.of(context).pop(());
-                }else{
-                  SystemNavigator.pop();
-                }
-              },
+            withArrowBack: false,
               context: context,
               title: "referred_by".tr(),
               centerTitle: true,
@@ -98,7 +92,7 @@ class ReferredDay extends StatelessWidget {
                                 barrierDismissible: true,
                                 builder: (context) {
                                   return Dialog(
-                                    insetPadding: EdgeInsets.symmetric(horizontal: 30),
+                                    insetPadding: EdgeInsets.symmetric(horizontal: 20),
                                     backgroundColor: ColorManager.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -177,9 +171,9 @@ class ReferredDay extends StatelessWidget {
       });
       Navigator.pushNamedAndRemoveUntil(context, HomeNavigationScreen.routeName, (route)=>false);
     } else if (state.referredByStatus == SubmitReferredByStatus.offline) {
-      showSnackBar(context, "no_internet_connection".tr());
+      showSnackBar(context, "no_internet_connection".tr(),isOffline: true);
     } else if (state.referredByStatus == SubmitReferredByStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

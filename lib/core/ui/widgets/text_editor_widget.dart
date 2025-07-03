@@ -47,11 +47,13 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
 
   bool _showGradientPicker = false;
   final List<GradientBackground> gradients = [
+    GradientBackground(Colors.white, Colors.white),
+    GradientBackground(ColorManager.primaryColor.withOpacity(0.2), Colors.white),
+    GradientBackground(Colors.purple, Colors.white),
     GradientBackground(Colors.pink, Colors.purple),
     GradientBackground(Colors.blue, Colors.blue),
     GradientBackground(Colors.green, Colors.green),
     GradientBackground(Colors.pink, Colors.pink),
-    GradientBackground(Colors.green, Colors.green),
   ];
 
   @override
@@ -138,6 +140,8 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
                           width: 25,
                           height: 25,
                           decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Colors.black26),
                             gradient:
                             _selectedGradient != null
                                 ? LinearGradient(

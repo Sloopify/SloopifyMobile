@@ -57,6 +57,7 @@ class EditMediaCubit extends Cubit<EditMediaState> {
         (e) => e.file?.path == file?.path,
         orElse:
             () => MediaEntity(
+              id: selectedAssets[i].id,
               file: file!,
               order: i + 1,
               isVideoFile: asset.type == AssetType.video,
@@ -69,6 +70,39 @@ class EditMediaCubit extends Cubit<EditMediaState> {
     }
 
     return result;
+  }
+  Future<List<AssetEntity>> getSelectedAssetEntitiesFromMediaList() async {
+    final List<String> assetIdsToFetch = [];
+
+    // Collect all unique asset IDs from the current mediaList
+    for (final mediaEntity in state.mediaList) {
+      assetIdsToFetch.add(mediaEntity.id!);
+        }
+
+    if (assetIdsToFetch.isEmpty) {
+      return []; // No asset IDs to fetch
+    }
+
+    try {
+      // Fetch AssetEntity objects by their IDs
+      final List<AssetEntity?> fetchedAssets =
+      await PhotoManager.getAssetListPaged(page:0,pageCount: 100 );
+
+      // Filter out nulls and return valid AssetEntity objects
+      // Maintain the order based on the original mediaList if needed,
+      // but for pre-selection, just having them is enough.
+      final List<AssetEntity> result = [];
+      for (final id in assetIdsToFetch) {
+        final asset = fetchedAssets.firstWhere((element) => element?.id == id, orElse: () => null);
+        if (asset != null) {
+          result.add(asset);
+        }
+      }
+      return result;
+    } catch (e) {
+      print("Error fetching AssetEntities from MediaList: $e");
+      return [];
+    }
   }
   void addFilterEffect(int index,File? filterImage) {
    state.mediaList[index].copyWith(file: filterImage);

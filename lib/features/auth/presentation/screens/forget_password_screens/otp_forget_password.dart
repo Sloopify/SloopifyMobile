@@ -246,9 +246,9 @@ class OtpForgetPassword extends StatelessWidget {
         arguments: {"forgetPasswordCubit": context.read<ForgetPasswordCubit>()},
       );
     } else if (state.otpSendStatus == OtpSendStatus.offline) {
-      showSnackBar(context, 'no_internet_connection'.tr());
+      showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);
     } else if (state.otpSendStatus == OtpSendStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

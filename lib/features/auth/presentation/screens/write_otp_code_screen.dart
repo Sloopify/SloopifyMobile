@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
@@ -29,41 +30,38 @@ class WriteOtpCodeScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: getCustomAppBar(context: context),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppPadding.p30,
-                vertical: AppPadding.p20,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset(AssetsManager.writeOtpCode, height: 300),
-                  Gaps.vGap2,
-                  Text(
-                    'write_otp_code'.tr(),
-                    style: AppTheme.headline2.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 28,
-                    ),
+        body: BlocBuilder<LoginWithOtpCubit, LoginWithOtpState>(
+          builder: (context, state) {
+            return SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppPadding.p30,
+                    vertical: AppPadding.p20,
                   ),
-                  Gaps.vGap2,
-                  Text(
-                    'code_has_sent'.tr(),
-                    style: AppTheme.headline4.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Gaps.vGap2,
-                  SizedBox(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width * 0.85,
-                    child: BlocBuilder<LoginWithOtpCubit, LoginWithOtpState>(
-                      builder: (context, state) {
-                        return PinCodeTextField(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(AssetsManager.writeOtpCode, height: 300),
+                      Gaps.vGap2,
+                      Text(
+                        'write_otp_code'.tr(),
+                        style: AppTheme.headline2.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 28,
+                        ),
+                      ),
+                      Gaps.vGap2,
+                      Text(
+                        'code_has_sent'.tr(),
+                        style: AppTheme.headline4.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Gaps.vGap2,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        child: PinCodeTextField(
                           errorTextMargin: EdgeInsets.only(top: AppPadding.p4),
                           errorTextSpace: 20,
                           appContext: context,
@@ -71,6 +69,7 @@ class WriteOtpCodeScreen extends StatelessWidget {
                           blinkWhenObscuring: false,
                           obscureText: false,
                           textStyle: AppTheme.headline4,
+                          autovalidateMode: AutovalidateMode.onUnfocus,
                           pinTheme: PinTheme(
                             shape: PinCodeFieldShape.box,
                             borderRadius: BorderRadius.circular(10),
@@ -83,7 +82,8 @@ class WriteOtpCodeScreen extends StatelessWidget {
                             disabledBorderWidth: 0.5,
                             inactiveBorderWidth: 0.5,
                             inactiveColor: ColorManager.disActive.withOpacity(
-                                0.5),
+                              0.5,
+                            ),
                             selectedColor: ColorManager.primaryColor,
                           ),
                           validator: (value) {
@@ -109,82 +109,120 @@ class WriteOtpCodeScreen extends StatelessWidget {
                           onChanged: (value) {
                             context.read<LoginWithOtpCubit>().setOtpCode(value);
                           },
-                        );
-                      },
-                    ),
-                  ),
-                  Text(
-                    "don't_get_code".tr(),
-                    style: AppTheme.headline4.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Gaps.vGap2,
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'resend_code'.tr(),
-                          style: AppTheme.headline4.copyWith(
-                            fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        "don't_get_code".tr(),
+                        style: AppTheme.headline4.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Gaps.vGap2,
+                      if (!state.isTimerFinished) ...[
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Resend code in ',
+                                style: AppTheme.headline4.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              TextSpan(
+                                text: state.timerSeconds.toString(),
+                                style: AppTheme.headline4.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: ColorManager.primaryColor,
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' s',
+                                style: AppTheme.headline4.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        TextSpan(
-                          text: ' 54 ',
-                          style: AppTheme.headline4.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: ColorManager.primaryColor,
-                          ),
-                        ),
-                        TextSpan(
-                          text: 'seconds'.tr(),
-                          style: AppTheme.headline4.copyWith(
-                            fontWeight: FontWeight.w500,
+                      ] else ...[
+                        InkWell(
+                          onTap: () {
+                            if (state.isTimerFinished) {
+                              context.read<LoginWithOtpCubit>().otpLogin(
+                                fromReset: true,
+                              );
+                            }
+                          },
+                          child: Text(
+                            "Resend code",
+                            style: AppTheme.headline4.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: ColorManager.black,
+                            ),
                           ),
                         ),
                       ],
-                    ),
+                      Gaps.vGap4,
+                      CustomElevatedButton(
+                        isLoading:
+                            context
+                                .read<LoginWithOtpCubit>()
+                                .state
+                                .verifyOtpLoginStatus ==
+                            VerifyOtpLoginStatus.loading,
+                        label: "verify",
+                        onPressed:
+                            context
+                                        .read<LoginWithOtpCubit>()
+                                        .state
+                                        .verifyOtpLoginStatus ==
+                                    VerifyOtpLoginStatus.loading
+                                ? () {}
+                                : () {
+                                  if (state.verifyOtpEntity.otp.length != 6) {
+                                    return;
+                                  } else {}
+                                  context
+                                      .read<LoginWithOtpCubit>()
+                                      .verifyOtpLogin();
+                                },
+                        isBold: true,
+                        backgroundColor:
+                            state.verifyOtpEntity.otp.length != 6
+                                ? ColorManager.disActive.withOpacity(0.2)
+                                : ColorManager.primaryColor,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        borderSide:
+                            state.verifyOtpEntity.otp.length != 6
+                                ? BorderSide(
+                                  color: ColorManager.disActive.withOpacity(
+                                    0.3,
+                                  ),
+                                )
+                                : null,
+                        width: MediaQuery.of(context).size.width * 0.6,
+                      ),
+                    ],
                   ),
-                  Gaps.vGap4,
-                  CustomElevatedButton(
-                    isLoading: context
-                        .read<LoginWithOtpCubit>()
-                        .state
-                        .verifyOtpLoginStatus == VerifyOtpLoginStatus.loading,
-                    label: "verify",
-                    onPressed: context
-                        .read <LoginWithOtpCubit>()
-                        .state
-                        .verifyOtpLoginStatus == VerifyOtpLoginStatus.loading
-                        ? () {}
-                        : () {
-                      context.read<LoginWithOtpCubit>().verifyOtpLogin();
-                    },
-                    isBold: true,
-                    backgroundColor: ColorManager.primaryColor,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width * 0.6,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),)
-      ,
+            );
+          },
+        ),
+      ),
     );
   }
 
-  void _buildVerifyLoginOtpListener(LoginWithOtpState state,
-      BuildContext context,) {
+  void _buildVerifyLoginOtpListener(
+    LoginWithOtpState state,
+    BuildContext context,
+  ) {
     if (state.verifyOtpLoginStatus == VerifyOtpLoginStatus.success) {
       BlocProvider.of<AuthenticationBloc>(context).add(UpdateEvent());
       Navigator.pushNamedAndRemoveUntil(
         context,
         AppWrapper.routeName,
-            (route) => false,
+        (route) => false,
       );
     } else if (state.verifyOtpLoginStatus == VerifyOtpLoginStatus.offline) {
       showSnackBar(context, 'no_internet_connection'.tr());

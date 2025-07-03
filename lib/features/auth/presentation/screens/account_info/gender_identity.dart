@@ -24,13 +24,7 @@ class GenderIdentity extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: getCustomAppBar(
-        onArrowBack: (){
-          if(Navigator.of(context).canPop()){
-            Navigator.of(context).pop(());
-          }else{
-            SystemNavigator.pop();
-          }
-        },
+        withArrowBack: false,
         context: context,
         title: "tell_us_gender".tr(),
         centerTitle: true,
@@ -39,26 +33,26 @@ class GenderIdentity extends StatelessWidget {
         listener: (context, state) {
           _buildSubmitListener(context, state);
         },
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppPadding.p30,
-                vertical: AppPadding.p10,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "tell_us_gender_hint".tr(),
-                    style: AppTheme.headline4.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
+        child: BlocBuilder<GenderIdentityCubit, CompleteGenderState>(
+          builder: (context, state) {
+            return SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppPadding.p30,
+                    vertical: AppPadding.p10,
                   ),
-                  Gaps.vGap3,
-                  BlocBuilder<GenderIdentityCubit, CompleteGenderState>(
-                    builder: (context, state) {
-                      return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "tell_us_gender_hint".tr(),
+                        style: AppTheme.headline4.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Gaps.vGap3,
+                      Center(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -83,47 +77,42 @@ class GenderIdentity extends StatelessWidget {
                             ),
                           ],
                         ),
-                      );
-                    },
+                      ),
+                      Gaps.vGap5,
+                      Center(
+                        child: CustomElevatedButton(
+                          isLoading:
+                              state.completeGenderStatus ==
+                              CompleteGenderStatus.loading,
+                          isBold: true,
+                          label: "continue".tr(),
+                          onPressed:
+                              state.completeGenderStatus ==
+                                      CompleteGenderStatus.loading
+                                  ? () {}
+                                  : () {
+                                    if (state.gender == Gender.none) {
+                                      showSnackBar(
+                                        context,
+                                        'you should select your interest',
+                                        isImportant: true,
+                                      );
+                                    } else {
+                                      context
+                                          .read<GenderIdentityCubit>()
+                                          .submitGender();
+                                    }
+                                  },
+                          backgroundColor: ColorManager.primaryColor,
+                          width: MediaQuery.of(context).size.width * 0.75,
+                        ),
+                      ),
+                    ],
                   ),
-                  Gaps.vGap5,
-                  Center(
-                    child: CustomElevatedButton(
-                      isLoading:
-                          context
-                              .read<GenderIdentityCubit>()
-                              .state
-                              .completeGenderStatus ==
-                          CompleteGenderStatus.loading,
-                      isBold: true,
-                      label: "continue".tr(),
-                      onPressed: () {
-                        if (context.read<GenderIdentityCubit>().state.gender ==
-                            Gender.none) {
-                          showSnackBar(
-                            context,
-                            'you should select your interest',
-                          );
-                        } else {
-                          if (context
-                                  .read<GenderIdentityCubit>()
-                                  .state
-                                  .completeGenderStatus ==
-                              CompleteGenderStatus.loading) {
-                            return;
-                          } else {
-                            context.read<GenderIdentityCubit>().submitGender();
-                          }
-                        }
-                      },
-                      backgroundColor: ColorManager.primaryColor,
-                      width: MediaQuery.of(context).size.width * 0.75,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
@@ -133,9 +122,9 @@ class GenderIdentity extends StatelessWidget {
     if (state.completeGenderStatus == CompleteGenderStatus.success) {
       Navigator.of(context).pushNamed(BirthdayScreen.routeName);
     } else if (state.completeGenderStatus == CompleteGenderStatus.offline) {
-      showSnackBar(context, "no_internet_connection".tr());
+      showSnackBar(context, "no_internet_connection".tr(),isOffline: true);
     } else if (state.completeGenderStatus == CompleteGenderStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

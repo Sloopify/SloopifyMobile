@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
+
+import '../../../create_story/presentation/screens/create_Story_first_step.dart';
 
 class HomeStories extends StatelessWidget {
   const HomeStories({super.key});
@@ -31,7 +35,14 @@ class HomeStories extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  // Navigator.of(context).push(
+                  //     MaterialPageRoute(builder: (context) =>
+                  //         BlocProvider(
+                  //           create: (context) => StoryEditorCubit(),
+                  //           child: CreateStoryFirstStep(),
+                  //         )));
+                },
                 child: SvgPicture.asset(AssetsManager.addStory),
               ),
             ],
@@ -50,10 +61,10 @@ class HomeStories extends StatelessWidget {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: ColorManager.black.withOpacity(0.25),
-                        blurRadius: 4,
-                        offset: Offset(4 ,0),
-                        spreadRadius: 0
+                          color: ColorManager.black.withOpacity(0.25),
+                          blurRadius: 4,
+                          offset: Offset(4, 0),
+                          spreadRadius: 0
                       )
                     ],
                     shape: BoxShape.circle,
@@ -67,9 +78,10 @@ class HomeStories extends StatelessWidget {
                   image: AssetsManager.manExample,
                   fit: BoxFit.cover,
                 );
-              }, separatorBuilder: (BuildContext context, int index) {
+              },
+              separatorBuilder: (BuildContext context, int index) {
                 return Gaps.hGap2;
-            },
+              },
             ),
           ),
         ],

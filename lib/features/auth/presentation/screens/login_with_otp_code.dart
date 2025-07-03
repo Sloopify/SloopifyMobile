@@ -262,12 +262,12 @@ class LoginWithOtpCode extends StatelessWidget {
       Navigator.pushNamed(
         context,
         WriteOtpCodeScreen.routeName,
-        arguments: {"otpLoginCubit": context.read<LoginWithOtpCubit>()},
+        arguments: {"otpLoginCubit": context.read<LoginWithOtpCubit>()..startTimer()},
       );
     } else if (state.otpLoginStatus == OtpLoginStatus.offline) {
-      showSnackBar(context, 'no_internet_connection'.tr());
+      showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);
     } else if (state.otpLoginStatus == OtpLoginStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

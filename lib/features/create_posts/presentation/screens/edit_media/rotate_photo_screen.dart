@@ -40,10 +40,10 @@ static const routeName ="rotate_image";
                     transform: Matrix4.identity()
                       ..rotateZ(angle * 3.1415926535 / 180)
                       ..scale(
-                          (state.mediaEntity.isFlipHorizontal ?? false)
+                          (state.mediaEntity.isFlipVertical ?? false)
                               ? -1.0
                               : 1.0,
-                          (state.mediaEntity.isFlipVertical ?? false)
+                          (state.mediaEntity.isFlipHorizontal ?? false)
                               ? -1.0
                               : 1.0
                       ),

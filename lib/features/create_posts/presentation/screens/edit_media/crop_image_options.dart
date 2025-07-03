@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -35,7 +36,8 @@ class _CropScreenState extends State<CropScreen> {
       compressFormat: ImageCompressFormat.jpg,
       uiSettings: [
         AndroidUiSettings(
-          backgroundColor: ColorManager.black,
+          backgroundColor: Colors.black,
+          statusBarColor: Colors.black,
           toolbarColor: Colors.black,
           toolbarWidgetColor: ColorManager.white,
           toolbarTitle: 'Crop',
@@ -60,9 +62,11 @@ class _CropScreenState extends State<CropScreen> {
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Custom Crop',
-          backgroundColor: ColorManager.black,
+          backgroundColor: Colors.black,
           toolbarColor: Colors.black,
           toolbarWidgetColor: ColorManager.white,
+          lockAspectRatio: false,
+          hideBottomControls: true
         ),
         IOSUiSettings(title: 'Custom Crop'),
       ],
@@ -105,7 +109,7 @@ class _CropScreenState extends State<CropScreen> {
                             Gaps.vGap1,
                             Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: AppPadding.p50,
+                                horizontal: AppPadding.p35,
                               ),
                               child: Row(
                                 children: [
@@ -144,7 +148,7 @@ class _CropScreenState extends State<CropScreen> {
                             Gaps.vGap2,
                             Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: AppPadding.p50,
+                                horizontal: AppPadding.p35,
                               ),
                               child: Row(
                                 children: [
@@ -299,9 +303,11 @@ class _CropScreenState extends State<CropScreen> {
           children: [
             SvgPicture.asset(assets),
             Gaps.hGap1,
-            Text(
-              label,
-              style: AppTheme.headline4.copyWith(color: ColorManager.gray600),
+            Flexible(
+              child: Text(
+                label,
+                style: AppTheme.headline4.copyWith(color: ColorManager.gray600),
+              ),
             ),
           ],
         ),

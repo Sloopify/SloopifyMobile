@@ -28,13 +28,7 @@ class FillAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: getCustomAppBar(
-        onArrowBack: (){
-          if(Navigator.of(context).canPop()){
-            Navigator.of(context).pop(());
-          }else{
-            SystemNavigator.pop();
-          }
-        },
+        withArrowBack: false,
         context: context,
         title: "fill_your_account".tr(),
         centerTitle: true,
@@ -63,7 +57,7 @@ class FillAccountScreen extends StatelessWidget {
                             child: InkWell(
                               onTap: () async {
                                 ImageSource imageSource =
-                                await showPickerImageSheet(context);
+                                    await showPickerImageSheet(context);
                                 File? pickedImage = await pickImage(
                                   context,
                                   imageSource,
@@ -125,7 +119,7 @@ class FillAccountScreen extends StatelessWidget {
                       label: "continue".tr(),
                       onPressed: () {
                         if (state.image == null) {
-                          showSnackBar(context, 'you should choose an image.');
+                          showSnackBar(context, 'you should choose an image.',isImportant: true);
                         } else {
                           if (state.uploadPictureStatus ==
                               UploadPictureStatus.loading) {
@@ -152,9 +146,9 @@ class FillAccountScreen extends StatelessWidget {
     if (state.uploadPictureStatus == UploadPictureStatus.done) {
       Navigator.of(context).pushNamed(ReferredDay.routeName);
     } else if (state.uploadPictureStatus == UploadPictureStatus.noInternet) {
-      showSnackBar(context, "no_internet_connection".tr());
+      showSnackBar(context, "no_internet_connection".tr(),isOffline: true);
     } else if (state.uploadPictureStatus == UploadPictureStatus.networkError) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

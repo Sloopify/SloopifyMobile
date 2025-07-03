@@ -165,7 +165,26 @@ class AccountsDataProviderImpl extends AccountsDataProvider {
     if (res["success"] == true) {
       return LoginModel.fromJson(res["data"]);
     } else {
-      throw NetworkErrorFailure(message: res['message']);
+      String errorMessage = '';
+      final errors = res['errors'] ?? res["message"];
+      if (errors is String) {
+        errorMessage = errors;
+      } else if (errors is Map<String, dynamic>) {
+        List<String> keys = (errors).keys.toList();
+        keys.forEach((e) {
+          if(errors[e] is String){
+            if ((errors[e] as String).isNotEmpty) {
+              errorMessage += errors[e] + '\n';
+            }
+          }else if (errors[e] is List<dynamic>){
+            if ((errors[e] as List<dynamic>).isNotEmpty) {
+              errorMessage += errors[e].first + '\n';
+            }
+          }
+
+        });
+      }
+      throw NetworkErrorFailure(message: errorMessage);
     }
   }
 

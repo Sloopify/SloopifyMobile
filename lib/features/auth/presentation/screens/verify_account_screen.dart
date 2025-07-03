@@ -272,16 +272,16 @@ class VerifyAccountScreen extends StatelessWidget {
         MaterialPageRoute(
           builder: (_) {
             return BlocProvider.value(
-              value: context.read<VerifyAccountBySignupCubit>(),
+              value: context.read<VerifyAccountBySignupCubit>()..startTimer(),
               child: OtpCodeScreen(fromSignUp:fromSignUp ,phoneNumber: phoneNumber,email: email,),
             );
           },
         ),
       );
     } else if (state.otpRegisterStatus == OtpRegisterStatus.offline) {
-      showSnackBar(context, 'no_internet_connection'.tr());
+      showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);
     } else if (state.otpRegisterStatus == OtpRegisterStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

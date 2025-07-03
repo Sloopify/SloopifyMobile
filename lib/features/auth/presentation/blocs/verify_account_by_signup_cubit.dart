@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
@@ -23,6 +25,7 @@ class VerifyAccountBySignupCubit extends Cubit<VerifyAccountBySignupState> {
     required this.verifyOtpRegisterUseCase,
     required this.registerOtpUseCase,
   }) : super(VerifyAccountBySignupState.empty());
+  Timer? _timer;
 
   void setOtpType(OtpSendType otpType, BuildContext context) {
     emit(
@@ -39,11 +42,7 @@ class VerifyAccountBySignupCubit extends Cubit<VerifyAccountBySignupState> {
     );
   }
 
-  void registerOtp(
- {
-    required String phoneNumber,
-    required String email,
-  }) async {
+  void registerOtp({required String phoneNumber, required String email,bool fromReset=false}) async {
     OtpDataEntity otpDataEntity = state.otpDataEntity.copyWith(
       fullPhoneNumber: phoneNumber,
       email: email,
@@ -56,7 +55,7 @@ class VerifyAccountBySignupCubit extends Cubit<VerifyAccountBySignupState> {
         _mapRegisterOtpStatus(emit, f, state);
       },
       (data) async {
-        emit(state.copyWith(otpRegisterStatus: OtpRegisterStatus.success));
+        emit(state.copyWith(otpRegisterStatus: fromReset? OtpRegisterStatus.init:OtpRegisterStatus.success));
       },
     );
   }
@@ -69,7 +68,8 @@ class VerifyAccountBySignupCubit extends Cubit<VerifyAccountBySignupState> {
       otp: state.otpCode,
       otpSendType: state.otpSendType,
       email: email,
-      phone: phoneNumber);
+      phone: phoneNumber,
+    );
     emit(
       state.copyWith(verifyRegisterOtpStatus: VerifyRegisterOtpStatus.loading),
     );
@@ -88,6 +88,31 @@ class VerifyAccountBySignupCubit extends Cubit<VerifyAccountBySignupState> {
         );
       },
     );
+  }
+
+  Future<void> startTimer() async {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (state.timerSeconds > 0) {
+        emit(
+          state.copyWith(
+            timerSeconds: state.timerSeconds - 1,
+            isTimerFinished: false,
+            verifyRegisterOtpStatus: VerifyRegisterOtpStatus.init,
+            otpRegisterStatus: OtpRegisterStatus.init
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            timerSeconds: 0,
+            isTimerFinished: true,
+            otpRegisterStatus: OtpRegisterStatus.init,
+            verifyRegisterOtpStatus: VerifyRegisterOtpStatus.init,
+          ),
+        );
+        _timer?.cancel();
+      }
+    });
   }
 
   _mapRegisterOtpStatus(emit, Failure f, VerifyAccountBySignupState state) {

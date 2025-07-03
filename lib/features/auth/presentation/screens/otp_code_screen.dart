@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -131,63 +132,122 @@ class OtpCodeScreen extends StatelessWidget {
                       ),
                     ),
                     Gaps.vGap2,
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Resend code in',
-                            style: AppTheme.headline4.copyWith(
-                              fontWeight: FontWeight.w500,
+                    if (!state.isTimerFinished) ...[
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Resend code in ',
+                              style: AppTheme.headline4.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text: ' 54 ',
-                            style: AppTheme.headline4.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: ColorManager.primaryColor,
+                            TextSpan(
+                              text: state.timerSeconds.toString(),
+                              style: AppTheme.headline4.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: ColorManager.primaryColor,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text: 's',
-                            style: AppTheme.headline4.copyWith(
-                              fontWeight: FontWeight.w500,
+                            TextSpan(
+                              text: ' s',
+                              style: AppTheme.headline4.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+                    ] else ...[
+                      InkWell(
+                        onTap: () {
+                          if (state.isTimerFinished) {
+                            context.read<VerifyAccountBySignupCubit>().registerOtp(
+                              fromReset: true,
+                              email:
+                                  fromSignUp
+                                      ? email ?? ""
+                                      : context
+                                              .read<AuthRepo>()
+                                              .getUserInfo()
+                                              ?.email ??
+                                          "",
+
+                              phoneNumber:
+                                  fromSignUp
+                                      ? phoneNumber ?? ""
+                                      : "${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.code}${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.phoneNumber}",
+                            );
+                          }
+                        },
+                        child: Text(
+                          "Resend code",
+                          style: AppTheme.headline4.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: ColorManager.black,
+                          ),
+                        ),
+                      ),
+                    ],
                     Gaps.vGap4,
-                    CustomElevatedButton(
-                      isLoading:
-                          state.verifyRegisterOtpStatus ==
-                          VerifyRegisterOtpStatus.loading,
-                      label: "verify",
-                      onPressed:
+                    InkWell(
+                      onTap:
                           state.verifyRegisterOtpStatus ==
                                   VerifyRegisterOtpStatus.loading
                               ? () {}
                               : () {
-                                context
-                                    .read<VerifyAccountBySignupCubit>()
-                                    .verifyOtpLogin(
-                                      email:
-                                          fromSignUp
-                                              ? email ?? ""
-                                              : context
-                                                      .read<AuthRepo>()
-                                                      .getUserInfo()
-                                                      ?.email ??
-                                                  "",
-                                      phoneNumber:
-                                          fromSignUp
-                                              ? phoneNumber ?? ""
-                                              : "${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.code}${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.phoneNumber}",
-                                    );
+                                if (state.verifyOtpEntity.otp.length != 6) {
+                                  return;
+                                } else {
+                                  context
+                                      .read<VerifyAccountBySignupCubit>()
+                                      .verifyOtpLogin(
+                                        email:
+                                            fromSignUp
+                                                ? email ?? ""
+                                                : context
+                                                        .read<AuthRepo>()
+                                                        .getUserInfo()
+                                                        ?.email ??
+                                                    "",
+                                        phoneNumber:
+                                            fromSignUp
+                                                ? phoneNumber ?? ""
+                                                : "${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.code}${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.phoneNumber}",
+                                      );
+                                }
                               },
-                      isBold: true,
-                      backgroundColor: ColorManager.primaryColor,
-                      padding: EdgeInsets.symmetric(vertical: 4),
-                      width: MediaQuery.of(context).size.width * 0.6,
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color:
+                              state.verifyOtpEntity.otp.length != 6
+                                  ? ColorManager.disActive.withOpacity(0.3)
+                                  : ColorManager.primaryColor,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              offset: Offset(0, 4),
+                              color: ColorManager.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child:
+                            state.verifyRegisterOtpStatus ==
+                                    VerifyRegisterOtpStatus.loading
+                                ? CircularProgressIndicator(color: ColorManager.white,)
+                                : Text(
+                                  "verify",
+                                  style: AppTheme.headline4.copyWith(
+                                    color: ColorManager.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                      ),
                     ),
                   ],
                 ),
@@ -204,6 +264,10 @@ class OtpCodeScreen extends StatelessWidget {
     BuildContext context,
   ) {
     if (state.verifyRegisterOtpStatus == VerifyRegisterOtpStatus.success) {
+      showSnackBar(
+        context,
+        "You have registered successfully,now please login it to complete your account information",
+      );
       context.read<AuthenticationBloc>().add(UpdateEvent());
       Navigator.pushNamedAndRemoveUntil(
         context,
@@ -212,9 +276,9 @@ class OtpCodeScreen extends StatelessWidget {
       );
     } else if (state.verifyRegisterOtpStatus ==
         VerifyRegisterOtpStatus.offline) {
-      showSnackBar(context, 'no_internet_connection'.tr());
+      showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);
     } else if (state.verifyRegisterOtpStatus == VerifyRegisterOtpStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
+import 'package:sloopify_mobile/core/managers/color_manager.dart';
 
 
 class SuccessDialogs extends StatelessWidget {
@@ -12,6 +13,10 @@ class SuccessDialogs extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height*0.7,
+      decoration: BoxDecoration(
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(10)
+      ),
       padding: EdgeInsets.all(AppPadding.p10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

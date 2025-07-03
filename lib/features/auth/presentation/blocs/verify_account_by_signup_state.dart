@@ -13,6 +13,8 @@ class VerifyAccountBySignupState extends Equatable {
   final OtpRegisterStatus otpRegisterStatus;
   final VerifyRegisterOtpStatus verifyRegisterOtpStatus;
   final bool hssPhoneNumberError;
+  final int timerSeconds;
+  final bool isTimerFinished;
 
   const VerifyAccountBySignupState({
     required this.errorMessage,
@@ -23,10 +25,14 @@ class VerifyAccountBySignupState extends Equatable {
     required this.hssPhoneNumberError,
     required this.verifyRegisterOtpStatus,
     required this.otpRegisterStatus,
+    required this.isTimerFinished,
+    required this.timerSeconds,
   });
 
   factory VerifyAccountBySignupState.empty() {
     return VerifyAccountBySignupState(
+      isTimerFinished: false,
+      timerSeconds: 60,
       errorMessage: "",
       otpDataEntity: OtpDataEntity.fromEmpty(),
       otpSendType: OtpSendType.email,
@@ -48,6 +54,8 @@ class VerifyAccountBySignupState extends Equatable {
     hssPhoneNumberError,
     verifyRegisterOtpStatus,
     otpRegisterStatus,
+    isTimerFinished,
+    timerSeconds
   ];
 
   VerifyAccountBySignupState copyWith({
@@ -61,8 +69,12 @@ class VerifyAccountBySignupState extends Equatable {
     OtpRegisterStatus? otpRegisterStatus,
     VerifyRegisterOtpStatus? verifyRegisterOtpStatus,
     bool? hssPhoneNumberError,
+    int ? timerSeconds,
+    bool ? isTimerFinished,
   }) {
     return VerifyAccountBySignupState(
+      timerSeconds: timerSeconds??this.timerSeconds,
+      isTimerFinished: isTimerFinished??this.isTimerFinished,
       errorMessage: errorMessage ?? this.errorMessage,
       verifyOtpEntity: verifyOtpEntity.copyWith(
         otp: otpCode ?? this.otpCode,

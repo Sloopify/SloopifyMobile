@@ -65,44 +65,49 @@ class CreatePost extends StatelessWidget {
                   Container(
                     height: 40,
                     margin: EdgeInsets.symmetric(horizontal: AppPadding.p10),
-                    child: state.createPostStatus==CreatePostStatus.loading? CircularProgressIndicator():CustomElevatedButton(
-                      label: "Create Post",
-                      onPressed:
-                          state.createPostStatus == CreatePostStatus.loading
-                              ? () {}
-                              : () {
-                                if (context
-                                        .read<CreatePostCubit>()
-                                        .state
-                                        .regularPostEntity
-                                        .content
-                                        .isEmpty &&
-                                    (context
+                    child:
+                        state.createPostStatus == CreatePostStatus.loading
+                            ? CircularProgressIndicator()
+                            : CustomElevatedButton(
+                              label: "Create Post",
+                              onPressed:
+                                  state.createPostStatus ==
+                                          CreatePostStatus.loading
+                                      ? () {}
+                                      : () {
+                                        if (context
                                                 .read<CreatePostCubit>()
                                                 .state
                                                 .regularPostEntity
-                                                .mediaFiles ==
-                                            null ||
-                                        context
-                                            .read<CreatePostCubit>()
-                                            .state
-                                            .regularPostEntity
-                                            .mediaFiles!
-                                            .isEmpty)) {
-                                  showSnackBar(
-                                    context,
-                                    "You should write your post or choose media",
-                                  );
-                                } else {
-                                  context
-                                      .read<CreatePostCubit>()
-                                      .createRegularPost();
-                                }
-                              },
-                      backgroundColor: ColorManager.primaryColor,
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      isBold: true,
-                    ),
+                                                .content
+                                                .isEmpty &&
+                                            (context
+                                                        .read<CreatePostCubit>()
+                                                        .state
+                                                        .regularPostEntity
+                                                        .mediaFiles ==
+                                                    null ||
+                                                context
+                                                    .read<CreatePostCubit>()
+                                                    .state
+                                                    .regularPostEntity
+                                                    .mediaFiles!
+                                                    .isEmpty)) {
+                                          showSnackBar(
+                                            context,
+                                            "You should write your post or choose media",
+                                            isImportant: true
+                                          );
+                                        } else {
+                                          context
+                                              .read<CreatePostCubit>()
+                                              .createRegularPost();
+                                        }
+                                      },
+                              backgroundColor: ColorManager.primaryColor,
+                              width: MediaQuery.of(context).size.width * 0.2,
+                              isBold: true,
+                            ),
                   ),
                 ],
               ),
@@ -182,6 +187,10 @@ class CreatePost extends StatelessWidget {
                                             svgAssets: AssetsManager.friendShip,
                                           ),
                                           ShipSelection(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 4,
+                                              vertical: 7,
+                                            ),
                                             onTap:
                                                 () => Navigator.pushNamed(
                                                   context,
@@ -601,39 +610,23 @@ class CreatePost extends StatelessWidget {
 
   Widget _buildPostDisappear24Hours(BuildContext context) {
     return InkWell(
+      splashColor: Colors.transparent,
       onTap: () => context.read<CreatePostCubit>().setPostAvailableFor24Hours(),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.p4,
-          vertical: AppPadding.p4,
-        ),
-        decoration: BoxDecoration(
-          color:
-              context
-                      .read<CreatePostCubit>()
-                      .state
-                      .regularPostEntity
-                      .disappears24h
-                  ? ColorManager.white
-                  : ColorManager.primaryShade1.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: SvgPicture.asset(
-          context.read<CreatePostCubit>().state.regularPostEntity.disappears24h
-              ? AssetsManager.postTimeActive
-              : AssetsManager.postTime,
-        ),
+      child: SvgPicture.asset(
+        context.read<CreatePostCubit>().state.regularPostEntity.disappears24h
+            ? AssetsManager.postTimeActive
+            : AssetsManager.postTime,
       ),
     );
   }
 
   void buildListener(BuildContext context, CreatePostState state) {
     if (state.createPostStatus == CreatePostStatus.success) {
-      ToastUtils.showSusToastMessage("your post created successfully");
+      showSnackBar(context, "your post created successfully", isSuccess: true);
       Navigator.of(context).pop();
     } else if (state.createPostStatus == CreatePostStatus.offline ||
         state.createPostStatus == CreatePostStatus.error) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 }

@@ -102,7 +102,7 @@ class AssetsManager{
   static const String chatNotification = '${chatIcons}chat_notification.svg';
 
   static const String baseCreatePostIcons = '${baseIconsURI}create_post/';
-  static const String postTime = '${baseCreatePostIcons}24hours.svg';
+  static const String postTime = '${baseCreatePostIcons}24Hours.svg';
   static const String postTimeActive = '${baseCreatePostIcons}24Hours_active.svg';
   static const String album = '${baseCreatePostIcons}album.svg';
   static const String feelings = '${baseCreatePostIcons}fellings.svg';
@@ -142,6 +142,8 @@ class AssetsManager{
   static const String sixteenNine = '${baseCreatePostIcons}sixteenNine.svg';
   static const String towThree = '${baseCreatePostIcons}towThree.svg';
   static const String customCrop = '${baseCreatePostIcons}custom_crop.svg';
+  static const String gifPost = '${baseCreatePostIcons}gif_post.svg';
+  static const String reelPost = '${baseCreatePostIcons}reel_post.svg';
 
 
   ////////////////***************create post images ********************
@@ -151,6 +153,37 @@ class AssetsManager{
   static const String baseCreatePostImages = '${baseImagesURI}create_post/';
   static const String addNewPlace = '${baseCreatePostImages}add_location.png';
   static const String currentLocation = '${baseCreatePostImages}current_location.png';
+
+
+
+  //////////////*************************create story **************///////////////
+
+  static const String baseCreateStoryIcons = '${baseIconsURI}create_story/';
+  static const String multiPhoto = '${baseCreateStoryIcons}multi_photo.svg';
+  static const String openCamera = '${baseCreateStoryIcons}open_camera.svg';
+  static const String storyAudience = '${baseCreateStoryIcons}story_audience.svg';
+  static const String text = '${baseCreateStoryIcons}text.svg';
+  static const String swipeCamera = '${baseCreateStoryIcons}swipe_camera.svg';
+  static const String flashOn = '${baseCreateStoryIcons}flash_on.svg';
+  static const String flashOff = '${baseCreateStoryIcons}flash_off.svg';
+  static const String sticker = '${baseCreateStoryIcons}sticker.svg';
+  static const String textAa = '${baseCreateStoryIcons}textAa.svg';
+  static const String textBold = '${baseCreateStoryIcons}text_bold.svg';
+  static const String textUnderLine = '${baseCreateStoryIcons}text_underline.svg';
+  static const String textItalic = '${baseCreateStoryIcons}text_italic.svg';
+  static const String textColor = '${baseCreateStoryIcons}text_color.svg';
+  static const String textAlignment = '${baseCreateStoryIcons}text_alignment.svg';
+  static const String colorPallete = '${baseCreateStoryIcons}color_pallete.svg';
+
+
+  //////////////////******************notification ******/////////////////
+
+  static const String baseNotification = '${baseIconsURI}notification/';
+  static const String alert = '${baseNotification}alert.svg';
+  static const String error = '${baseNotification}error.svg';
+  static const String important = '${baseNotification}important.svg';
+  static const String offline = '${baseNotification}important.svg';
+  static const String successNote = '${baseNotification}success.svg';
 
 
 }

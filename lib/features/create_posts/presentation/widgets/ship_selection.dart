@@ -9,13 +9,15 @@ class ShipSelection extends StatelessWidget {
   final String text;
   final String svgAssets;
   final Function() onTap;
-  const ShipSelection({super.key,required this.onTap,required this.text,required this.svgAssets});
+  final EdgeInsets? padding;
+  const ShipSelection({super.key,required this.onTap,required this.text,required this.svgAssets,this.padding});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       child: Container(
+        height: 33,
         padding: EdgeInsets.symmetric(horizontal: AppPadding.p4,vertical: AppPadding.p4),
         margin: EdgeInsets.symmetric(horizontal: AppPadding.p4),
         decoration: BoxDecoration(

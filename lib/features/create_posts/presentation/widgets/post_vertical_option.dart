@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sloopify_mobile/core/utils/helper/snackbar.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_media_cubit/edit_media_cubit.dart';
 
 import '../../../../core/managers/assets_managers.dart';
@@ -17,7 +18,7 @@ class PostVerticalOption extends StatelessWidget {
     return DraggableScrollableSheet(
       initialChildSize: 0.2,
       minChildSize: 0.2,
-      maxChildSize: 0.3,
+      maxChildSize: 0.4,
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
@@ -50,6 +51,29 @@ class PostVerticalOption extends StatelessWidget {
                         },
                       );
                     }),
+                    _buildOption(
+                      "Camera",
+                      AssetsManager.cameraPost,
+                          () {
+                        showSnackBar(context, "will be implemented soon",isWarning: true);
+                          },
+                    ),
+                    _buildOption(
+                      "Gif",
+                      AssetsManager.gifPost,
+                          () {
+                            showSnackBar(context, "will be implemented soon",isWarning: true);
+
+                          },
+                    ),
+                    _buildOption(
+                      "Reel",
+                      AssetsManager.reelPost,
+                          () {
+                            showSnackBar(context, "will be implemented soon",isWarning: true);
+
+                          },
+                    ),
                     // _buildOption(
                     //   "Shami post",
                     //   AssetsManager.shamiPost,
@@ -65,16 +89,16 @@ class PostVerticalOption extends StatelessWidget {
                     //   AssetsManager.cameraPost,
                     //       () {},
                     // ),
-                    _buildOption(
-                      "Opinion poll",
-                      AssetsManager.opinionPoll,
-                      () {},
-                    ),
-                    _buildOption(
-                      "Personal occasion",
-                      AssetsManager.occasion,
-                      () {},
-                    ),
+                    // _buildOption(
+                    //   "Opinion poll",
+                    //   AssetsManager.opinionPoll,
+                    //   () {},
+                    // ),
+                    // _buildOption(
+                    //   "Personal occasion",
+                    //   AssetsManager.occasion,
+                    //   () {},
+                    // ),
                   ],
                 ),
               ),

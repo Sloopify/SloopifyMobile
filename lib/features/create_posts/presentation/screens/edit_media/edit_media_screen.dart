@@ -61,7 +61,6 @@ class _EditMediaScreenState extends State<EditMediaScreen> {
           body: SafeArea(
             child: BlocBuilder<EditMediaCubit, EditMediaState>(
               builder: (context, state) {
-                print(state.mediaList[_currentIndex].file);
                 return Center(
                   child: Column(
                     children: [
@@ -207,146 +206,162 @@ class _EditMediaScreenState extends State<EditMediaScreen> {
                       ),
                       Gaps.vGap2,
                       // 🔧 Tools row
-                      if (!state.mediaList[_currentIndex].isVideoFile)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _toolButton(
-                                    AssetsManager.crop,
-                                    'Crop',
-                                    'crop',
-                                    () {
-                                      Navigator.of(context).pushNamed(
-                                        CropScreen.routeName,
-                                        arguments: {
-                                          "edit_media_cubit":
-                                              context.read<EditMediaCubit>(),
-                                          "CropCubit": CropCubit(
-                                            mediaEntity:
-                                                state.mediaList[_currentIndex],
-                                          ),
-                                          "initialIndex": _currentIndex,
-                                        },
-                                      );
-                                    },
-                                    context,
-                                  ),
-                                  Gaps.hGap3,
-                                  _toolButton(
-                                    AssetsManager.rotate,
-                                    'Rotate',
-                                    'rotate',
-                                    () async {
-                                      Navigator.of(context).pushNamed(
-                                        RotateImageScreen.routeName,
-                                        arguments: {
-                                          "edit_media_cubit":
-                                              context.read<EditMediaCubit>(),
-                                          "rotate_cubit": RotateMediaCubit(
-                                            initialEntity:
-                                                state.mediaList[_currentIndex],
-                                          ),
-                                          "initialIndex": _currentIndex,
-                                        },
-                                      );
-                                    },
-                                    context,
-                                  ),
-                                ],
-                              ),
-                              Gaps.vGap2,
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _toolButton(
-                                    AssetsManager.effects,
-                                    'Effects',
-                                    'effects',
-                                    () async {
-                                      String fileName = basename(
-                                        state
-                                            .mediaList[_currentIndex]
-                                            .file!
-                                            .path,
-                                      );
-                                      var image = img.decodeImage(
-                                        await state
-                                            .mediaList[_currentIndex]
-                                            .file!
-                                            .readAsBytes(),
-                                      );
-                                      image = img.copyResize(
-                                        image!,
-                                        width: 600,
-                                      );
-                                      var imageFile = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => PhotoFilterSelector(
-                                                circleShape: false,
-                                                title: const Text(
-                                                  "Photo Filter effects",
-                                                ),
-                                                image: image!,
-                                                filters: presetFiltersList,
-                                                filename: fileName!,
-                                                appBarColor: ColorManager.white,
-                                                loader: const Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                ),
-                                                fit: BoxFit.contain,
+                      if(state.mediaList.isNotEmpty)...[
+                        if (!state.mediaList[_currentIndex].isVideoFile)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _toolButton(
+                                      AssetsManager.crop,
+                                      'Crop',
+                                      'crop',
+                                          () {
+                                        Navigator.of(context).pushNamed(
+                                          CropScreen.routeName,
+                                          arguments: {
+                                            "edit_media_cubit":
+                                            context.read<EditMediaCubit>(),
+                                            "CropCubit": CropCubit(
+                                              mediaEntity:
+                                              state.mediaList[_currentIndex],
+                                            ),
+                                            "initialIndex": _currentIndex,
+                                          },
+                                        );
+                                      },
+                                      context,
+                                    ),
+                                    Gaps.hGap3,
+                                    _toolButton(
+                                      AssetsManager.rotate,
+                                      'Rotate',
+                                      'rotate',
+                                          () async {
+                                        Navigator.of(context).pushNamed(
+                                          RotateImageScreen.routeName,
+                                          arguments: {
+                                            "edit_media_cubit":
+                                            context.read<EditMediaCubit>(),
+                                            "rotate_cubit": RotateMediaCubit(
+                                              initialEntity:
+                                              state.mediaList[_currentIndex],
+                                            ),
+                                            "initialIndex": _currentIndex,
+                                          },
+                                        );
+                                      },
+                                      context,
+                                    ),
+                                  ],
+                                ),
+                                Gaps.vGap2,
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _toolButton(
+                                      AssetsManager.effects,
+                                      'Effects',
+                                      'effects',
+                                          () async {
+                                        String fileName = basename(
+                                          state
+                                              .mediaList[_currentIndex]
+                                              .file!
+                                              .path,
+                                        );
+                                        var image = img.decodeImage(
+                                          await state
+                                              .mediaList[_currentIndex]
+                                              .file!
+                                              .readAsBytes(),
+                                        );
+                                        image = img.copyResize(
+                                          image!,
+                                          width: 600,
+                                        );
+                                        var imageFile = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => PhotoFilterSelector(
+                                              circleShape: false,
+                                              title: const Text(
+                                                "Photo Filter effects",
                                               ),
-                                        ),
-                                      );
-                                      if (imageFile != null &&
-                                          imageFile.containsKey(
-                                            'image_filtered',
-                                          )) {
-                                        final updateEntity = state
-                                            .mediaList[_currentIndex]
-                                            .copyWith(
-                                              file: imageFile['image_filtered'],
-                                            );
-                                        context
-                                            .read<EditMediaCubit>()
-                                            .updateMedia(
-                                              _currentIndex,
-                                              updateEntity,
-                                            );
-                                      }
-                                    },
-                                    context,
-                                  ),
-                                  Gaps.hGap3,
-                                  _toolButton(
-                                    AssetsManager.deleteImage,
-                                    'Delete',
-                                    'delete',
-                                    () {
-                                      context
-                                          .read<EditMediaCubit>()
-                                          .deleteMedia(
+                                              image: image!,
+                                              filters: presetFiltersList,
+                                              filename: fileName!,
+                                              appBarColor: ColorManager.white,
+                                              loader: const Center(
+                                                child:
+                                                CircularProgressIndicator(),
+                                              ),
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                        if (imageFile != null &&
+                                            imageFile.containsKey(
+                                              'image_filtered',
+                                            )) {
+                                          final updateEntity = state
+                                              .mediaList[_currentIndex]
+                                              .copyWith(
+                                            file: imageFile['image_filtered'],
+                                          );
+                                          context
+                                              .read<EditMediaCubit>()
+                                              .updateMedia(
+                                            _currentIndex,
+                                            updateEntity,
+                                          );
+                                        }
+                                      },
+                                      context,
+                                    ),
+                                    Gaps.hGap3,
+                                    _toolButton(
+                                      AssetsManager.deleteImage,
+                                      'Delete',
+                                      'delete',
+                                          () {
+                                        if(state.mediaList.length==1){
+                                          context
+                                              .read<EditMediaCubit>()
+                                              .deleteMedia(
                                             state.mediaList[_currentIndex],
                                           );
-                                    },
-                                    context,
-                                    isDestructive: true,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                                          context
+                                              .read<CreatePostCubit>()
+                                              .setFinalListOfMediaFiles(
+                                            state.mediaList,
+                                          );
+                                        }else{
+                                          context
+                                              .read<EditMediaCubit>()
+                                              .deleteMedia(
+                                            state.mediaList[_currentIndex],
+                                          );
+                                        }
 
-                      Gaps.vGap2,
+                                      },
+                                      context,
+                                      isDestructive: true,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        Gaps.vGap2,
+                      ],
+
 
                       // Footer buttons
                       Padding(

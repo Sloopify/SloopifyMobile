@@ -28,6 +28,9 @@ static const Color blue=Color(0xff0000FF);
 static const Color redWithGradiant=Color(0xffD75151);
 static const Color blueWithGradiant=Color(0xff433E7B);
 static const Color textGray3=Color(0xff727171);
+static const Color offWhite=Color(0xffEDEFF1);
+static const Color lightRed=Color(0xffFECDD3);
+
 
   static final gradient = const LinearGradient(
     begin: Alignment.topCenter,

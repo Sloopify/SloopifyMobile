@@ -3,7 +3,7 @@ description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 
-version: 1.0.1+2
+version: 1.0.3+4
 
 environment:
   sdk: ^3.7.0
@@ -69,6 +69,14 @@ dependencies:
   http: ^1.4.0
   photofilters: ^3.0.1
   path: ^1.9.1
+  google_fonts: ^6.2.1
+  flutter_colorpicker: ^1.1.0
+  uuid: ^4.4.2
+  camera: ^0.11.1
+
+
+
+
 
   comment_tree:
    path: lib/core/external_packages/comment_tree-master
@@ -89,8 +97,10 @@ flutter:
      - assets/icons/auth/
      - assets/icons/home/
      - assets/icons/chat/
+     - assets/icons/notification/
      - assets/icons/profile_info/
      - assets/icons/create_post/
+     - assets/icons/create_story/
      - assets/images/
      - assets/images/start_up/
      - assets/images/home/

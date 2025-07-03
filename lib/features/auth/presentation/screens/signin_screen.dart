@@ -254,7 +254,7 @@ class SignInScreen extends StatelessWidget {
                                       },
                               width: MediaQuery.of(context).size.width * 0.7,
                               backgroundColor: ColorManager.primaryColor,
-                              padding: EdgeInsets.symmetric(vertical: 8),
+                              padding: EdgeInsets.symmetric(vertical: 10),
                             ),
                           ),
                           Gaps.vGap2,
@@ -407,9 +407,9 @@ class SignInScreen extends StatelessWidget {
         (route) => false,
       );
     } else if (state.loginStatus == LoginStatus.noInternet) {
-      showSnackBar(context, 'no_internet_connection'.tr());
+      showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);
     } else if (state.loginStatus == LoginStatus.networkError) {
-      showSnackBar(context, state.errorMessage);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
   }
 
