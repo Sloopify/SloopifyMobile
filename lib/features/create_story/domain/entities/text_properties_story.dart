@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class TextPropertiesForStory extends Equatable {
   final Color? color;
@@ -8,7 +9,7 @@ class TextPropertiesForStory extends Equatable {
   final bool? italic;
   final bool? underline;
   final String? alignment;
-  final double ? fontSize;
+  final double? fontSize;
 
   const TextPropertiesForStory({
     required this.color,
@@ -17,7 +18,7 @@ class TextPropertiesForStory extends Equatable {
     required this.italic,
     required this.underline,
     required this.alignment,
-    required this.fontSize
+    required this.fontSize,
   });
 
   factory TextPropertiesForStory.fromJson(Map<String, dynamic> json) {
@@ -32,14 +33,16 @@ class TextPropertiesForStory extends Equatable {
     );
   }
 
-  factory TextPropertiesForStory.empty(){
-    return TextPropertiesForStory(color: null,
-        fontType: null,
-        bold: false,
-        italic: false,
-        underline: false,
-        fontSize: null,
-        alignment: null);
+  factory TextPropertiesForStory.empty() {
+    return TextPropertiesForStory(
+      color: Colors.white,
+      fontType: 'Roboto',
+      bold: false,
+      italic: false,
+      underline: false,
+      fontSize: 24,
+      alignment: 'center',
+    );
   }
 
   TextPropertiesForStory copyWith({
@@ -49,7 +52,7 @@ class TextPropertiesForStory extends Equatable {
     bool? italic,
     bool? underline,
     String? alignment,
-    double ? fontSize
+    double? fontSize,
   }) {
     return TextPropertiesForStory(
       color: color ?? this.color,
@@ -58,7 +61,7 @@ class TextPropertiesForStory extends Equatable {
       italic: italic ?? this.italic,
       underline: underline ?? this.underline,
       alignment: alignment ?? this.alignment,
-      fontSize: fontSize??this.fontSize
+      fontSize: fontSize ?? this.fontSize,
     );
   }
 
@@ -87,13 +90,12 @@ class TextPropertiesForStory extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object?> get props =>
-      [
-        color,
-        fontType,
-        bold,
-        italic,
-        underline,
-        alignment,
-      ];
+  List<Object?> get props => [
+    color,
+    fontType,
+    bold,
+    italic,
+    underline,
+    alignment,
+  ];
 }

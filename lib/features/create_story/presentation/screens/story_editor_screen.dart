@@ -5,20 +5,27 @@ import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
-import 'package:sloopify_mobile/features/create_story/domain/all_positioned_element.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing_story/drawing_story_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing_story/drawing_story_state.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_state.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_state.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/editing_top_tool_bar.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/widgets/story_elements_sheet.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/story_painter.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/stroke_width_drawer.dart';
-import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../domain/text_properties_story.dart';
+import '../../../../core/ui/widgets/custom_sheet.dart';
 import '../blocs/story_editor_cubit/story_editor_cubit.dart';
+import '../widgets/confirm_discard_or_keep_editing_story.dart';
+import '../widgets/drawing_color_pallete.dart';
 import '../widgets/editable_text_element.dart';
+import '../widgets/postitioned_element_item.dart';
 import '../widgets/text_input_overlay.dart';
 
-enum EditingMode { normal, crop, draw, text, sticker }
+enum EditingMode { normal, draw, text, sticker }
 
 class StoryEditorScreen extends StatefulWidget {
   final MediaEntity media;
@@ -39,12 +46,6 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
   // Editing state
   EditingMode _currentMode = EditingMode.normal;
 
-  // Drawing state
-  List<Offset> _currentPoints = [];
-  Color _selectedColor = Colors.red;
-  double _strokeWidth = 5.0;
-  List<DrawingElement> _drawingLines = [];
-
   // UI state
   bool _isToolbarVisible = true;
 
@@ -58,26 +59,8 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
   double _initialRotation = 0.0;
   Offset _initialOffset = Offset.zero;
   late double _mediaInitialRotationRadians;
-
-  // Text Editing State (now using String? and bool? as per TextPropertiesForStory)
-  Color? _currentTextColorString = Colors.white; // Default to 'white' string
-  String? _currentFontTypeString = 'Roboto'; // Default to 'Roboto' string
-  bool? _currentTextBold = false;
-  bool? _currentTextItalic = false;
-  String currentText="";
-  bool? _currentTextUnderline = false;
-  String? _currentTextAlignmentString = 'center'; // Default to 'center' string
-  // The single text element currently being edited/manipulated
-  PositionedTextElement? _activeTextElement;
-  final GlobalKey _activeTextElementKey = GlobalKey();
-  // List of finalized text elements (not currently being edited)
-  List<PositionedTextElement> _textElements = [];
-  final Map<PositionedTextElement, GlobalKey> _finalizedTextElementKeys = {};
-  // Initial transformation values for the active text element during a gesture
-  Offset _initialActiveTextElementOffset = Offset.zero;
-  double _initialActiveTextElementScale = 1.0;
-  double _initialActiveTextElementRotation = 0.0;
-  final Uuid _uuid = const Uuid();
+  final Map<String, GlobalKey> _textKeys = {};
+  final Map<String, GlobalKey> _elementsKey = {};
 
   @override
   void initState() {
@@ -111,47 +94,6 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
       if (mounted) setState(() {});
     }
   }
-  // Text Editing Callbacks
-  void _onTextPropertiesUpdated(
-      String text,
-      Color? color,
-      String? fontType,
-      bool? bold,
-      bool? italic,
-      bool? underline,
-      double? fontSize,
-      String? alignment,
-      ) {
-    setState(() {
-      currentText=text;
-      final textProperties = TextPropertiesForStory(
-        fontSize: fontSize,
-        color: color,
-        fontType: fontType,
-        bold: bold,
-        italic: italic,
-        underline: underline,
-        alignment: alignment,
-      );
-
-      if (_activeTextElement == null) {
-        // This case should ideally not happen if we always create _activeTextElement
-        // when entering text mode, but as a fallback:
-        _activeTextElement = PositionedTextElement(
-          id: _uuid.v4(),
-          textPropertiesForStory: textProperties,
-          offset: Offset.zero, // Will be updated by TextInputOverlay
-          size: Size.zero,
-          rotation: 0.0,
-          positionedElementStoryTheme: null, text: '',
-        );
-      } else {
-        _activeTextElement = _activeTextElement!.copyWith(
-          textProperty: textProperties,
-        );
-      }
-    });
-  }
 
   @override
   void dispose() {
@@ -178,173 +120,98 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
     });
   }
 
-  void _undoDrawing() {
-    if (_drawingLines.isNotEmpty) {
-      setState(() {
-        _drawingLines.removeLast();
-      });
-    }
-  }
-
-  void _clearDrawing() {
-    setState(() {
-      _drawingLines.clear();
-      _currentPoints = [];
-    });
-  }
-
-  void _changeDrawingColor(Color color) {
-    setState(() {
-      _selectedColor = color;
-    });
-  }
-
-  void _changeStrokeWidth(double width) {
-    setState(() {
-      _strokeWidth = width;
-    });
-  }
-  // Text Editing Callbacks (now using String? and bool?)
-  void _onTextSubmitted(String text) {
-    if (text.isNotEmpty) {
-      setState(() {
-        final textProperties = TextPropertiesForStory(
-          fontSize: _activeTextElement?.textPropertiesForStory.fontSize ?? 24.0,
-          color: _currentTextColorString,
-          fontType: _currentFontTypeString,
-          bold: _currentTextBold,
-          italic: _currentTextItalic,
-          underline: _currentTextUnderline,
-          alignment: _currentTextAlignmentString,
-        );
-        _textElements.add(PositionedTextElement(
-          id: _uuid.v4(),
-          textPropertiesForStory: textProperties,
-          offset: Offset.zero, // Placeholder for finalPosition
-          size: Size.zero,     // Placeholder for final size
-          rotation: 0.0, // Initial rotation for text element
-          positionedElementStoryTheme: null, text: text, // As per your requirement
-        ));
-        _changeEditingMode(EditingMode.normal);
-      });
-    } else {
-    }
-  }
-
-
-
-  void _updateActiveTextElementMeasurement(
-      PositionedTextElement element, Offset finalPosition, Size size) {
-    setState(() {
-      _activeTextElement = element.copyWith(
-        offset: finalPosition,
-        size: size,
-      );
-    });
-  }
-
-  void _changeCurrentTextColorString(Color? color) {
-    setState(() {
-      _currentTextColorString = color;
-    });
-  }
-
-  void _changeCurrentFontTypeString(String? fontType) {
-    setState(() {
-      _currentFontTypeString = fontType;
-    });
-  }
-
-  void _toggleCurrentTextBold(bool? bold) {
-    setState(() {
-      _currentTextBold = bold;
-    });
-  }
-
-  void _toggleCurrentTextItalic(bool? italic) {
-    setState(() {
-      _currentTextItalic = italic;
-    });
-  }
-
-  void _toggleCurrentTextUnderline(bool? underline) {
-    setState(() {
-      _currentTextUnderline = underline;
-    });
-  }
-
-  void _changeCurrentTextAlignmentString(String? alignment) {
-    setState(() {
-      _currentTextAlignmentString = alignment;
-    });
-  }
   @override
   Widget build(BuildContext context) {
+    print(context
+        .read<StoryEditorCubit>()
+        .state
+        .positionedElements);
     return Scaffold(
       backgroundColor: Colors.black,
-      body: BlocBuilder<StoryEditorCubit, StoryEditorState>(
+      body: BlocBuilder<DrawingStoryCubit, DrawingState>(
         builder: (context, state) {
           return Stack(
             children: [
               // Media Display
               Positioned.fill(
                 child: GestureDetector(
-                  onScaleUpdate:_currentMode!=EditingMode.draw && _currentMode!=EditingMode.text? (details) {
-                    if (_currentMode != EditingMode.draw) {
-                      setState(() {
-                        // Update scale
-                        _currentScale = _initialScale * details.scale;
+                  onScaleUpdate:
+                      _currentMode != EditingMode.draw &&
+                              context
+                                  .read<TextEditingCubit>()
+                                  .state
+                                  .allTextAlignment
+                                  .isEmpty
+                          ? (details) {
+                            if (_currentMode != EditingMode.draw) {
+                              setState(() {
+                                // Update scale
+                                _currentScale = _initialScale * details.scale;
 
-                        // Update rotation
-                        _currentRotation = _initialRotation + details.rotation;
+                                // Update rotation
+                                _currentRotation =
+                                    _initialRotation + details.rotation;
 
-                        _currentOffset += details.focalPointDelta;
-                      });
-                    }
-                  }:null,
-                  onScaleStart: _currentMode!=EditingMode.draw && _currentMode!=EditingMode.text?(details) {
-                    if (_currentMode != EditingMode.draw) {
-                      _initialScale = _currentScale;
-                      _initialRotation = _currentRotation;
-                      _initialOffset = _currentOffset;
-                    }
-                  }:null,
+                                _currentOffset += details.focalPointDelta;
+                              });
+                            }
+                          }
+                          : null,
+                  onScaleStart:
+                      _currentMode != EditingMode.draw &&
+                              context
+                                  .read<TextEditingCubit>()
+                                  .state
+                                  .allTextAlignment
+                                  .isEmpty
+                          ? (details) {
+                            if (_currentMode != EditingMode.draw) {
+                              _initialScale = _currentScale;
+                              _initialRotation = _currentRotation;
+                              _initialOffset = _currentOffset;
+                            }
+                          }
+                          : null,
                   onTap: () {},
-                  onPanStart:_currentMode==EditingMode.draw? (details) {
-                    setState(() {
-                      _currentPoints = [details.localPosition];
-                    });
-                  }:null,
-                  onPanUpdate: _currentMode==EditingMode.draw?(details) {
-                    setState(() {
-                      _currentPoints.add(
-                        details.localPosition,
-                      ); // Add the new point
-                    });
-                  }:null,
-                  onPanEnd: _currentMode==EditingMode.draw?(details) {
-                    _drawingLines.add(
-                      DrawingElement(
-                        color: _selectedColor,
-                        points: List.from(_currentPoints),
-                        strokeWidth: _strokeWidth,
-                      ),
-                    );
-                    context.read<StoryEditorCubit>().addDrawingElement(
-                      List.from(_currentPoints),
-                      _selectedColor,
-                      _strokeWidth,
-                    );
-                    setState(() {
-                      _currentPoints = []; // Clear for the next drawing
-                    });
-                  }:null,
+                  onPanStart:
+                      _currentMode == EditingMode.draw &&
+                              context
+                                  .read<TextEditingCubit>()
+                                  .state
+                                  .allTextAlignment
+                                  .isEmpty
+                          ? (details) {
+                            context.read<DrawingStoryCubit>().changeCurrentLine(
+                              [details.localPosition],
+                            );
+                          }
+                          : null,
+                  onPanUpdate:
+                      _currentMode == EditingMode.draw
+                          ? (details) {
+                            context.read<DrawingStoryCubit>().addNewLine(
+                              details.localPosition,
+                            );
+                          }
+                          : null,
+                  onPanEnd:
+                      _currentMode == EditingMode.draw
+                          ? (details) {
+                            context
+                                .read<DrawingStoryCubit>()
+                                .addDrawingElement();
+                            context
+                                .read<DrawingStoryCubit>()
+                                .emptyCurrentPoints();
+                          }
+                          : null,
                   child: Container(
                     color: Colors.black,
                     child: Transform.translate(
                       offset: _currentOffset, // Apply translation first
                       child: Transform.rotate(
-                        angle: _mediaInitialRotationRadians + _currentRotation, // Combine initial and gesture rotation
+                        angle: _mediaInitialRotationRadians + _currentRotation,
+                        // Combine initial and gesture rotation
                         child: Transform.scale(
                           scale: _currentScale, // Apply scale
                           child: Stack(
@@ -360,31 +227,29 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                                   child: CustomPaint(
                                     painter: StoryPainter(
                                       drawingPaths:
-                                          _drawingLines +
+                                          state.lines +
                                           [
-                                            if (_currentPoints.isNotEmpty)
+                                            if (state.currentPoints.isNotEmpty)
                                               DrawingElement(
-                                                points: _currentPoints,
-                                                color: _selectedColor,
-                                                strokeWidth: _strokeWidth,
+                                                points: state.currentPoints,
+                                                color: state.lineColor,
+                                                strokeWidth: state.strokeWidth,
                                               ),
                                           ],
                                     ),
                                   ),
                                 ),
 
-
                               // Display and manipulate the active text element
                               // In the Stack children of the build method
-
                               ...context
                                   .watch<StoryEditorCubit>()
                                   .state
                                   .positionedElements
                                   .map(
-                                    (element) => _buildPositionedElement(element),
-                              ),
-
+                                    (element) =>
+                                        _buildPositionedElement(element),
+                                  ),
                             ],
                           ),
                         ),
@@ -393,15 +258,57 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                   ),
                 ),
               ),
-              if (_textElements.isNotEmpty)
-                EditableTextElement(
-                  textElement: _textElements.first,
-                  onElementChanged: (updatedElement) {
-                    setState(() {
-                      _activeTextElement = updatedElement;
-                    });
-                  },
-                ),
+              if (context
+                  .read<TextEditingCubit>()
+                  .state
+                  .allTextAlignment
+                  .isNotEmpty)
+                ...context.read<TextEditingCubit>().state.allTextAlignment.map((
+                  e,
+                ) {
+                  _textKeys.putIfAbsent(e.id, () => GlobalKey());
+                  return BlocBuilder<TextEditingCubit, TextEditingState>(
+                    builder: (context, state) {
+
+                      return EditableTextElement(
+                        widgetKey: _textKeys[e.id]!,
+                        textElement: e,
+                        onElementChanged: (updatedElement) {
+                          print(updatedElement.id);
+                          context
+                              .read<TextEditingCubit>()
+                              .updateSelectedPositionedText(updatedElement.id);
+                        },
+                      );
+                    },
+                  );
+                }),
+              if (context
+                  .read<StoryEditorCubit>()
+                  .state
+                  .positionedElements
+                  .isNotEmpty)
+                ...context
+                    .read<StoryEditorCubit>()
+                    .state
+                    .positionedElements
+                    .map((e) {
+                      _elementsKey.putIfAbsent(e.id, () => GlobalKey());
+                      return BlocBuilder<StoryEditorCubit, StoryEditorState>(
+                        builder: (context, state) {
+                          print(state.positionedElements);
+                          return PositionedElementItem(
+                            widgetKey: _elementsKey[e.id]!,
+                            onUpdateElement: (element) {
+                              context
+                                  .read<StoryEditorCubit>()
+                                  .updateSelectedPositioned(element);
+                            },
+                            positionedElement: e,
+                          );
+                        },
+                      );
+                    }),
               // Top Toolbar
               Positioned(
                 top: MediaQuery.of(context).padding.top,
@@ -409,15 +316,27 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                 right: 0,
                 child: EditingTopToolBar(
                   editingMode: _currentMode,
-                  onDone: () {},
+                  onDone: () {
+                    _changeEditingMode(EditingMode.normal);
+                  },
                   onBack: () {
                     if (_currentMode == EditingMode.draw) {
-                      _clearDrawing();
+                      context.read<DrawingStoryCubit>().clearDrawing();
+                      _changeEditingMode(EditingMode.normal);
+                      _toggleToolbar();
+                    } else if (_currentMode == EditingMode.normal) {
+                      _toggleToolbar();
+                      CustomSheet.show(
+                        child: ConfirmDiscardOrKeepEditingStory(),
+                        context: context,
+                        barrierColor: ColorManager.black.withOpacity(0.2),
+                      );
+                    } else if (_currentMode == EditingMode.text) {
                       _changeEditingMode(EditingMode.normal);
                       _toggleToolbar();
                     }
                   },
-                  undoDrawing: _undoDrawing,
+                  undoDrawing: context.read<DrawingStoryCubit>().undoDrawing,
                 ),
               ),
               // Bottom Toolbar
@@ -431,7 +350,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                       offset: Offset(0, 100 * (1 - _toolbarAnimation.value)),
                       child: Opacity(
                         opacity: _toolbarAnimation.value,
-                        child: _buildSideLeftDrawingToolBar(),
+                        child: _buildSideLeftDrawingToolBar(context),
                       ),
                     ),
                   );
@@ -442,29 +361,20 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                   top: MediaQuery.of(context).padding.top + 100,
                   right: 0,
                   child: StrokeWidthDrawer(
-                    onChanged: _changeStrokeWidth,
-                    currentStrokeWidth: _strokeWidth,
+                    onChanged:
+                        context.read<DrawingStoryCubit>().changeStrokeWidth,
+                    currentStrokeWidth: state.strokeWidth,
                   ),
                 ),
               // Mode-specific Toolbars
-              if (_currentMode == EditingMode.draw) _buildColorPallete(),
+              if (_currentMode == EditingMode.draw) DrawingColorPallete(),
               // Text Editing Overlay (TextField and Text Toolbar)
               if (_currentMode == EditingMode.text)
                 TextInputOverlay(
-                  initialText: currentText,
-                  initialColor: _currentTextColorString,
-                  initialFontTypeString: _currentFontTypeString,
-                  initialBold: _currentTextBold,
-                  initialItalic: _currentTextItalic,
-                  initialUnderline: _currentTextUnderline,
-                  initialAlignmentString: _currentTextAlignmentString,
-                  onTextSubmitted: (text) => _onTextSubmitted(text),
-                  onColorChanged: _changeCurrentTextColorString,
-                  onFontTypeStringChanged: _changeCurrentFontTypeString,
-                  onBoldChanged: _toggleCurrentTextBold,
-                  onItalicChanged: _toggleCurrentTextItalic,
-                  onUnderlineChanged: _toggleCurrentTextUnderline,
-                  onAlignmentStringChanged: _changeCurrentTextAlignmentString,
+                  onTextSubmitted: () {
+                    _changeEditingMode(EditingMode.normal);
+                    _toggleToolbar();
+                  },
                 ),
             ],
           );
@@ -479,14 +389,18 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
         child: CircularProgressIndicator(color: Colors.white),
       );
     }
-    return AspectRatio(
-      aspectRatio: _videoController!.value.aspectRatio,
-      child: VideoPlayer(_videoController!),
+    return Positioned.fill(
+      child: AspectRatio(
+        aspectRatio: _videoController!.value.aspectRatio,
+        child: VideoPlayer(_videoController!),
+      ),
     );
   }
 
   Widget _buildImageDisplay() {
-    return Image.file(widget.media.file!, fit: BoxFit.contain);
+    return Positioned.fill(
+      child: Image.file(widget.media.file!, fit: BoxFit.contain),
+    );
   }
 
   Widget _buildPositionedElement(dynamic element) {
@@ -494,8 +408,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
     return const SizedBox.shrink();
   }
 
-
-  Widget _buildSideLeftDrawingToolBar() {
+  Widget _buildSideLeftDrawingToolBar(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -504,12 +417,21 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
             _changeEditingMode(EditingMode.draw);
             _toggleToolbar();
           },
-          icon: Icon(Icons.brush,color: ColorManager.white,size: 24,),
+          icon: Icon(Icons.brush, color: ColorManager.white, size: 24),
         ),
         Gaps.vGap2,
         InkWell(
           onTap: () {
             _toggleToolbar();
+            _changeEditingMode(EditingMode.sticker);
+            CustomSheet.show(
+              child: BlocProvider.value(
+                value: context.read<StoryEditorCubit>(),
+                child: StoryElementsSheet(),
+              ),
+              context: context,
+              barrierColor: ColorManager.black.withOpacity(0.2),
+            );
           },
           child: SvgPicture.asset(AssetsManager.sticker),
         ),
@@ -525,266 +447,4 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
       ],
     );
   }
-
-  Widget _buildToolButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool isActive = false,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive ? Colors.white : Colors.white.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: isActive ? Colors.black : Colors.white, size: 24),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isActive ? Colors.black : Colors.white,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildColorPallete() {
-    return Positioned(
-      bottom: MediaQuery.of(context).padding.bottom + 50,
-      left: 50,
-      right: 0,
-      child: Center(
-        child: Container(
-          height: 50,
-          alignment: Alignment.center,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children:
-                [
-                      Colors.red,
-                      Colors.blue,
-                      Colors.green,
-                      Colors.yellow,
-                      Colors.purple,
-                      Colors.orange,
-                      Colors.pink,
-                      Colors.white,
-                      Colors.black,
-                    ]
-                    .map(
-                      (color) => GestureDetector(
-                        onTap: () => _changeDrawingColor(color),
-                        child: Container(
-                          width: 25,
-                          height: 25,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color:
-                                  _selectedColor == color
-                                      ? Colors.white
-                                      : Colors.transparent,
-                              width: 3,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-          ),
-        ),
-      ),
-    );
-  }
-  // Helper for displaying and manipulating text elements
-  Widget _buildPositionedTextElement(
-      PositionedTextElement element,
-      GlobalKey key,
-      Function(PositionedTextElement, Offset, Size) onMeasurementComplete,
-      {bool isEditable = false} // New parameter
-      ) {
-    // Initial measurement callback (only for editable elements)
-    if (isEditable) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
-        if (renderBox != null && element.size == Size.zero) {
-          final size = renderBox.size;
-          final position = renderBox.localToGlobal(Offset.zero);
-          onMeasurementComplete(element, position, size);
-        }
-      });
-    }
-
-    final textProps = element.textPropertiesForStory;
-
-
-    // Helper to convert string alignment to TextAlign
-    TextAlign _stringToTextAlign(String? alignString) {
-      switch (alignString?.toLowerCase()) {
-        case 'left': return TextAlign.left;
-        case 'center': return TextAlign.center;
-        case 'right': return TextAlign.right;
-        default: return TextAlign.center;
-      }
-    }
-
-    // Helper to get font weight
-    FontWeight _getFontWeight(bool? bold) {
-      return (bold ?? false) ? FontWeight.bold : FontWeight.normal;
-    }
-
-    // Helper to get font style
-    FontStyle _getFontStyle(bool? italic) {
-      return (italic ?? false) ? FontStyle.italic : FontStyle.normal;
-    }
-
-    // Helper to get text decoration
-    TextDecoration _getTextDecoration(bool? underline) {
-      return (underline ?? false) ? TextDecoration.underline : TextDecoration.none;
-    }
-
-    // Gesture handling for the text element
-    return Positioned(
-      left: element.offset?.dx,
-      top: element.offset?.dy,
-      child: GestureDetector(
-        onTap: isEditable ? () {
-          // When tapping an active text element, re-enter text editing mode
-          setState(() {
-            _activeTextElement = element; // Set this as the active element
-            _currentTextColorString = element.textPropertiesForStory.color;
-            _currentFontTypeString = element.textPropertiesForStory.fontType;
-            _currentTextBold = element.textPropertiesForStory.bold;
-            _currentTextItalic = element.textPropertiesForStory.italic;
-            _currentTextUnderline = element.textPropertiesForStory.underline;
-            _currentTextAlignmentString = element.textPropertiesForStory.alignment;
-            _changeEditingMode(EditingMode.text);
-          });
-        } : null, // Only active elements are tappable for re-editing
-        onPanStart: isEditable ? (details) {
-          setState(() {
-            _initialActiveTextElementOffset = element.offset!;
-          });
-        } : null,
-        onPanUpdate: isEditable ? (details) {
-          setState(() {
-            _activeTextElement = element.copyWith(
-              offset: _initialActiveTextElementOffset + details.delta,
-            );
-          });
-        } : null,
-        onPanEnd: isEditable ? (details) {
-          // No-op, state is already updated
-        } : null,
-        onScaleStart: isEditable ? (details) {
-          setState(() {
-            _initialActiveTextElementScale = element.textPropertiesForStory.fontSize ?? 24.0; // Store initial font size
-            _initialActiveTextElementRotation = element.rotation!;
-            _initialActiveTextElementOffset = element.offset!; // Store initial offset for pivot calculation
-          });
-        } : null,
-        onScaleUpdate: isEditable ? (details) {
-          setState(() {
-            // Calculate new font size based on initial font size and gesture scale
-            final newFontSize = _initialActiveTextElementScale * details.scale;
-
-            // Update rotation
-            final newRotation = _initialActiveTextElementRotation + details.rotation;
-
-            // Calculate new offset to keep the element centered during scale/rotate
-            // This is a more robust approach for focal point scaling/rotation
-            final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
-            final elementCenter = renderBox.size.center(element.offset!);
-
-            final newOffset = elementCenter - (details.focalPoint - details.focalPointDelta);
-
-            _activeTextElement = element.copyWith(
-              textProperty: element.textPropertiesForStory.copyWith(fontSize: newFontSize), // Update font size in text properties
-              rotation: newRotation,
-              offset: newOffset, // Update element offset
-            );
-          });
-        } : null,
-        onScaleEnd: isEditable ? (details) {
-          // No-op, state is already updated
-        } : null,
-        child: Transform.translate(
-          offset: Offset(element.size!.width / 2, element.size!.height / 2), // Move origin to center for rotation/scaling
-          child: Transform.rotate(
-            angle: element.rotation!,
-            child: Transform.scale(
-              scale: (element.textPropertiesForStory.fontSize ?? 24.0) / 24.0, // Apply scale based on current font size relative to a base (e.g., 24.0)
-              child: Transform.translate(
-                offset: Offset(-element.size!.width / 2, -element.size!.height / 2), // Move back
-                child: Container(
-                  decoration: _getTextBackgroundDecoration(textProps.color, textProps.alignment),
-                  padding: _getTextBackgroundPadding(textProps.alignment),
-                  child: Text(
-                   currentText,
-                    key: key,
-                    textAlign: _stringToTextAlign(textProps.alignment),
-                    style: TextStyle(
-                      color: textProps.color,
-                      fontSize: textProps.fontSize ?? 24.0, // Use the actual font size from properties
-                      fontWeight: _getFontWeight(textProps.bold),
-                      fontStyle: _getFontStyle(textProps.italic),
-                      decoration: _getTextDecoration(textProps.underline),
-                      fontFamily: textProps.fontType,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Updated background decoration helper
-  BoxDecoration? _getTextBackgroundDecoration(Color? colorString, String? alignmentString) {
-    // This logic needs to be adapted based on how you represent background styles
-    // in TextPropertiesForStory. It currently only has color and alignment.
-    // If 'alignment' is used to imply a background style (e.g., 'filled'),
-    // you'd need a mapping. For now, I'll assume a simple filled background
-    // if a color is present and it's not 'none' or 'null'.
-    if (colorString != null && colorString != 'null' && colorString != 'none') {
-      return BoxDecoration(
-        color: colorString.withOpacity(0.5), // Example: semi-transparent background
-        borderRadius: BorderRadius.circular(8),
-      );
-    }
-    return null;
-  }
-
-  // Helper for background padding
-  EdgeInsetsGeometry _getTextBackgroundPadding(String? alignmentString) {
-    // If you have different background styles, you might need different padding
-    // For now, a generic padding if a background is implied.
-    if (alignmentString != null && alignmentString != 'none') { // Assuming 'none' means no background
-      return const EdgeInsets.symmetric(horizontal: 8, vertical: 4);
-    }
-    return EdgeInsets.zero;
-  }
-
-
-
-
-
-
-
-
 }
-

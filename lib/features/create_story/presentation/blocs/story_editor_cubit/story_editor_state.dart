@@ -4,12 +4,13 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
-import 'package:sloopify_mobile/features/create_story/domain/all_positioned_element.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/screens/story_audience/choose_story_audience.dart';
 
 import '../../../../create_posts/presentation/screens/post_audience_screen.dart';
-import '../../../domain/positioned_element_entity.dart';
-import '../../../domain/text_properties_story.dart';
+import '../../../domain/entities/positioned_element_entity.dart';
+import '../../../domain/entities/text_properties_story.dart';
 
 class StoryEditorState extends Equatable {
   final List<AssetEntity> selectedMedia;
@@ -18,8 +19,9 @@ class StoryEditorState extends Equatable {
   final List<MediaEntity>? mediaFiles;
   final List<String> backgroundColors;
   final List<PositionedElement> positionedElements;
+  final PositionedElement? currentElement;
   final bool isVideoMuted;
-  final PostAudience privacy;
+  final StoryAudience privacy;
   final List<int> specificFriends;
   final List<int> friendExcept;
   final String? gifUrl;
@@ -31,12 +33,13 @@ class StoryEditorState extends Equatable {
     this.backgroundColors = const [],
     this.positionedElements = const [],
     this.isVideoMuted = false,
-    this.privacy = PostAudience.public,
+    this.privacy = StoryAudience.public,
     this.specificFriends = const [],
     this.friendExcept = const [],
     this.gifUrl,
     this.mediaFiles,
     this.drawingElements=const [],
+    this.currentElement
 
   });
   StoryEditorState copyWith({
@@ -46,7 +49,7 @@ class StoryEditorState extends Equatable {
     List<String>? backgroundColors,
     List<PositionedElement>? positionedElements,
     bool? isVideoMuted,
-    PostAudience? privacy,
+    StoryAudience? privacy,
     List<int>? specificFriends,
     List<int>? friendExcept,
     String? gifUrl,
@@ -57,6 +60,7 @@ class StoryEditorState extends Equatable {
     Color?drawingColor,
     double? drawingWidth,
     DrawingElement? currentLine,
+    PositionedElement? currentOne
 
   }) {
     return StoryEditorState(
@@ -72,6 +76,7 @@ class StoryEditorState extends Equatable {
       gifUrl: gifUrl ?? this.gifUrl,
       mediaFiles: mediaFiles??this.mediaFiles,
       drawingElements: drawingElements??this.drawingElements,
+      currentElement: currentOne??currentElement
 
     );
   }
@@ -89,6 +94,7 @@ class StoryEditorState extends Equatable {
     gifUrl,
     mediaFiles,
     drawingElements,
+    currentElement
 
   ];
 }

@@ -109,7 +109,7 @@ class _LocationMapScreenState extends State<LocationMapScreen> {
   }
 
   Future<void> fetchLocation(BuildContext context) async {
-    GeoLoc? res = await LocationService.getLocationCoords(context: context);
+    GeoLoc? res = await LocationService.getLocationCoords();
     Logger().e(res);
     if (res != null) {
       _userCurrentLocationCoords = LatLng(res.lat, res.lng);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/create_story/domain/all_positioned_element.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 
 class DrawingPainter extends CustomPainter {
   final List<DrawingElement> lines;

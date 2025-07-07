@@ -24,7 +24,7 @@ class StrokeWidthDrawer extends StatelessWidget {
               child: Slider(
                 padding: EdgeInsets.zero,
                 value: currentStrokeWidth,
-                min: 4.0,
+                min: 3.0,
                 max: 20,
                 divisions: 9,
                 activeColor: Colors.white,

@@ -102,7 +102,6 @@ class MediaEntity extends Equatable {
     if (file != null) {
       data['file'] = await MultipartFile.fromFile(file!.path);
     }
-    print(data);
     return data;
   }
 

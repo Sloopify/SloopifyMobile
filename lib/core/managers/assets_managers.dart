@@ -174,6 +174,14 @@ class AssetsManager{
   static const String textColor = '${baseCreateStoryIcons}text_color.svg';
   static const String textAlignment = '${baseCreateStoryIcons}text_alignment.svg';
   static const String colorPallete = '${baseCreateStoryIcons}color_pallete.svg';
+  static const String storyMention = '${baseCreateStoryIcons}story_mention.svg';
+  static const String storyClock = '${baseCreateStoryIcons}story_clock.svg';
+  static const String storyFeeling = '${baseCreateStoryIcons}story_feeling.svg';
+  static const String storyGif = '${baseCreateStoryIcons}story_gif.svg';
+  static const String storyLocation = '${baseCreateStoryIcons}story_music.svg';
+  static const String storyPoll = '${baseCreateStoryIcons}story_poll.svg';
+  static const String storyWeather = '${baseCreateStoryIcons}story_weather.svg';
+  static const String storyAudio = '${baseCreateStoryIcons}story_music.svg';
 
 
   //////////////////******************notification ******/////////////////

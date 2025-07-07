@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/all_positioned_element.dart';
+import '../../domain/entities/all_positioned_element.dart';
 
 class PositionedTextElementWidget extends StatelessWidget {
   final PositionedTextElement positionedTextElement;

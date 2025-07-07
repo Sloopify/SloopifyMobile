@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
-  static Future<GeoLoc?> getLocationCoords({
-    BuildContext? context,
-  }) async {
+  static Future<GeoLoc?> getLocationCoords() async {
     LocationPermission status;
 
     try {

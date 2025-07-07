@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 
-import '../../domain/all_positioned_element.dart'; // For Path, Canvas, Paint, Offset
+import '../../domain/entities/all_positioned_element.dart'; // For Path, Canvas, Paint, Offset
 
 class StoryPainter extends CustomPainter {
   final List<DrawingElement> drawingPaths;

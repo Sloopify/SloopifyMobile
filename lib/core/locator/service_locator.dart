@@ -44,6 +44,11 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_loc
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/data/create_stoty_provider/create_story_data_provider.dart';
+import 'package:sloopify_mobile/features/create_story/data/repository/create_story_repo.dart';
+import 'package:sloopify_mobile/features/create_story/domain/repository/create_story_repository.dart';
+import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_story_friends_use_case.dart';
+import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_story_friends_use_case.dart';
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
 import 'package:sloopify_mobile/features/posts/presentation/blocs/fetch_comments_bloc/fetch_comments_bloc.dart';
 
@@ -110,6 +115,8 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => ChatBloc());
   locator.registerFactory(
     () => PostFriendsCubit(
+      getStoryFriendsUseCase: locator(),
+      searchStoryFriendsUseCase: locator(),
       getFriendsListUseCase: locator(),
       searchFriendsListUseCase: locator(),
     ),
@@ -252,6 +259,12 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton(
         () => CreatePostUseCase(createPostRepo: locator()),
   );
+  locator.registerLazySingleton(
+        () => GetStoryFriendsUseCase(createStoryRepo: locator()),
+  );
+  locator.registerLazySingleton(
+        () => SearchStoryFriendsUseCase(createStoryRepo: locator()),
+  );
 
   ///
   ///Repositories
@@ -263,7 +276,9 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<CreatePostRepo>(
     () => CreatePostRepoImpl(createPostDataProvider: locator()),
   );
-
+  locator.registerLazySingleton<CreateStoryRepo>(
+        () => CreateStoryRepoImpl(createStoryDataProvider: locator()),
+  );
   ////
   //////data source
   ////
@@ -272,6 +287,9 @@ Future<void> setupLocator() async {
   );
   locator.registerLazySingleton<AccountsDataProvider>(
     () => AccountsDataProviderImpl(client: locator()),
+  );
+  locator.registerLazySingleton<CreateStoryDataProvider>(
+        () => CreateStoryDataProviderImpl(client: locator()),
   );
 
   ///

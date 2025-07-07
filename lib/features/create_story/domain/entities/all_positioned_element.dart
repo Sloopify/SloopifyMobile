@@ -1,9 +1,10 @@
 import 'dart:ui';
 
-import 'package:sloopify_mobile/features/create_story/domain/positioned_element_entity.dart';
-import 'package:sloopify_mobile/features/create_story/domain/text_properties_story.dart';
 
-import '../../../core/utils/helper/postioned_element_story_theme.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/text_properties_story.dart';
+
+import '../../../../core/utils/helper/postioned_element_story_theme.dart';
 
 class PositionedElementWithLocationId extends PositionedElement {
   final int locationId;
@@ -15,6 +16,7 @@ class PositionedElementWithLocationId extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
+    required super.scale
   });
 
   @override
@@ -28,6 +30,7 @@ class PositionedElementWithLocationId extends PositionedElement {
     Offset? offset,
     Size? size,
     double? rotation,
+    double? scale,
   }) {
     return PositionedElementWithLocationId(
       rotation: rotation ?? this.rotation,
@@ -37,20 +40,24 @@ class PositionedElementWithLocationId extends PositionedElement {
       positionedElementStoryTheme:
       positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
+      scale: scale??this.scale
     );
   }
 }
 
 class PositionedMentionElement extends PositionedElement {
   final int friendId;
+  final String friendName;
 
   PositionedMentionElement({
     required this.friendId,
-    required super.offset,
+     super.offset,
     required super.id,
-    required super.rotation,
-    required super.positionedElementStoryTheme,
-    required super.size,
+     super.rotation,
+     super.positionedElementStoryTheme,
+     super.size,
+     super.scale,
+    required this.friendName
   });
 
   @override
@@ -64,8 +71,11 @@ class PositionedMentionElement extends PositionedElement {
     Offset? offset,
     Size? size,
     double? rotation,
+    double?scale,
+    String? friendName
   }) {
     return PositionedMentionElement(
+      friendName: friendName??this.friendName,
       id: id,
       friendId: friendId ?? this.friendId,
       offset: offset ?? this.offset,
@@ -73,6 +83,7 @@ class PositionedMentionElement extends PositionedElement {
       positionedElementStoryTheme:
       positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
+      scale: scale??this.scale
     );
   }
 }
@@ -88,6 +99,7 @@ class PositionedTextElement extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
+    required super.scale,
     required this.text
   });
 
@@ -105,10 +117,11 @@ class PositionedTextElement extends PositionedElement {
     Size? size,
     double? rotation,
     TextPropertiesForStory? textProperty,
-    String ? text
+    String ? text,
+    double?scale,
   }) {
     return PositionedTextElement(
-      text: text??this.text,
+      text: text ?? this.text,
       textPropertiesForStory: textProperty ?? textPropertiesForStory,
       id: id,
       offset: offset ?? this.offset,
@@ -116,6 +129,7 @@ class PositionedTextElement extends PositionedElement {
       positionedElementStoryTheme:
       positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
+      scale: scale??this.scale
     );
   }
 }
@@ -130,6 +144,7 @@ class FeelingElement extends PositionedElement {
     required super.rotation,
     required super.id,
     required super.size,
+    required super.scale
   });
 
   @override
@@ -143,6 +158,7 @@ class FeelingElement extends PositionedElement {
     Offset? offset,
     double? rotation,
     Size? size,
+    double? scale,
   }) {
     return FeelingElement(
       feelingId: feelingId ?? this.feelingId,
@@ -152,6 +168,7 @@ class FeelingElement extends PositionedElement {
       positionedElementStoryTheme:
       positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
+      scale: scale??this.scale
     );
   }
 }
@@ -159,13 +176,14 @@ class FeelingElement extends PositionedElement {
 class TemperatureElement extends PositionedElement {
   final double value;
 
-  TemperatureElement({
+  const TemperatureElement({
     required this.value,
-    required super.offset,
+     super.offset,
     required super.id,
-    required super.rotation,
-    required super.positionedElementStoryTheme,
-    required super.size,
+     super.rotation,
+     super.positionedElementStoryTheme,
+     super.size,
+     super.scale
   });
 
   @override
@@ -179,16 +197,29 @@ class TemperatureElement extends PositionedElement {
     Offset? offset,
     double? rotation,
     Size? size,
+    double? scale,
   }) {
     return TemperatureElement(
-      id: id,
-      value: value ?? this.value,
-      offset: offset ?? this.offset,
-      rotation: rotation ?? this.rotation,
-      positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
-      size: size ?? this.size,
+        id: id,
+        value: value ?? this.value,
+        offset: offset ?? this.offset,
+        rotation: rotation ?? this.rotation,
+        positionedElementStoryTheme:
+        positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+        size: size ?? this.size,
+        scale: scale ?? this.scale
     );
+  }
+
+  factory TemperatureElement.empty(){
+    return const  TemperatureElement(
+        value: 0.0,
+        offset: Offset.zero,
+        id: '',
+        rotation: 0.0,
+        positionedElementStoryTheme: null,
+        size: null,
+        scale: null);
   }
 }
 
@@ -202,6 +233,7 @@ class AudioElement extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
+    required super.scale
   });
 
   @override
@@ -216,6 +248,7 @@ class AudioElement extends PositionedElement {
     double? rotation,
     Size? size,
     int? audioId,
+    double?scale
   }) {
     return AudioElement(
       audioId: audioId ?? this.audioId,
@@ -225,6 +258,7 @@ class AudioElement extends PositionedElement {
       positionedElementStoryTheme:
       positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
+      scale: scale??this.scale
     );
   }
 }
@@ -241,6 +275,7 @@ class PollElement extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
+    required super.scale
   });
 
   @override
@@ -256,6 +291,7 @@ class PollElement extends PositionedElement {
     Size? size,
     String? question,
     List<String>? options,
+    double? scale
   }) {
     return PollElement(
       options: options ?? this.options,
@@ -266,6 +302,7 @@ class PollElement extends PositionedElement {
       positionedElementStoryTheme:
       positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
+      scale: scale??this.scale
     );
   }
 }
@@ -280,6 +317,7 @@ class StickerElement extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
+    required super.scale
   });
 
   @override
@@ -293,6 +331,7 @@ class StickerElement extends PositionedElement {
     double? rotation,
     Size? size,
     String? gifUrl,
+    double? scale
   }) {
     return StickerElement(
       gifUrl: gifUrl ?? this.gifUrl,
@@ -302,6 +341,7 @@ class StickerElement extends PositionedElement {
       positionedElementStoryTheme:
       positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
+      scale: scale??this.scale
     );
   }
 }
@@ -318,6 +358,7 @@ class ClockElement extends PositionedElement {
     required super.id,
     required this.theme,
     required this.dateTime,
+    required super.scale
   });
 
   @override
@@ -337,6 +378,7 @@ class ClockElement extends PositionedElement {
     double? rotation,
     DateTime? time,
     String? theme,
+    double?scale
   }) {
     return ClockElement(
       dateTime: time ?? dateTime,
@@ -347,6 +389,7 @@ class ClockElement extends PositionedElement {
       positionedElementStoryTheme:
       positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
+      scale: scale??this.scale
     );
   }
 }

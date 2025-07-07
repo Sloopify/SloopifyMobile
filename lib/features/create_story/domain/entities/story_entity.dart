@@ -1,10 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:sloopify_mobile/core/utils/helper/app_extensions/post_audience_extention.dart';
+import 'package:sloopify_mobile/core/utils/helper/app_extensions/stoty_audience_extension.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
-import 'package:sloopify_mobile/features/create_story/domain/positioned_element_entity.dart';
-import 'package:sloopify_mobile/features/create_story/domain/text_properties_story.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/text_properties_story.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/screens/story_audience/choose_story_audience.dart';
 
-import '../../create_posts/presentation/screens/post_audience_screen.dart';
+import '../../../create_posts/presentation/screens/post_audience_screen.dart';
 import 'all_positioned_element.dart';
 
 class StoryEntity extends Equatable {
@@ -12,7 +14,7 @@ class StoryEntity extends Equatable {
   final TextPropertiesForStory? textPropertiesForStory;
   final List<String>? backgroundColor;
   final bool isVideoMuted;
-  final PostAudience privacy;
+  final StoryAudience privacy;
   final List<int>? specificFriends;
   final List<int>? friendExcept;
   final PositionedElementWithLocationId? locationElement;
@@ -50,7 +52,7 @@ class StoryEntity extends Equatable {
       textPropertiesForStory: null,
       backgroundColor: null,
       isVideoMuted: false,
-      privacy: PostAudience.public,
+      privacy: StoryAudience.public,
       specificFriends: null,
       friendExcept: null,
       locationElement: null,

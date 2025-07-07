@@ -36,12 +36,12 @@ class HomeStories extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  // Navigator.of(context).push(
-                  //     MaterialPageRoute(builder: (context) =>
-                  //         BlocProvider(
-                  //           create: (context) => StoryEditorCubit(),
-                  //           child: CreateStoryFirstStep(),
-                  //         )));
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) =>
+                          BlocProvider(
+                            create: (context) => StoryEditorCubit(),
+                            child: CreateStoryFirstStep(),
+                          )));
                 },
                 child: SvgPicture.asset(AssetsManager.addStory),
               ),

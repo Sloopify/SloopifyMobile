@@ -12,8 +12,11 @@ import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/media_editor_screen.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_editor_screen.dart';
+
+import '../blocs/drawing_story/drawing_story_cubit.dart';
 
 class CameraCaptureScreen extends StatefulWidget {
   const CameraCaptureScreen({Key? key}) : super(key: key);
@@ -80,8 +83,18 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) {
-              return BlocProvider.value(
-                value: context.read<StoryEditorCubit>(),
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(
+                    value: context.read<StoryEditorCubit>(),
+                  ),
+                  BlocProvider(
+                    create: (context) => TextEditingCubit(),
+                  ),
+                  BlocProvider(
+                    create: (context) => DrawingStoryCubit(),
+                  ),
+                ],
                 child: StoryEditorScreen(media: mediaEntity),
               );
             },
@@ -132,99 +145,99 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
   Widget build(BuildContext context) {
     return _isInitialized
         ? Scaffold(
-          body: Stack(
-            children: [
-              Positioned.fill(child: CameraPreview(_controller!)),
-              Positioned(
-                top: 20,
-                left: 0,
-                right: 0,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppPadding.p20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(Icons.arrow_back, color: ColorManager.white),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isFlashOn = !isFlashOn;
-                          });
-                          if (isFlashOn)
-                            _controller?.setFlashMode(FlashMode.torch);
-                          if (!isFlashOn)
-                            _controller?.setFlashMode(FlashMode.off);
-                        },
-                        child: SvgPicture.asset(
-                          isFlashOn
-                              ? AssetsManager.flashOff
-                              : AssetsManager.flashOn,
-                        ),
-                      ),
-                    ],
+      body: Stack(
+        children: [
+          Positioned.fill(child: CameraPreview(_controller!)),
+          Positioned(
+            top: 20,
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppPadding.p20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.arrow_back, color: ColorManager.white),
                   ),
-                ),
-              ),
-              Positioned(
-                bottom: 100,
-                left: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap:
-                      isPhotoCamera
-                          ? () => _takePicture(context)
-                          : _toggleVideoRecording,
-                  child: Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color:
-                          !isPhotoCamera
-                              ? _isRecording
-                                  ? Colors.red
-                                  : Colors.white
-                              : Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey, width: 3),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        isFlashOn = !isFlashOn;
+                      });
+                      if (isFlashOn)
+                        _controller?.setFlashMode(FlashMode.torch);
+                      if (!isFlashOn)
+                        _controller?.setFlashMode(FlashMode.off);
+                    },
+                    child: SvgPicture.asset(
+                      isFlashOn
+                          ? AssetsManager.flashOff
+                          : AssetsManager.flashOn,
                     ),
-                    child:
-                        !isPhotoCamera
-                            ? Icon(
-                              _isRecording ? Icons.stop : Icons.videocam,
-                              color: _isRecording ? Colors.white : Colors.black,
-                              size: 30,
-                            )
-                            : null,
                   ),
-                ),
+                ],
               ),
-              Positioned(
-                bottom: 50,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildPhotoVideoSelect(isPhotoCamera, isPhoto: true),
-                    Gaps.hGap4,
-                    _buildPhotoVideoSelect(!isPhotoCamera, isPhoto: false),
-                  ],
-                ),
-              ),
-              Positioned(
-                bottom: 50,
-                left: 20,
-                child: InkWell(
-                  onTap: () {},
-                  child: SvgPicture.asset(AssetsManager.swipeCamera),
-                ),
-              ),
-            ],
+            ),
           ),
-        )
+          Positioned(
+            bottom: 100,
+            left: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap:
+              isPhotoCamera
+                  ? () => _takePicture(context)
+                  : _toggleVideoRecording,
+              child: Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  color:
+                  !isPhotoCamera
+                      ? _isRecording
+                      ? Colors.red
+                      : Colors.white
+                      : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey, width: 3),
+                ),
+                child:
+                !isPhotoCamera
+                    ? Icon(
+                  _isRecording ? Icons.stop : Icons.videocam,
+                  color: _isRecording ? Colors.white : Colors.black,
+                  size: 30,
+                )
+                    : null,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 50,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildPhotoVideoSelect(isPhotoCamera, isPhoto: true),
+                Gaps.hGap4,
+                _buildPhotoVideoSelect(!isPhotoCamera, isPhoto: false),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 50,
+            left: 20,
+            child: InkWell(
+              onTap: () {},
+              child: SvgPicture.asset(AssetsManager.swipeCamera),
+            ),
+          ),
+        ],
+      ),
+    )
         : const Center(child: CircularProgressIndicator());
   }
 

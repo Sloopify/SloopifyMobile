@@ -42,6 +42,15 @@ static const String changePassword="auth/forgot-password/reset-password";
 
 
 
+  ////////////////**********create story******************/////////////
+  static const String getStoryFriends="stories/get-friends";
+  static const String searchStoryFriend="post/search-friends";
+  static const String getStoryFeeling="stories/get-feeling";
+  static const String searchStoryFeeling="stories/search-feeling";
+
+
+
+
 
 
 }

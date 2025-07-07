@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/create_story/domain/all_positioned_element.dart';
-
+import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 class EditableTextElement extends StatefulWidget {
   final PositionedTextElement textElement;
+  final GlobalKey widgetKey;
   final Function(PositionedTextElement updatedElement) onElementChanged;
 
   const EditableTextElement({
     Key? key,
     required this.textElement,
     required this.onElementChanged,
+    required this.widgetKey
   }) : super(key: key);
 
   @override
@@ -16,48 +17,25 @@ class EditableTextElement extends StatefulWidget {
 }
 
 class _EditableTextElementState extends State<EditableTextElement> {
-  late Offset _currentOffset;
-  late double _currentRotation;
-  late double _currentFontSize;
-
-  // Initial values for gesture calculations
-  late Offset _initialGestureOffset;
-  late double _initialGestureRotation;
-  late double _initialGestureFontSize;
+  Offset _position = Offset(100, 100);
+  double _scale = 1.0;
+  double _initialScale = 1.0;
+  double _rotation = 0.0;
+  double _initialRotation = 0.0;
+  Offset _initialFocalPoint = Offset.zero;
+  Offset _initialPosition = Offset.zero;
+  double _initialFontSize=24;
+  double _currentFontSize=24;
+  int _pointerCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _currentOffset = widget.textElement.offset!;
-    _currentRotation = widget.textElement.rotation!;
-    _currentFontSize = widget.textElement.textPropertiesForStory.fontSize ?? 24.0;
   }
 
-  @override
-  void didUpdateWidget(covariant EditableTextElement oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Update internal state if the parent widget passes a new textElement
-    if (widget.textElement != oldWidget.textElement) {
-      _currentOffset = widget.textElement.offset!;
-      _currentRotation = widget.textElement.rotation!;
-      _currentFontSize = widget.textElement.textPropertiesForStory.fontSize ?? 24.0;
-    }
-  }
 
-  // Helper to convert string color to Flutter Color object
-  Color _stringToColor(String? colorString) {
-    switch (colorString?.toLowerCase()) {
-      case 'red': return Colors.red;
-      case 'blue': return Colors.blue;
-      case 'green': return Colors.green;
-      case 'yellow': return Colors.yellow;
-      case 'purple': return Colors.purple;
-      case 'orange': return Colors.orange;
-      case 'pink': return Colors.pink;
-      case 'black': return Colors.black;
-      default: return Colors.white;
-    }
-  }
+
+
 
   // Helper to convert string alignment to TextAlign
   TextAlign _stringToTextAlign(String? alignString) {
@@ -84,81 +62,84 @@ class _EditableTextElementState extends State<EditableTextElement> {
     return (underline ?? false) ? TextDecoration.underline : TextDecoration.none;
   }
 
-  // Updated background decoration helper
-  BoxDecoration? _getTextBackgroundDecoration(String? colorString, String? alignmentString) {
-    if (colorString != null && colorString != 'null' && colorString != 'none') {
-      return BoxDecoration(
-        color: _stringToColor(colorString).withOpacity(0.5),
-        borderRadius: BorderRadius.circular(8),
-      );
-    }
-    return null;
-  }
 
-  // Helper for background padding
-  EdgeInsetsGeometry _getTextBackgroundPadding(String? alignmentString) {
-    if (alignmentString != null && alignmentString != 'none') {
-      return const EdgeInsets.symmetric(horizontal: 8, vertical: 4);
-    }
-    return EdgeInsets.zero;
-  }
 
   void _updateParent() {
-    final updatedTextProperties = widget.textElement.textPropertiesForStory.copyWith(
-      fontSize: _currentFontSize,
-    );
-    final updatedElement = widget.textElement.copyWith(
-      offset: _currentOffset,
-      rotation: _currentRotation,
-      textProperty: updatedTextProperties,
-      // Size will be updated by the parent after layout, so we don't set it here
-    );
-    widget.onElementChanged(updatedElement);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Size? originalSize = widget.widgetKey.currentContext?.size;
+      Size scaledSize=Size.zero;
+      if (originalSize != null) {
+        Size scaledSize = Size(
+          originalSize.width * _scale,
+          originalSize.height * _scale,
+        );
+        print("Scaled Size: $scaledSize");
+      }
+        // Fallback if context is not available (should be rare after addPostFrameCallback)
+        final updatedTextProperties = widget.textElement.textPropertiesForStory.copyWith(
+          fontSize: _currentFontSize
+        );
+        final updatedElement = widget.textElement.copyWith(
+          offset: _position,
+          rotation: _rotation,
+          textProperty: updatedTextProperties,
+          size: scaledSize,
+          scale: _scale,
+        );
+        widget.onElementChanged(updatedElement);
+
+    });
   }
+
+  void _onScaleStart(ScaleStartDetails details) {
+    print('nnnnnnnnnnnnnnnnnnn');
+    _initialScale = _scale;
+    _initialRotation = _rotation;
+    _initialFocalPoint = details.focalPoint;
+    _initialPosition = _position;
+    _initialFontSize=_currentFontSize;
+
+
+  }
+
+  void _onScaleUpdate(ScaleUpdateDetails details) {
+    // If new finger added or removed, update base references
+
+    setState(() {
+      _scale = (_initialScale * details.scale).clamp(0.5, 5.0);
+      _rotation = _initialRotation + details.rotation;
+      final delta = details.focalPoint - _initialFocalPoint;
+      _position = _initialPosition + delta;
+    });
+    print('nnnnnnnnnnnnnnnnnnn');
+    print(_pointerCount);
+    _updateParent();
+
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     final textProps = widget.textElement.textPropertiesForStory;
 
     return Positioned(
-      left: _currentOffset.dx,
-      top: _currentOffset.dy,
+      left: _position.dx,
+      top: _position.dy,
       child: GestureDetector(
-        onPanStart: (details) {
-          _initialGestureOffset = _currentOffset;
-        },
-        onPanUpdate: (details) {
-          setState(() {
-            _currentOffset = _initialGestureOffset + details.delta;
-            _updateParent();
-          });
-        },
-        // onScaleStart: (details) {
-        //   _initialGestureFontSize = _currentFontSize;
-        //   _initialGestureRotation = _currentRotation;
-        //   _initialGestureOffset = _currentOffset;
-        // },
-        // onScaleUpdate: (details) {
-        //   setState(() {
-        //     _currentFontSize = _initialGestureFontSize * details.scale;
-        //     _currentRotation = _initialGestureRotation + details.rotation;
-        //
-        //     _currentOffset += details.focalPointDelta;
-        //
-        //     _updateParent();
-        //   });
-        // },
-        child: Transform.translate(
-          offset: Offset(widget.textElement.size!.width / 2, widget.textElement.size!.height / 2),
-          child: Transform.rotate(
-            angle: _currentRotation,
-            child: Transform.scale(
-              scale: _currentFontSize / 24.0,
-              child: Transform.translate(
-                offset: Offset(-widget.textElement.size!.width / 2, -widget.textElement.size!.height / 2),
-                child: Container(
-                  padding: _getTextBackgroundPadding(textProps.alignment),
-                  child: Text(
+        onScaleStart: _onScaleStart,
+        onScaleUpdate: _onScaleUpdate,
+        child: Transform(
+          transform: Matrix4.identity()
+            ..translate(0.0, 0.0)
+            ..rotateZ(_rotation)
+            ..scale(_scale),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            color: Colors.transparent,
+            child:  Text(
+              key: widget.widgetKey,
                     widget.textElement.text ,
                     textAlign: _stringToTextAlign(textProps.alignment),
                     style: TextStyle(
@@ -173,9 +154,8 @@ class _EditableTextElementState extends State<EditableTextElement> {
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+
+        );
+
   }
 }

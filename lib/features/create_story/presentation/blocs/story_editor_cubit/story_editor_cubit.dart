@@ -1,17 +1,22 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:photo_manager/photo_manager.dart';
+import 'package:sloopify_mobile/core/utils/location_service.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_state.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/screens/story_audience/choose_story_audience.dart';
 
 import '../../../../../core/utils/helper/postioned_element_story_theme.dart';
 import '../../../../create_posts/domain/entities/media_entity.dart';
-import '../../../../create_posts/presentation/screens/post_audience_screen.dart';
-import '../../../domain/all_positioned_element.dart';
+import '../../../domain/entities/all_positioned_element.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../domain/story_entity.dart';
-import '../../../domain/text_properties_story.dart';
+import '../../../domain/entities/story_entity.dart';
+import '../../../domain/entities/text_properties_story.dart';
 
 enum EditingMode { normal, draw, text, sticker }
 
@@ -37,6 +42,10 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void updateContent(String content) {
     emit(state.copyWith(content: content));
+  }
+
+  void setStoryAudience(StoryAudience privacy) {
+    emit(state.copyWith(privacy: privacy));
   }
 
   void updateTextProperties({
@@ -75,12 +84,14 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     Offset? offset,
     Size? size,
     double? rotation,
+    double? scale,
   }) {
     final currentTextProperties =
         state.textProperties ?? TextPropertiesForStory.empty();
     final newElement = PositionedTextElement(
+      scale: scale,
       text: text,
-      id: _uuid.v4(),
+      id: Uuid().v4(),
       offset: offset,
       size: size,
       rotation: rotation,
@@ -110,10 +121,6 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     emit(state.copyWith(isVideoMuted: !state.isVideoMuted));
   }
 
-  void updatePrivacy(PostAudience privacy) {
-    emit(state.copyWith(privacy: privacy));
-  }
-
   void updateSpecificFriends(List<int> friends) {
     emit(state.copyWith(specificFriends: friends));
   }
@@ -128,8 +135,10 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
+    double? scale,
   }) {
     final newElement = PositionedElementWithLocationId(
+      scale: scale,
       id: _uuid.v4(),
       offset: offset,
       positionedElementStoryTheme: theme,
@@ -147,24 +156,20 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void addMentionElement({
     required int friendId,
-    required Offset offset,
-    PositionedElementStoryTheme? theme,
-    Size? size,
-    double? rotation,
+    required String friendName
+
   }) {
     final newElement = PositionedMentionElement(
-      id: _uuid.v4(),
+      id: Uuid().v4(),
       friendId: friendId,
-      offset: offset,
-      positionedElementStoryTheme: theme,
-      size: size,
-      rotation: rotation,
+      friendName: friendName,
     );
+    List<PositionedElement> newList= List.from(state.positionedElements);
+    newList.add(newElement);
     emit(
       state.copyWith(
-        positionedElements: List.from(state.positionedElements)
-          ..add(newElement),
-      ),
+        positionedElements: newList),
+
     );
   }
 
@@ -173,11 +178,13 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
+    double? scale,
   }) {
     final newElement = ClockElement(
+      scale: scale,
       dateTime: DateTime.now(),
       theme: "",
-      id: _uuid.v4(),
+      id: Uuid().v4(),
       offset: offset,
       positionedElementStoryTheme: theme,
       size: size,
@@ -197,9 +204,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
+    double? scale,
   }) {
     final newElement = FeelingElement(
-      id: _uuid.v4(),
+      scale: scale,
+      id: Uuid().v4(),
       feelingId: feelingId,
       offset: offset,
       positionedElementStoryTheme: theme,
@@ -214,20 +223,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     );
   }
 
-  void addTemperatureElement({
-    required double value,
-    required Offset offset,
-    PositionedElementStoryTheme? theme,
-    Size? size,
-    double? rotation,
-  }) {
+  Future<void> addTemperatureElement() async {
+    final tempValue= await getCurrentTemperature();
     final newElement = TemperatureElement(
-      id: _uuid.v4(),
-      value: value,
-      offset: offset,
-      positionedElementStoryTheme: theme,
-      size: size,
-      rotation: rotation,
+      id: Uuid().v4(),
+      value: tempValue??0.0,
     );
     emit(
       state.copyWith(
@@ -243,9 +243,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
+    double? scale,
   }) {
     final newElement = AudioElement(
-      id: _uuid.v4(),
+      scale: scale,
+      id: Uuid().v4(),
       audioId: audioId,
       offset: offset,
       positionedElementStoryTheme: theme,
@@ -267,9 +269,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
+    double? scale,
   }) {
     final newElement = PollElement(
-      id: _uuid.v4(),
+      scale: scale,
+      id: Uuid().v4(),
       question: question,
       options: options,
       offset: offset,
@@ -291,9 +295,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
+    double? scale,
   }) {
     final newElement = StickerElement(
-      id: _uuid.v4(),
+      scale: scale,
+      id: Uuid().v4(),
       gifUrl: gifUrl,
       offset: offset,
       positionedElementStoryTheme: theme,
@@ -355,11 +361,18 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     emit(state.copyWith(drawingElements: newList));
   }
 
+
+  void updateSelectedPositioned(PositionedElement element){
+    emit(state.copyWith(currentOne: element));
+
+  }
+
   void updatePositionedElement(
     String id,
     Offset? newOffset,
-      Size? newSize,
+    Size? newSize,
     double? newRotation,
+      double ?scale,
   ) {
     final updatedElements =
         state.positionedElements.map((element) {
@@ -511,4 +524,31 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   void addCameraPhotoOrVideoToMediaFiles(MediaEntity mediaEntity) {
     emit(state.copyWith(mediaFiles: [...state.mediaFiles ?? [], mediaEntity]));
   }
+
+  Future<double?> getCurrentTemperature() async {
+    final position = await LocationService.getLocationCoords();
+    if (position != null) {
+      return await fetchTemperature(position.lat, position.lng);
+    }
+    return null;
+  }
+
+  Future<double?> fetchTemperature(double lat, double lon) async {
+    const apiKey = 'c71d13f2526f444c023f9c0efc8f8707';
+    final url = Uri.parse(
+      'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=$apiKey',
+    );
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['main']['temp']?.toDouble();
+    } else {
+      throw Exception('Failed to fetch weather data');
+    }
+  }
+
+
+
 }

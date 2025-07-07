@@ -5,12 +5,16 @@ import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
+import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_state.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/screens/story_editor_screen.dart';
 import 'dart:typed_data';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/ui/widgets/custom_elevated_button.dart';
+import '../blocs/drawing_story/drawing_story_cubit.dart';
+import '../blocs/text_editing_cubit/text_editing_cubit.dart';
 
 class SelectMediaGalleryStory extends StatefulWidget {
   final bool isMultiSelection;
@@ -55,7 +59,7 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
     }
 
     final albums = await PhotoManager.getAssetPathList(
-      type: RequestType.common,
+      type: RequestType.all,
       onlyAll: false,
     );
 
@@ -106,6 +110,28 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
           context.read<StoryEditorCubit>().toggleSelection(asset);
         } else {
           context.read<StoryEditorCubit>().selectOneMedia(asset);
+          final file = await asset.file;
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) {
+                return MultiBlocProvider(
+                  providers: [
+                    BlocProvider.value(value: context.read<StoryEditorCubit>()),
+                    BlocProvider(create: (context) => TextEditingCubit()),
+                    BlocProvider(create: (context) => DrawingStoryCubit()),
+                  ],
+                  child: StoryEditorScreen(
+                    media: MediaEntity(
+                      file: file,
+                      order: 1,
+                      isVideoFile: asset.type==AssetType.video,
+                      id: asset.id,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
         }
       },
       child: BlocBuilder<StoryEditorCubit, StoryEditorState>(
