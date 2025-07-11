@@ -19,7 +19,7 @@ class InterestCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.asset(
-              'assets/images/3.jpg',
+              'assets/images/friendlist/3.jpg',
               height: 60,
               width: 60,
               fit: BoxFit.cover,

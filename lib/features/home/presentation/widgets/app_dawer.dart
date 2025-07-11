@@ -6,8 +6,11 @@ import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/suggestedFriendListPage.dart';
 
 class CustomDrawer extends StatelessWidget {
+  const CustomDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -139,7 +142,15 @@ class CustomDrawer extends StatelessWidget {
                   drawerItem(
                     itemName: "Friendship",
                     assets: AssetsManager.friendShip,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SuggestedFriendListPage(),
+                        ),
+                      );
+                    },
                   ),
                   Gaps.vGap2,
 

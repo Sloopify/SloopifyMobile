@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/friend_list/screen/freindsRequests.dart';
-import 'package:sloopify_mobile/features/friend_list/screen/youMayKnowScreen.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/myRequests.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/youMayKnowScreen.dart';
 
 class FilterButton extends StatelessWidget {
   final String text;

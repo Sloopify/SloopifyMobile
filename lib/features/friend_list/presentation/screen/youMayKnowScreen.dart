@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/friend_list/widgets/search_bar.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/widgets/search_bar.dart';
 import '../widgets/user_list_item.dart';
 
 class YouMayKnowPage extends StatelessWidget {

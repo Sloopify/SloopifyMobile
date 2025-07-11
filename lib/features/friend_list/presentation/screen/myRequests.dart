@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/friend_list/widgets/SortBottomSheet%20.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/widgets/SortBottomSheet%20.dart';
 import '../widgets/request_list_item.dart';
 import '../widgets/filter_chip_widget.dart';
 import '../widgets/search_bar.dart';
 
 class MyRequestsPage extends StatelessWidget {
   MyRequestsPage({super.key});
-  static const routeName = "suggest_friends_screen";
+  static const routeName = "my_requests_screen";
 
   final List<Map<String, dynamic>> sentRequests = List.generate(15, (index) {
     return {
       'name': 'lorem ipsum',
       'mutualFriends': 12,
       'status': index % 4 == 1 || index % 4 == 2 ? 'Rejected' : 'Pending',
-      'imageUrl': 'assets/images/',
+      'imageUrl': 'assets/images/friendlist/3.jpg',
     };
   });
 
@@ -61,7 +61,9 @@ class MyRequestsPage extends StatelessWidget {
                           top: Radius.circular(20),
                         ),
                       ),
-                      builder: (context) => SortBottomSheet(),
+                      builder:
+                          (context) =>
+                              SortBottomSheet(onSelect: (String option) {}),
                     );
                   },
                   child: const Text(
