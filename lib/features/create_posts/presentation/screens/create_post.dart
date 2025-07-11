@@ -254,6 +254,7 @@ class CreatePost extends StatelessWidget {
                                             context.read<CreatePostCubit>(),
                                         "add_location_cubit":
                                             context.read<AddLocationCubit>(),
+                                        "fromStory":false
                                       },
                                     );
                                   },

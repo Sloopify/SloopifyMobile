@@ -73,6 +73,13 @@ dependencies:
   flutter_colorpicker: ^1.1.0
   uuid: ^4.4.2
   camera: ^0.11.1
+  giphy_get: ^3.6.1
+  gif_view: ^1.0.3
+  just_audio: ^0.10.4
+
+
+
+
 
 
 

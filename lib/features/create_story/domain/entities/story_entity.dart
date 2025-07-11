@@ -1,19 +1,16 @@
 import 'package:equatable/equatable.dart';
-import 'package:sloopify_mobile/core/utils/helper/app_extensions/post_audience_extention.dart';
 import 'package:sloopify_mobile/core/utils/helper/app_extensions/stoty_audience_extension.dart';
-import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/text_properties_story.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_audience/choose_story_audience.dart';
 
-import '../../../create_posts/presentation/screens/post_audience_screen.dart';
 import 'all_positioned_element.dart';
+import 'media_story.dart';
 
 class StoryEntity extends Equatable {
   final String content;
-  final TextPropertiesForStory? textPropertiesForStory;
+  final PositionedTextElement? positionedTextElement;
   final List<String>? backgroundColor;
-  final bool isVideoMuted;
   final StoryAudience privacy;
   final List<int>? specificFriends;
   final List<int>? friendExcept;
@@ -24,14 +21,14 @@ class StoryEntity extends Equatable {
   final TemperatureElement? temperatureElement;
   final AudioElement? audioElement;
   final PollElement? pollElement;
-  final String? gifUrl;
-  final List<MediaEntity>? mediaFiles;
+  final StickerElement ? stickerElement;
+  final List<MediaStory>? mediaFiles;
+  final List<DrawingElement>? lines;
 
   const StoryEntity({
     required this.content,
-    this.textPropertiesForStory,
+    this.positionedTextElement,
     this.backgroundColor,
-    required this.isVideoMuted,
     required this.privacy,
     this.specificFriends,
     this.friendExcept,
@@ -42,16 +39,16 @@ class StoryEntity extends Equatable {
     this.temperatureElement,
     this.audioElement,
     this.pollElement,
-    this.gifUrl,
-    this.mediaFiles
+    this.mediaFiles,
+    this.stickerElement,
+    this.lines
   });
 
   factory StoryEntity.fromEmpty() {
     return const StoryEntity(
       content: "",
-      textPropertiesForStory: null,
+      positionedTextElement: null,
       backgroundColor: null,
-      isVideoMuted: false,
       privacy: StoryAudience.public,
       specificFriends: null,
       friendExcept: null,
@@ -62,7 +59,8 @@ class StoryEntity extends Equatable {
       temperatureElement: null,
       audioElement: null,
       pollElement: null,
-      gifUrl: null,
+      stickerElement: null,
+      lines: [],
       mediaFiles: []
     );
   }
@@ -70,7 +68,6 @@ class StoryEntity extends Equatable {
   @override
   // TODO: implement props
   List<Object?> get props => [
-    gifUrl,
     pollElement,
     audioElement,
     temperatureElement,
@@ -81,21 +78,21 @@ class StoryEntity extends Equatable {
     friendExcept,
     specificFriends,
     privacy,
-    isVideoMuted,
     backgroundColor,
-    textPropertiesForStory,
+    stickerElement,
+    positionedTextElement,
     content,
-    mediaFiles
+    mediaFiles,
+    lines
   ];
 
   Future<Map<String, dynamic>> toJson() async {
     final Map<String, dynamic> data = {
       'content': content,
-      'is_video_muted': isVideoMuted,
       'privacy': privacy.getValueForApi(),
     };
-    if (textPropertiesForStory != null) {
-      data['text_properties'] = textPropertiesForStory!.toJson();
+    if (positionedTextElement != null) {
+      data['text_element'] = positionedTextElement!.toJson();
     }
     if (backgroundColor != null && backgroundColor!.isNotEmpty) {
       data['background_color'] = backgroundColor;
@@ -128,10 +125,12 @@ class StoryEntity extends Equatable {
     if (pollElement != null) {
       data['poll_element'] = pollElement!.toJson();
     }
-    if (gifUrl != null) {
-      data['gif_url'] = gifUrl;
+    if (stickerElement != null) {
+      data['gif_element'] = stickerElement!.toJson();
     }
-
+    if (lines != null) {
+      data['drawing_elements'] = lines!.map((e)=>e.toJson()).toList();
+    }
     if (mediaFiles != null) {
       // Wait for all media files to be converted to JSON
       final mediaList = await Future.wait(mediaFiles!.map((e) => e.toJson()));

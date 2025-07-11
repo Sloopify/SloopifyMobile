@@ -11,6 +11,7 @@ import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/media_editor_screen.dart';
@@ -93,6 +94,9 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
                   ),
                   BlocProvider(
                     create: (context) => DrawingStoryCubit(),
+                  ),
+                  BlocProvider(
+                    create: (context) => CalculateTempCubit(),
                   ),
                 ],
                 child: StoryEditorScreen(media: mediaEntity),

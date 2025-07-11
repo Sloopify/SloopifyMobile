@@ -85,6 +85,7 @@ class TextPropertiesForStory extends Equatable {
     if (alignment != null) {
       data["alignment"] = alignment;
     }
+
     return data;
   }
 

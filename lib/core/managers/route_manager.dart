@@ -18,6 +18,8 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/crop_im
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_media_cubit/edit_media_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/rotate_photo_cubit/rotate_photo_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/widgets/feelings_list_widget.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/play_audio_cubit/play_audio_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
@@ -48,8 +50,11 @@ import '../../features/create_posts/presentation/screens/places/add_new_place.da
 import '../../features/create_posts/presentation/screens/places/all_user_places_screen.dart';
 import '../../features/create_posts/presentation/screens/places/location_map_screen.dart';
 import '../../features/create_posts/presentation/screens/post_audience_screen.dart';
-import '../../features/create_story/presentation/screens/story_audience/choose_story_audience.dart' show StoryAudienceScreen;
+import '../../features/create_story/presentation/screens/story_audience/choose_story_audience.dart'
+    show StoryAudienceScreen;
 import '../../features/create_story/presentation/screens/story_audience/story_friends_list.dart';
+import '../../features/create_story/presentation/screens/story_audios.dart';
+import '../../features/create_story/presentation/screens/story_feelings_list.dart';
 import '../../features/home/presentation/screens/home_navigation_screen.dart';
 import '../../features/start_up/presenation/screens/on_boarding_screen.dart';
 
@@ -91,10 +96,9 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) {
             return VerifyAccountScreen(
-              email: arg["email"] as String? ,
+              email: arg["email"] as String?,
               phoneNumber: arg["phoneNumber"] as String?,
               fromSignUp: arg["fromSignUp"] as bool,
-
             );
           },
         );
@@ -103,7 +107,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) {
             return OtpCodeScreen(
-              email: arg["email"] as String? ,
+              email: arg["email"] as String?,
               phoneNumber: arg["phoneNumber"] as String?,
               fromSignUp: arg["fromSignUp"] as bool,
             );
@@ -164,9 +168,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) {
             return BlocProvider(
-              create: (context) =>
-              locator<InterestCubit>()
-                ..getAllCategories(),
+              create: (context) => locator<InterestCubit>()..getAllCategories(),
               child: UserInterests(),
             );
           },
@@ -272,11 +274,30 @@ class AppRouter {
                 ),
                 BlocProvider.value(
                   value:
-                  arg["feelings_activities_cubit"]
-                  as FeelingsActivitiesCubit,
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
                 ),
               ],
               child: FeelingsActivitiesScreen(),
+            );
+          },
+        );
+      case StoryFeelingsList.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+           BlocProvider.value(
+                      value: arg["story_editor_cubit"] as StoryEditorCubit,
+                    ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
+              ],
+              child: StoryFeelingsList(),
             );
           },
         );
@@ -291,11 +312,11 @@ class AppRouter {
                 ),
                 BlocProvider.value(
                   value:
-                  arg["feelings_activities_cubit"]
-                  as FeelingsActivitiesCubit,
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
                 ),
               ],
-              child: ActivitiesByCategories(name: arg["categoryName"],),
+              child: ActivitiesByCategories(name: arg["categoryName"]),
             );
           },
         );
@@ -322,15 +343,18 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(
+               arg["fromStory"]==false? BlocProvider.value(
                   value: arg["create_post_cubit"] as CreatePostCubit,
-                ),
+                ): BlocProvider.value(
+                 value: arg["story_editor_cubit"] as StoryEditorCubit,
+               ) ,
                 BlocProvider.value(
-                  value: (arg["add_location_cubit"] as AddLocationCubit)
-                    ..getAllUserPlaces(),
+                  value:
+                      (arg["add_location_cubit"] as AddLocationCubit)
+                        ..getAllUserPlaces(),
                 ),
               ],
-              child: AllUserPlacesScreen(),
+              child: AllUserPlacesScreen(fromStory: arg["fromStory"]??false,),
             );
           },
         );
@@ -374,9 +398,8 @@ class AppRouter {
                 BlocProvider.value(
                   value: arg["edit_media_cubit"] as EditMediaCubit,
                 ),
-
               ],
-              child: EditMediaScreen(initialIndex: arg["initialIndex"],),
+              child: EditMediaScreen(initialIndex: arg["initialIndex"]),
             );
           },
         );
@@ -389,28 +412,31 @@ class AppRouter {
                 BlocProvider.value(
                   value: arg["edit_media_cubit"] as EditMediaCubit,
                 ),
-               BlocProvider(create:(context)=> arg ["CropCubit"] as CropCubit),
+                BlocProvider(
+                  create: (context) => arg["CropCubit"] as CropCubit,
+                ),
               ],
-              child: CropScreen(index: arg["initialIndex"],),
+              child: CropScreen(index: arg["initialIndex"]),
             );
           },
         );
-    case RotateImageScreen.routeName:
-      final arg = routeSettings.arguments as Map;
-      return MaterialPageRoute(
-        builder: (context) {
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider.value(
-                value: arg["edit_media_cubit"] as EditMediaCubit,
-              ),
-              BlocProvider(create: (context)=>arg["rotate_cubit"] as RotateMediaCubit),
-
-            ],
-            child: RotateImageScreen(index: arg["initialIndex"],),
-          );
-        },
-      );
+      case RotateImageScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["edit_media_cubit"] as EditMediaCubit,
+                ),
+                BlocProvider(
+                  create: (context) => arg["rotate_cubit"] as RotateMediaCubit,
+                ),
+              ],
+              child: RotateImageScreen(index: arg["initialIndex"]),
+            );
+          },
+        );
       case StoryAudienceScreen.routeName:
         final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
@@ -438,10 +464,27 @@ class AppRouter {
                   value: arg["story_editor_cubit"] as StoryEditorCubit,
                 ),
                 BlocProvider.value(
-                 value: arg["post_friends_cubit"] as PostFriendsCubit,
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
               child: StoryFriendsList(),
+            );
+          },
+        );
+      case StoryAudios.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider(
+                  create:(context)=> arg["play_audio_cubit"] as PlayAudioCubit,
+                ),
+              ],
+              child: StoryAudios(),
             );
           },
         );
@@ -459,8 +502,7 @@ class AppRouter {
   Route<dynamic> unDefinedRoute() {
     return MaterialPageRoute(
       builder:
-          (_) =>
-          Scaffold(
+          (_) => Scaffold(
             appBar: AppBar(title: Text('no_route'.tr())),
             body: Center(child: Text('no_route'.tr())),
           ),

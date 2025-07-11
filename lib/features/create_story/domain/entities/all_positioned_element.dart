@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'dart:ui';
-
 
 import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/text_properties_story.dart';
@@ -8,6 +8,8 @@ import '../../../../core/utils/helper/postioned_element_story_theme.dart';
 
 class PositionedElementWithLocationId extends PositionedElement {
   final int locationId;
+  final String countryName;
+  final String cityName;
 
   const PositionedElementWithLocationId({
     required this.locationId,
@@ -16,12 +18,19 @@ class PositionedElementWithLocationId extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
-    required super.scale
+    required super.scale,
+    required this.countryName,
+    required this.cityName,
   });
 
   @override
   Map<String, dynamic> toJson() {
-    return {'id': locationId, ...super.toJson()};
+    return {
+      'id': locationId,
+      'country_name': countryName,
+      "city_name": cityName,
+      ...super.toJson(),
+    };
   }
 
   PositionedElementWithLocationId copyWith({
@@ -31,16 +40,20 @@ class PositionedElementWithLocationId extends PositionedElement {
     Size? size,
     double? rotation,
     double? scale,
+    String? countryName,
+    String? cityName,
   }) {
     return PositionedElementWithLocationId(
+      cityName: cityName ?? this.cityName,
+      countryName: countryName ?? this.countryName,
       rotation: rotation ?? this.rotation,
       id: id,
       locationId: locationId ?? this.locationId,
       offset: offset ?? this.offset,
       positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
-      scale: scale??this.scale
+      scale: scale ?? this.scale,
     );
   }
 }
@@ -51,39 +64,44 @@ class PositionedMentionElement extends PositionedElement {
 
   PositionedMentionElement({
     required this.friendId,
-     super.offset,
+    super.offset,
     required super.id,
-     super.rotation,
-     super.positionedElementStoryTheme,
-     super.size,
-     super.scale,
-    required this.friendName
+    super.rotation,
+    super.positionedElementStoryTheme,
+    super.size,
+    super.scale,
+    required this.friendName,
   });
 
   @override
   Map<String, dynamic> toJson() {
-    return {'friend_id': friendId, ...super.toJson()};
+    return {
+      'friend_id': friendId,
+      'friend_name': friendName,
+      ...super.toJson(),
+    };
   }
 
+  @override
   PositionedMentionElement copyWith({
     int? friendId,
     PositionedElementStoryTheme? positionedElementStoryTheme,
     Offset? offset,
     Size? size,
     double? rotation,
-    double?scale,
-    String? friendName
+    double? scale,
+    String? friendName,
   }) {
     return PositionedMentionElement(
-      friendName: friendName??this.friendName,
+      friendName: friendName ?? this.friendName,
       id: id,
       friendId: friendId ?? this.friendId,
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
-      scale: scale??this.scale
+      scale: scale ?? this.scale,
     );
   }
 }
@@ -100,14 +118,15 @@ class PositionedTextElement extends PositionedElement {
     required super.positionedElementStoryTheme,
     required super.size,
     required super.scale,
-    required this.text
+    required this.text,
   });
 
   @override
   Map<String, dynamic> toJson() {
     return {
       'text_properties': textPropertiesForStory.toJson(),
-      ...super.toJson()
+      'text': text,
+      ...super.toJson(),
     };
   }
 
@@ -117,8 +136,8 @@ class PositionedTextElement extends PositionedElement {
     Size? size,
     double? rotation,
     TextPropertiesForStory? textProperty,
-    String ? text,
-    double?scale,
+    String? text,
+    double? scale,
   }) {
     return PositionedTextElement(
       text: text ?? this.text,
@@ -127,29 +146,37 @@ class PositionedTextElement extends PositionedElement {
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
-      scale: scale??this.scale
+      scale: scale ?? this.scale,
     );
   }
 }
 
 class FeelingElement extends PositionedElement {
   final int feelingId;
+  final String feelingName;
+  final String feelingIcon;
 
   FeelingElement({
     required this.feelingId,
+    required this.feelingName,
+    required this.feelingIcon,
     required super.offset,
     required super.positionedElementStoryTheme,
     required super.rotation,
     required super.id,
     required super.size,
-    required super.scale
+    required super.scale,
   });
 
   @override
   Map<String, dynamic> toJson() {
-    return {'feeling_id': feelingId, ...super.toJson()};
+    return {
+      'feeling_id': feelingId,
+      'feeling_name': feelingName,
+      ...super.toJson(),
+    };
   }
 
   FeelingElement copyWith({
@@ -159,36 +186,49 @@ class FeelingElement extends PositionedElement {
     double? rotation,
     Size? size,
     double? scale,
+    String? feelingName,
+    String? feelingIcon
   }) {
     return FeelingElement(
+      feelingName: feelingName ?? this.feelingName,
       feelingId: feelingId ?? this.feelingId,
       rotation: rotation ?? this.rotation,
       offset: offset ?? this.offset,
+      feelingIcon: feelingIcon??this.feelingIcon,
       id: id,
       positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
-      scale: scale??this.scale
+      scale: scale ?? this.scale,
     );
   }
 }
 
 class TemperatureElement extends PositionedElement {
   final double value;
+  final dynamic weatherCode;
+  final bool isDay;
 
   const TemperatureElement({
     required this.value,
-     super.offset,
+    required this.isDay,
+    required this.weatherCode,
+    super.offset,
     required super.id,
-     super.rotation,
-     super.positionedElementStoryTheme,
-     super.size,
-     super.scale
+    super.rotation,
+    super.positionedElementStoryTheme,
+    super.size,
+    super.scale,
   });
 
   @override
   Map<String, dynamic> toJson() {
-    return {'value': value, ...super.toJson()};
+    return {
+      'value': value,
+      'weather_code': weatherCode,
+      'isDay': isDay,
+      ...super.toJson(),
+    };
   }
 
   TemperatureElement copyWith({
@@ -198,28 +238,35 @@ class TemperatureElement extends PositionedElement {
     double? rotation,
     Size? size,
     double? scale,
+    num? weatherCode,
+    bool? isDay,
   }) {
     return TemperatureElement(
-        id: id,
-        value: value ?? this.value,
-        offset: offset ?? this.offset,
-        rotation: rotation ?? this.rotation,
-        positionedElementStoryTheme:
-        positionedElementStoryTheme ?? this.positionedElementStoryTheme,
-        size: size ?? this.size,
-        scale: scale ?? this.scale
+      isDay: isDay ?? this.isDay,
+      weatherCode: weatherCode ?? this.weatherCode,
+      id: id,
+      value: value ?? this.value,
+      offset: offset ?? this.offset,
+      rotation: rotation ?? this.rotation,
+      positionedElementStoryTheme:
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      size: size ?? this.size,
+      scale: scale ?? this.scale,
     );
   }
 
-  factory TemperatureElement.empty(){
-    return const  TemperatureElement(
-        value: 0.0,
-        offset: Offset.zero,
-        id: '',
-        rotation: 0.0,
-        positionedElementStoryTheme: null,
-        size: null,
-        scale: null);
+  factory TemperatureElement.empty() {
+    return const TemperatureElement(
+      weatherCode: 0,
+      isDay: true,
+      value: 0.0,
+      offset: Offset.zero,
+      id: '',
+      rotation: 0.0,
+      positionedElementStoryTheme: null,
+      size: null,
+      scale: null,
+    );
   }
 }
 
@@ -233,7 +280,7 @@ class AudioElement extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
-    required super.scale
+    required super.scale,
   });
 
   @override
@@ -248,7 +295,7 @@ class AudioElement extends PositionedElement {
     double? rotation,
     Size? size,
     int? audioId,
-    double?scale
+    double? scale,
   }) {
     return AudioElement(
       audioId: audioId ?? this.audioId,
@@ -256,9 +303,9 @@ class AudioElement extends PositionedElement {
       rotation: rotation ?? this.rotation,
       id: id,
       positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
-      scale: scale??this.scale
+      scale: scale ?? this.scale,
     );
   }
 }
@@ -275,7 +322,7 @@ class PollElement extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
-    required super.scale
+    required super.scale,
   });
 
   @override
@@ -291,7 +338,7 @@ class PollElement extends PositionedElement {
     Size? size,
     String? question,
     List<String>? options,
-    double? scale
+    double? scale,
   }) {
     return PollElement(
       options: options ?? this.options,
@@ -300,9 +347,9 @@ class PollElement extends PositionedElement {
       rotation: rotation ?? this.rotation,
       id: id,
       positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
-      scale: scale??this.scale
+      scale: scale ?? this.scale,
     );
   }
 }
@@ -317,7 +364,7 @@ class StickerElement extends PositionedElement {
     required super.rotation,
     required super.positionedElementStoryTheme,
     required super.size,
-    required super.scale
+    required super.scale,
   });
 
   @override
@@ -331,7 +378,7 @@ class StickerElement extends PositionedElement {
     double? rotation,
     Size? size,
     String? gifUrl,
-    double? scale
+    double? scale,
   }) {
     return StickerElement(
       gifUrl: gifUrl ?? this.gifUrl,
@@ -339,16 +386,16 @@ class StickerElement extends PositionedElement {
       rotation: rotation ?? this.rotation,
       id: id,
       positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
-      scale: scale??this.scale
+      scale: scale ?? this.scale,
     );
   }
 }
 
 class ClockElement extends PositionedElement {
   final DateTime dateTime;
-  final String theme;
+  final String clockTheme;
 
   ClockElement({
     required super.offset,
@@ -356,19 +403,14 @@ class ClockElement extends PositionedElement {
     super.size,
     super.rotation,
     required super.id,
-    required this.theme,
+    required this.clockTheme,
     required this.dateTime,
-    required super.scale
+    required super.scale,
   });
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      'x': offset?.dx,
-      'y': offset?.dy,
-      'theme': positionedElementStoryTheme?.getValuesForApi(),
-      'size': size,
-    };
+    return {"clock": '${dateTime.hour}: ${dateTime.minute}', "clockTheme": ""};
   }
 
   ClockElement copyWith({
@@ -378,18 +420,18 @@ class ClockElement extends PositionedElement {
     double? rotation,
     DateTime? time,
     String? theme,
-    double?scale
+    double? scale,
   }) {
     return ClockElement(
       dateTime: time ?? dateTime,
-      theme: theme ?? this.theme,
+      clockTheme: theme ?? this.clockTheme,
       id: id,
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       positionedElementStoryTheme:
-      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
-      scale: scale??this.scale
+      scale: scale ?? this.scale,
     );
   }
 }
@@ -405,7 +447,6 @@ class DrawingElement {
     required this.strokeWidth,
   });
 
-
   DrawingElement copyWith({
     List<Offset>? points,
     Color? color,
@@ -414,7 +455,15 @@ class DrawingElement {
     return DrawingElement(
       color: color ?? this.color,
       points: points ?? this.points,
-      strokeWidth: strokeWidth ?? this.strokeWidth,);
+      strokeWidth: strokeWidth ?? this.strokeWidth,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'points': points.map((p) => {'x': p.dx, 'y': p.dy}).toList(),
+      'color': color.value,
+      'strokeWidth': strokeWidth,
+    };
   }
 }
-

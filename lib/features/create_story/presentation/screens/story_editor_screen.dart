@@ -5,7 +5,11 @@ import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing_story/drawing_story_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing_story/drawing_story_state.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_state.dart';
@@ -65,6 +69,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
   @override
   void initState() {
     super.initState();
+    context.read<CalculateTempCubit>().getCurrentTemperature();
     _initializeAnimations();
     _initializeMedia();
     _mediaInitialRotationRadians =
@@ -122,10 +127,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
 
   @override
   Widget build(BuildContext context) {
-    print(context
-        .read<StoryEditorCubit>()
-        .state
-        .positionedElements);
+    print(context.read<StoryEditorCubit>().state.positionedElements);
     return Scaffold(
       backgroundColor: Colors.black,
       body: BlocBuilder<DrawingStoryCubit, DrawingState>(
@@ -269,7 +271,6 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                   _textKeys.putIfAbsent(e.id, () => GlobalKey());
                   return BlocBuilder<TextEditingCubit, TextEditingState>(
                     builder: (context, state) {
-
                       return EditableTextElement(
                         widgetKey: _textKeys[e.id]!,
                         textElement: e,
@@ -296,13 +297,13 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                       _elementsKey.putIfAbsent(e.id, () => GlobalKey());
                       return BlocBuilder<StoryEditorCubit, StoryEditorState>(
                         builder: (context, state) {
-                          print(state.positionedElements);
                           return PositionedElementItem(
                             widgetKey: _elementsKey[e.id]!,
                             onUpdateElement: (element) {
                               context
                                   .read<StoryEditorCubit>()
-                                  .updateSelectedPositioned(element);
+                                  .updateSelectedPositioned(element.id);
+
                             },
                             positionedElement: e,
                           );
@@ -425,8 +426,13 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
             _toggleToolbar();
             _changeEditingMode(EditingMode.sticker);
             CustomSheet.show(
-              child: BlocProvider.value(
-                value: context.read<StoryEditorCubit>(),
+              child: MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(value: context.read<StoryEditorCubit>()),
+                  BlocProvider.value(value: context.read<CalculateTempCubit>()),
+                  BlocProvider.value(value: context.read<FeelingsActivitiesCubit>()),
+                  BlocProvider.value(value: context.read<AddLocationCubit>()),
+                ],
                 child: StoryElementsSheet(),
               ),
               context: context,

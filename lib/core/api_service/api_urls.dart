@@ -47,6 +47,14 @@ static const String changePassword="auth/forgot-password/reset-password";
   static const String searchStoryFriend="post/search-friends";
   static const String getStoryFeeling="stories/get-feeling";
   static const String searchStoryFeeling="stories/search-feeling";
+  static const String getStoryPlaces="stories/get-user-places";
+  static const String searchStoryPlaces="stories/search-user-places";
+  static const String getStoryPlaceById="stories/get-user-place-by-id";
+  static const String createStoryLocation="stories/create-user-place";
+  static const String updateUserLocation="stories/update-user-place";
+  static const String deleteUserLocation="stories/update-user-place";
+  static const String getStoryAudios="stories/get-story-audio";
+  static const String searchStoryAudio="stories/search-story-audio";
 
 
 

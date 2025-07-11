@@ -6,6 +6,8 @@ import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_state.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_editor_screen.dart';
@@ -13,6 +15,7 @@ import 'dart:typed_data';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/ui/widgets/custom_elevated_button.dart';
+import '../blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
 import '../blocs/drawing_story/drawing_story_cubit.dart';
 import '../blocs/text_editing_cubit/text_editing_cubit.dart';
 
@@ -119,6 +122,12 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
                     BlocProvider.value(value: context.read<StoryEditorCubit>()),
                     BlocProvider(create: (context) => TextEditingCubit()),
                     BlocProvider(create: (context) => DrawingStoryCubit()),
+                    BlocProvider(
+                      create: (context) => CalculateTempCubit(),
+                    ),
+                    BlocProvider.value(value: context.read<FeelingsActivitiesCubit>()),
+                    BlocProvider.value(value: context.read<AddLocationCubit>()),
+
                   ],
                   child: StoryEditorScreen(
                     media: MediaEntity(

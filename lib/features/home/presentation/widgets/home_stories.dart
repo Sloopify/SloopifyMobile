@@ -5,8 +5,12 @@ import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 
+import '../../../../core/locator/service_locator.dart';
+import '../../../create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
+import '../../../create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import '../../../create_story/presentation/screens/create_Story_first_step.dart';
 
 class HomeStories extends StatelessWidget {
@@ -38,8 +42,16 @@ class HomeStories extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) =>
-                          BlocProvider(
-                            create: (context) => StoryEditorCubit(),
+                          MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) => StoryEditorCubit(),
+                              ),
+                              BlocProvider(create: (context) => locator<FeelingsActivitiesCubit>()),
+                              BlocProvider(create: (context) => locator<PostFriendsCubit>()),
+                              BlocProvider(create: (context) => locator<AddLocationCubit>()),
+
+                            ],
                             child: CreateStoryFirstStep(),
                           )));
                 },

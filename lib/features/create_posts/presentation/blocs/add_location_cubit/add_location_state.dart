@@ -14,6 +14,9 @@ class AddLocationState extends Equatable {
   final int selectedLocationId;
   final int page;
   final bool hasReachedEnd;
+  final bool fromStory;
+  final String selectedCityName;
+  final String selectedCountryName;
 
   const AddLocationState({
     required this.addNewPlaceStatus,
@@ -24,7 +27,10 @@ class AddLocationState extends Equatable {
     required this.searchKeyWord,
     required this.selectedLocationId,
     required this.page,
-    required this.hasReachedEnd
+    required this.hasReachedEnd,
+    required this.fromStory,
+    required this.selectedCityName,
+    required this.selectedCountryName
   });
 
   factory AddLocationState.empty() {
@@ -38,6 +44,9 @@ class AddLocationState extends Equatable {
       errorMessage: "",
       searchKeyWord: "",
       selectedLocationId: 0,
+      fromStory: false,
+      selectedCityName: '',
+      selectedCountryName: ''
     );
   }
 
@@ -52,7 +61,10 @@ class AddLocationState extends Equatable {
     searchKeyWord,
     selectedLocationId,
     hasReachedEnd,
-    page
+    page,
+    fromStory,
+    selectedCountryName,
+    selectedCityName
   ];
 
   AddLocationState copyWith({
@@ -70,9 +82,14 @@ class AddLocationState extends Equatable {
     String? searchKeyWord,
     int? selectedLocationId,
     int ? page,
-    bool ? hasReachedEnd
+    bool ? hasReachedEnd,
+    bool? fromStory,
+   String? selectedCountryName,
+   String? selectedCityName
   }) {
     return AddLocationState(
+      selectedCityName: selectedCityName??this.selectedCityName,
+      selectedCountryName: selectedCountryName??this.selectedCountryName,
       hasReachedEnd: hasReachedEnd??this.hasReachedEnd,
       page: page??this.page,
       selectedLocationId: selectedLocationId ?? this.selectedLocationId,
@@ -87,9 +104,11 @@ class AddLocationState extends Equatable {
         id: id ?? createPlaceEntity.id,
         status: status ?? createPlaceEntity.status,
         latitude: latitude ?? createPlaceEntity.latitude,
+
       ),
       errorMessage: errorMessage ?? this.errorMessage,
       places: places ?? this.places,
+      fromStory: fromStory??this.fromStory
     );
   }
 }

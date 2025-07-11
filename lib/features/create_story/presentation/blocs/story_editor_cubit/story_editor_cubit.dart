@@ -131,13 +131,17 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void addLocationElement({
     required int id,
-    required Offset offset,
+    required String cityName,
+    required String countryName,
+     Offset? offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
     double? scale,
   }) {
     final newElement = PositionedElementWithLocationId(
+      countryName: countryName,
+      cityName: cityName,
       scale: scale,
       id: _uuid.v4(),
       offset: offset,
@@ -154,23 +158,15 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     );
   }
 
-  void addMentionElement({
-    required int friendId,
-    required String friendName
-
-  }) {
+  void addMentionElement({required int friendId, required String friendName}) {
     final newElement = PositionedMentionElement(
       id: Uuid().v4(),
       friendId: friendId,
       friendName: friendName,
     );
-    List<PositionedElement> newList= List.from(state.positionedElements);
+    List<PositionedElement> newList = List.from(state.positionedElements);
     newList.add(newElement);
-    emit(
-      state.copyWith(
-        positionedElements: newList),
-
-    );
+    emit(state.copyWith(positionedElements: newList));
   }
 
   void addClockElement({
@@ -183,7 +179,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     final newElement = ClockElement(
       scale: scale,
       dateTime: DateTime.now(),
-      theme: "",
+      clockTheme: "",
       id: Uuid().v4(),
       offset: offset,
       positionedElementStoryTheme: theme,
@@ -200,13 +196,16 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void addFeelingElement({
     required int feelingId,
-    required Offset offset,
+    required String feelingName,
+     Offset? offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
     double? scale,
+    required String feelingIcon
   }) {
     final newElement = FeelingElement(
+      feelingIcon: feelingIcon,
       scale: scale,
       id: Uuid().v4(),
       feelingId: feelingId,
@@ -214,6 +213,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       positionedElementStoryTheme: theme,
       size: size,
       rotation: rotation,
+      feelingName: feelingName,
     );
     emit(
       state.copyWith(
@@ -223,12 +223,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     );
   }
 
-  Future<void> addTemperatureElement() async {
-    final tempValue= await getCurrentTemperature();
-    final newElement = TemperatureElement(
-      id: Uuid().v4(),
-      value: tempValue??0.0,
-    );
+  Future<void> addTemperatureElement(TemperatureElement newElement) async {
     emit(
       state.copyWith(
         positionedElements: List.from(state.positionedElements)
@@ -291,7 +286,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void addStickerElement({
     required String gifUrl,
-    required Offset offset,
+     Offset ? offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
@@ -361,9 +356,14 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     emit(state.copyWith(drawingElements: newList));
   }
 
-
-  void updateSelectedPositioned(PositionedElement element){
-    emit(state.copyWith(currentOne: element));
+  void updateSelectedPositioned(String id) {
+   List<PositionedElement> elements=List.from(state.positionedElements);
+  final PositionedElement currentOne= elements.where((e)=>e.id==id).first;
+    emit(state.copyWith(currentOne: currentOne));
+  }
+  void togglePositionedTheme(PositionedElementStoryTheme theme) {
+    final newElement= state.currentElement?.copyWith(positionedElementStoryTheme: theme);
+    emit(state.copyWith(currentOne: newElement));
 
   }
 
@@ -372,7 +372,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     Offset? newOffset,
     Size? newSize,
     double? newRotation,
-      double ?scale,
+    double? scale,
   ) {
     final updatedElements =
         state.positionedElements.map((element) {
@@ -469,9 +469,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     }
     return StoryEntity(
       content: state.content,
-      textPropertiesForStory: state.textProperties,
       backgroundColor: state.backgroundColors,
-      isVideoMuted: state.isVideoMuted,
       privacy: state.privacy,
       specificFriends:
           state.specificFriends.isEmpty ? null : state.specificFriends,
@@ -483,7 +481,6 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       temperatureElement: temperatureElement,
       audioElement: audioElement,
       pollElement: pollElement,
-      gifUrl: gifUrl,
     );
   }
 
@@ -524,31 +521,4 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   void addCameraPhotoOrVideoToMediaFiles(MediaEntity mediaEntity) {
     emit(state.copyWith(mediaFiles: [...state.mediaFiles ?? [], mediaEntity]));
   }
-
-  Future<double?> getCurrentTemperature() async {
-    final position = await LocationService.getLocationCoords();
-    if (position != null) {
-      return await fetchTemperature(position.lat, position.lng);
-    }
-    return null;
-  }
-
-  Future<double?> fetchTemperature(double lat, double lon) async {
-    const apiKey = 'c71d13f2526f444c023f9c0efc8f8707';
-    final url = Uri.parse(
-      'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=$apiKey',
-    );
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data['main']['temp']?.toDouble();
-    } else {
-      throw Exception('Failed to fetch weather data');
-    }
-  }
-
-
-
 }
