@@ -102,14 +102,7 @@ class _SuggestedFriendListPageState extends State<SuggestedFriendListPage> {
               ],
             ),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SectionTitle(title: "They sharing you same interests"),
-
-                //          Text(" See all", style: TextStyle(color: Colors.teal)),
-              ],
-            ),
+            SectionTitle(title: "They sharing you same interests"),
             const SizedBox(height: 12),
             SizedBox(
               height: 170,

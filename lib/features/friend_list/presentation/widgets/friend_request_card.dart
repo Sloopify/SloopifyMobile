@@ -18,8 +18,8 @@ class FriendRequestCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
               'assets/images/friendlist/5.jpg',
-              height: 48,
-              width: 48,
+              height: 80,
+              width: 80,
               fit: BoxFit.cover,
             ),
           ),
@@ -28,38 +28,46 @@ class FriendRequestCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Lorem ipsum",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 4),
-                SizedBox(
-                  width: 380,
-                  height: 120,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 20, left: 2),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(4, (index) {
-                        return CircleAvatar(
-                          radius: 40, // 80px diameter
-                          backgroundImage: AssetImage(
-                            'assets/images/friendlist/${index + 1}.jpg',
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
+                const SizedBox(height: 8),
+                Row(
+                  children: List.generate(4, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 4.0),
+                      child: CircleAvatar(
+                        radius: 10, // smallest practical size
+                        backgroundImage: AssetImage(
+                          'assets/images/friendlist/${index + 1}.jpg',
+                        ),
+                      ),
+                    );
+                  }),
                 ),
-
                 const SizedBox(height: 4),
-                Text("12 mutual friends", style: TextStyle(fontSize: 12)),
+                const Text("12 mutual friends", style: TextStyle(fontSize: 12)),
               ],
             ),
           ),
-          const Icon(Icons.check_box_outlined),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4), // Slight rounding
+            ),
+            child: const Icon(Icons.check_box_outlined, size: 20),
+          ),
           const SizedBox(width: 8),
-          const Icon(Icons.cancel_outlined),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: const Icon(Icons.cancel_outlined, size: 20),
+          ),
         ],
       ),
     );

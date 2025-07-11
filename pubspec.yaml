@@ -98,22 +98,24 @@ flutter:
   generate: true
 
   assets:
-     - assets/
-     - assets/icons/
-     - assets/lottie/
-     - assets/icons/auth/
-     - assets/icons/home/
-     - assets/icons/chat/
-     - assets/icons/notification/
-     - assets/icons/profile_info/
-     - assets/icons/create_post/
-     - assets/icons/create_story/
-     - assets/images/
-     - assets/images/start_up/
-     - assets/images/home/
-     - assets/images/create_post/
-     - assets/locales/
-     - pubspec.yaml
+    - assets/
+    - assets/icons/
+    - assets/lottie/
+    - assets/icons/auth/
+    - assets/icons/home/
+    - assets/icons/chat/
+    - assets/icons/notification/
+    - assets/icons/profile_info/
+    - assets/icons/create_post/
+    - assets/icons/create_story/
+    - assets/images/
+    - assets/images/friendlist/
+
+    - assets/images/start_up/
+    - assets/images/home/
+    - assets/images/create_post/
+    - assets/locales/
+    - pubspec.yaml
 
   # example:
   fonts:
@@ -212,3 +214,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+dev_dependencies:
+  flutter_quill_delta_from_html: ^1.5.2
+  google_fonts: ^6.2.1
