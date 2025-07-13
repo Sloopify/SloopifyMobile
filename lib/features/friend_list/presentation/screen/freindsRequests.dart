@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/friend_list/widgets/SortBottomSheet%20.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/widgets/SortBottomSheet%20.dart';
 import '../widgets/request_list_item.dart';
 import '../widgets/filter_chip_widget.dart';
 import '../widgets/search_bar.dart';

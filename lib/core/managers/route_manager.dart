@@ -19,9 +19,9 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_me
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/rotate_photo_cubit/rotate_photo_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
-import 'package:sloopify_mobile/features/friend_list/screen/freindsRequests.dart';
-import 'package:sloopify_mobile/features/friend_list/screen/myFreinds.dart';
-import 'package:sloopify_mobile/features/friend_list/screen/suggestedFriendListPage.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/freindsRequests.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/myFreinds.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/suggestedFriendListPage.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
 import '../../features/app_wrapper/presentation/screens/app_wrapper.dart';

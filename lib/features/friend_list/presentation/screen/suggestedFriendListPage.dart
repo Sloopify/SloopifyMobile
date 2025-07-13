@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/friend_list/screen/myFreinds.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/myFreinds.dart';
 import '../widgets/filter_button.dart';
 import '../widgets/interest_card.dart';
 import '../widgets/friend_request_card.dart';

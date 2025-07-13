@@ -6,7 +6,7 @@ import 'package:sloopify_mobile/core/app_configuation/app_configuation.dart';
 import 'package:sloopify_mobile/core/managers/route_manager.dart';
 import 'package:sloopify_mobile/features/auth/domain/reposritory/auth_repo.dart';
 import 'package:sloopify_mobile/features/auth/domain/use_cases/verify_token_use_case.dart';
-import 'package:sloopify_mobile/features/friend_list/screen/suggestedFriendListPage.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/suggestedFriendListPage.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/on_boarding_screen.dart';
 
 import 'core/local_storage/preferene_utils.dart';
