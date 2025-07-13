@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gif_view/gif_view.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
@@ -10,11 +7,7 @@ import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/utils/helper/postioned_element_story_theme.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/widgets/gif_element.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/main_postitioned_widget.dart';
-
-import '../../../../core/ui/widgets/general_image.dart';
 
 class PositionedElementItem extends StatefulWidget {
   final PositionedElement positionedElement;
@@ -43,8 +36,6 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
   double _initialFontSize = 24;
   double _currentFontSize = 24;
   int _pointerCount = 0;
-  PositionedElementStoryTheme _initStoryTheme =
-      PositionedElementStoryTheme.white;
 
   void _updateParent() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -64,7 +55,6 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
         rotation: _rotation,
         size: scaledSize,
         scale: _scale,
-        positionedElementStoryTheme: _initStoryTheme,
       );
       print(updatedElement.size);
       widget.onUpdateElement(updatedElement);
@@ -102,26 +92,13 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
         onScaleUpdate: _onScaleUpdate,
         child: Transform(
           transform:
-          Matrix4.identity()
-            ..translate(0.0, 0.0)
-            ..rotateZ(_rotation)
-            ..scale(_scale),
-          child:
-          widget.positionedElement is StickerElement
-              ? GifView.network(
-            (widget.positionedElement as StickerElement).gifUrl,
-            height: 200,
-            width: 200,
-          )
-              : MainPositionedWidget(
-            theme: _initStoryTheme,
-            onChangedTheme: () {
-              toggleElementTheme();
-              context.read<StoryEditorCubit>().togglePositionedTheme(
-                _initStoryTheme,
-              );
-            },
+              Matrix4.identity()
+                ..translate(0.0, 0.0)
+                ..rotateZ(_rotation)
+                ..scale(_scale),
+          child: MainPositionedWidget(
             key: widget.widgetKey,
+            theme: widget.positionedElement.positionedElementStoryTheme!,
             child: _buildMainPostionedItem(context),
           ),
         ),
@@ -130,30 +107,31 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
   }
 
   Widget _buildMainPostionedItem(BuildContext context) {
-    final elementTextStyle = AppTheme.headline4.copyWith(
-      fontWeight: FontWeight.w500,
-      color:
-      _initStoryTheme == PositionedElementStoryTheme.white
-          ? ColorManager.black
-          : _initStoryTheme ==
-          PositionedElementStoryTheme.focusedWithPrimaryColor
-          ? ColorManager.white
-          : ColorManager.primaryColor,
-    );
     if (widget.positionedElement is PositionedMentionElement) {
       return Row(
         children: [
           SvgPicture.asset(
             AssetsManager.storyMention,
             color:
-            _initStoryTheme == PositionedElementStoryTheme.white
-                ? null
-                : ColorManager.primaryColor,
+                widget.positionedElement.positionedElementStoryTheme ==
+                        PositionedElementStoryTheme.white
+                    ? null
+                    : ColorManager.primaryColor,
           ),
           Gaps.hGap1,
           Text(
             (widget.positionedElement as PositionedMentionElement).friendName,
-            style: elementTextStyle,
+            style: AppTheme.headline4.copyWith(
+              fontWeight: FontWeight.w500,
+              color:
+                  widget.positionedElement.positionedElementStoryTheme ==
+                          PositionedElementStoryTheme.white
+                      ? ColorManager.black
+                      : widget.positionedElement.positionedElementStoryTheme ==
+                          PositionedElementStoryTheme.focusedWithPrimaryColor
+                      ? ColorManager.white
+                      : ColorManager.primaryColor,
+            ),
           ),
         ],
       );
@@ -163,46 +141,17 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
           Text(
             (widget.positionedElement as TemperatureElement).value
                 .toStringAsFixed(0),
-            style: elementTextStyle,
-          ),
-          Text(
-            getWeatherEmoji(
-              (widget.positionedElement as TemperatureElement).value,
+            style: AppTheme.headline4.copyWith(
+              fontWeight: FontWeight.w500,
+              color: ColorManager.white,
             ),
           ),
+          Text(getWeatherEmoji( (widget.positionedElement as TemperatureElement).value))
         ],
       );
-    } else if (widget.positionedElement is FeelingElement) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          GeneralImage.circular(
-            radius: 35,
-            isNetworkImage: true,
-            placeHolder: Icon(Icons.emoji_emotions),
-            image: (widget.positionedElement as FeelingElement).feelingIcon,
-          ),
-          Gaps.hGap1,
-          Text(
-            (widget.positionedElement as FeelingElement).feelingName,
-            style: elementTextStyle,
-          ),
-        ],
-      );
-    } else if (widget.positionedElement is PositionedElementWithLocationId) {
-      return Row(children: [
-        SvgPicture.asset(AssetsManager.location),
-        Gaps.hGap1,
-        Text(
-          '${(widget.positionedElement as PositionedElementWithLocationId)
-              .countryName}, ${(widget
-              .positionedElement as PositionedElementWithLocationId).cityName}',
-          style: elementTextStyle,
-        ),
-      ]);
-    } else
+    } else {
       return SizedBox.shrink();
+    }
   }
 
   String getWeatherEmoji(double tempCelsius) {
@@ -212,28 +161,5 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
     if (tempCelsius >= 5) return '🌥'; // Cool
     if (tempCelsius >= 0) return '❄️'; // Cold
     return '🥶'; // Freezing
-  }
-
-  void toggleElementTheme() {
-    if (_initStoryTheme == PositionedElementStoryTheme.white) {
-      setState(() {
-        _initStoryTheme = PositionedElementStoryTheme.normalWithBorder;
-      });
-    } else if (_initStoryTheme ==
-        PositionedElementStoryTheme.normalWithBorder) {
-      setState(() {
-        _initStoryTheme = PositionedElementStoryTheme.focusedWithPrimaryColor;
-      });
-    } else if (_initStoryTheme ==
-        PositionedElementStoryTheme.focusedWithPrimaryColor) {
-      setState(() {
-        _initStoryTheme = PositionedElementStoryTheme.focusedWithPrimaryShade;
-      });
-    } else if (_initStoryTheme ==
-        PositionedElementStoryTheme.focusedWithPrimaryShade) {
-      setState(() {
-        _initStoryTheme = PositionedElementStoryTheme.white;
-      });
-    }
   }
 }

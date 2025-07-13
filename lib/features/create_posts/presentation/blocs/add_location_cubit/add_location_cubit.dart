@@ -12,14 +12,9 @@ import 'package:sloopify_mobile/features/create_posts/domain/use_cases/create_pl
 import 'package:sloopify_mobile/features/create_posts/domain/use_cases/get_all_user_places_use_case.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/use_cases/search_places.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/use_cases/update_place_use_caes.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_user_place_by_id_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/update_place_use_caes.dart';
 import 'package:sloopify_mobile/features/location/domain/entities/coords_entity.dart';
 
 import '../../../../../core/errors/failures.dart';
-import '../../../../create_story/domain/use_cases/create_place_use_case.dart';
-import '../../../../create_story/domain/use_cases/get_all_user_places_use_case.dart';
-import '../../../../create_story/domain/use_cases/search_places.dart';
 import '../../../domain/use_cases/get_user_place_by_id_use_case.dart';
 
 part 'add_location_state.dart';
@@ -30,11 +25,6 @@ class AddLocationCubit extends Cubit<AddLocationState> {
   final SearchPlaces searchPlaces;
   final CreatePlaceUseCase createPlaceUseCase;
   final UpdatePlaceUseCase updatePlaceUseCase;
-  final GetAllStoryUserPlaces getAllStoryUserPlaces;
-  final CreateStoryPlaces createStoryPlaces;
-  final UpdateStoryUserPlace updateStoryUserPlace;
-  final GetStoryUserPlaceByIdUseCase getStoryUserPlaceByIdUseCase;
-  final SearchStoryPlaces searchStoryPlaces;
 
   AddLocationCubit({
     required this.updatePlaceUseCase,
@@ -42,17 +32,8 @@ class AddLocationCubit extends Cubit<AddLocationState> {
     required this.searchPlaces,
     required this.getUserPlaceByIdUseCase,
     required this.getAllUserPlacesUseCase,
-    required this.getAllStoryUserPlaces,
-    required this.getStoryUserPlaceByIdUseCase,
-    required this.updateStoryUserPlace,
-    required this.createStoryPlaces,
-    required this.searchStoryPlaces,
   }) : super(AddLocationState.empty());
   final RefreshController refreshController = RefreshController();
-
-  setFromStory() {
-    emit(state.copyWith(fromStory: true));
-  }
 
   setSearchPlaces(String value) {
     emit(
@@ -68,24 +49,6 @@ class AddLocationCubit extends Cubit<AddLocationState> {
     emit(
       state.copyWith(
         selectedLocationId: value,
-        getUserPlacesStatus: GetUserPlacesStatus.init,
-        addNewPlaceStatus: AddNewPlaceStatus.init,
-      ),
-    );
-  }
-  setCityName(String city) {
-    emit(
-      state.copyWith(
-        selectedCityName: city,
-        getUserPlacesStatus: GetUserPlacesStatus.init,
-        addNewPlaceStatus: AddNewPlaceStatus.init,
-      ),
-    );
-  }
-  setCountryName(String countryName) {
-    emit(
-      state.copyWith(
-        selectedCountryName: countryName,
         getUserPlacesStatus: GetUserPlacesStatus.init,
         addNewPlaceStatus: AddNewPlaceStatus.init,
       ),
@@ -145,10 +108,10 @@ class AddLocationCubit extends Cubit<AddLocationState> {
         ),
       );
     }
-    final res =
-        state.fromStory
-            ? await getAllStoryUserPlaces.call(page: state.page, perPage: 10)
-            : await getAllUserPlacesUseCase.call(page: state.page, perPage: 10);
+    final res = await getAllUserPlacesUseCase.call(
+      page: state.page,
+      perPage: 10,
+    );
     res.fold(
       (l) {
         refreshController.loadFailed();
@@ -202,18 +165,11 @@ class AddLocationCubit extends Cubit<AddLocationState> {
         ),
       );
     }
-    final res =
-        state.fromStory
-            ? await searchStoryPlaces.call(
-              search: state.searchKeyWord,
-              page: state.page,
-              perPage: 10,
-            )
-            : await searchPlaces.call(
-              search: state.searchKeyWord,
-              page: state.page,
-              perPage: 10,
-            );
+    final res = await searchPlaces.call(
+      search: state.searchKeyWord,
+      page: state.page,
+      perPage: 10,
+    );
     res.fold(
       (l) {
         _mapFailureGetPlacesToState(emit, l, state);
@@ -242,14 +198,9 @@ class AddLocationCubit extends Cubit<AddLocationState> {
 
   createUserPlace() async {
     emit(state.copyWith(addNewPlaceStatus: AddNewPlaceStatus.loading));
-    final res =
-        state.fromStory
-            ? await createStoryPlaces.call(
-              createPlaceEntity: state.createPlaceEntity,
-            )
-            : await createPlaceUseCase.call(
-              createPlaceEntity: state.createPlaceEntity,
-            );
+    final res = await createPlaceUseCase.call(
+      createPlaceEntity: state.createPlaceEntity,
+    );
     res.fold(
       (l) {
         _mapFailureCreatePlacesToState(emit, l, state);

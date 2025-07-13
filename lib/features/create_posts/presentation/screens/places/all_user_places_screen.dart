@@ -7,7 +7,6 @@ import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_footer.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/place_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 
 import '../../../../../core/managers/app_dimentions.dart';
 import '../../../../../core/managers/app_gaps.dart';
@@ -19,9 +18,7 @@ import '../../blocs/create_post_cubit/create_post_cubit.dart';
 import 'add_new_place.dart';
 
 class AllUserPlacesScreen extends StatelessWidget {
-  final bool fromStory;
-
-  const AllUserPlacesScreen({super.key, this.fromStory = false});
+  const AllUserPlacesScreen({super.key});
 
   static const routeName = " All_user_places";
 
@@ -34,9 +31,9 @@ class AllUserPlacesScreen extends StatelessWidget {
           builder: (context, state) {
             return Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: AppPadding.p20,
-                vertical: AppPadding.p10,
-              ),
+                  horizontal: AppPadding.p20,
+                  vertical: AppPadding.p10,
+                ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -47,9 +44,9 @@ class AllUserPlacesScreen extends StatelessWidget {
                           hintText: "Search for places",
                           withTitle: false,
                           onChanged: (value) {
-                            context.read<AddLocationCubit>().setSearchPlaces(
-                              value,
-                            );
+                            context
+                                .read<AddLocationCubit>()
+                                .setSearchPlaces(value);
                           },
                         ),
                       ),
@@ -60,12 +57,16 @@ class AllUserPlacesScreen extends StatelessWidget {
                         child: CustomElevatedButton(
                           label: "Find",
                           onPressed: () {
-                            context.read<AddLocationCubit>().searchUserPlaces();
+                            context
+                                .read<AddLocationCubit>()
+                                .searchUserPlaces();
                           },
                           backgroundColor: ColorManager.primaryColor
                               .withOpacity(0.3),
                           borderSide: BorderSide(
-                            color: ColorManager.primaryColor.withOpacity(0.3),
+                            color: ColorManager.primaryColor.withOpacity(
+                              0.3,
+                            ),
                           ),
                         ),
                       ),
@@ -96,38 +97,48 @@ class AllUserPlacesScreen extends StatelessWidget {
                   ),
                   Gaps.vGap3,
                   if (state.getUserPlacesStatus ==
-                          GetUserPlacesStatus.loading &&
-                      state.places.isEmpty) ...[
+                      GetUserPlacesStatus.loading &&state.places.isEmpty) ...[
                     Padding(
-                      padding: EdgeInsets.only(top: AppPadding.p20),
+                      padding:  EdgeInsets.only(top: AppPadding.p20),
                       child: Center(child: CircularProgressIndicator()),
                     ),
                   ] else if (state.getUserPlacesStatus ==
                       GetUserPlacesStatus.offline) ...[
                     Center(
-                      child: Text("you are offline", style: AppTheme.headline4),
+                      child: Text(
+                        "you are offline",
+                        style: AppTheme.headline4,
+                      ),
                     ),
                   ] else if (state.getUserPlacesStatus ==
                       GetUserPlacesStatus.error) ...[
                     Center(
                       child: Text(
-                        state.errorMessage,
+                       state.errorMessage,
                         style: AppTheme.headline4,
                       ),
                     ),
-                  ] else ...[
+                  ] else...[
                     Expanded(
                       child: SmartRefresher(
                         controller:
-                            context.read<AddLocationCubit>().refreshController,
+                        context
+                            .read<AddLocationCubit>()
+                            .refreshController,
                         enablePullUp: true,
                         enablePullDown: true,
                         onRefresh:
-                            () => context.read<AddLocationCubit>().onRefresh(),
+                            () =>
+                            context
+                                .read<AddLocationCubit>()
+                                .onRefresh(),
                         onLoading:
-                            () => context.read<AddLocationCubit>().onLoadMore(),
+                            () =>
+                            context
+                                .read<AddLocationCubit>()
+                                .onLoadMore(),
                         footer: customFooter,
-                        child: ListView.separated(
+                        child:  ListView.separated(
                           physics: BouncingScrollPhysics(),
                           itemCount: state.places.length,
                           itemBuilder: (context, index) {
@@ -136,47 +147,37 @@ class AllUserPlacesScreen extends StatelessWidget {
                               context,
                             );
                           },
-                          separatorBuilder: (BuildContext context, int index) {
+                          separatorBuilder: (
+                              BuildContext context,
+                              int index,
+                              ) {
                             return Gaps.vGap2;
                           },
                         ),
                       ),
                     ),
-                    SafeArea(
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          width: double.infinity,
-                          height: 60,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppPadding.p50,
-                            vertical: AppPadding.p8,
-                          ),
-                          child: CustomElevatedButton(
-                            label: "Done",
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              if (!fromStory) {
-                                context.read<CreatePostCubit>().setLocationId(
-                                  state.selectedLocationId,
-                                );
-                              } else {
-                                context
-                                    .read<StoryEditorCubit>()
-                                    .addLocationElement(
-                                      id: state.selectedLocationId,
-                                      cityName: state.selectedCityName,
-                                      countryName: state.selectedCountryName,
-                                    );
-                              }
-                            },
-                            backgroundColor: ColorManager.primaryColor,
-                            width: MediaQuery.of(context).size.width * 0.5,
-                          ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        width: double.infinity,
+                        height: 60,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppPadding.p50,
+                          vertical: AppPadding.p8,
+                        ),
+                        child: CustomElevatedButton(
+                          label: "Done",
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            context.read<CreatePostCubit>().setLocationId(state.selectedLocationId);
+                          },
+                          backgroundColor: ColorManager.primaryColor,
+                          width: MediaQuery.of(context).size.width * 0.5,
                         ),
                       ),
                     ),
                   ],
+
                 ],
               ),
             );
@@ -190,8 +191,6 @@ class AllUserPlacesScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         context.read<AddLocationCubit>().selectLocation(place.id);
-        context.read<AddLocationCubit>().setCityName(place.city);
-        context.read<AddLocationCubit>().setCountryName(place.country);
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

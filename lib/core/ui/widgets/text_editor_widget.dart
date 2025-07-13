@@ -23,7 +23,7 @@ class GradientBackground {
 }
 
 class TextEditorWidget extends StatefulWidget {
-  TextEditorWidget({
+  const TextEditorWidget({
     super.key,
     required this.hint,
     required this.initialValue,
@@ -48,7 +48,10 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
   bool _showGradientPicker = false;
   final List<GradientBackground> gradients = [
     GradientBackground(Colors.white, Colors.white),
-    GradientBackground(ColorManager.primaryColor.withOpacity(0.2), Colors.white),
+    GradientBackground(
+      ColorManager.primaryColor.withOpacity(0.2),
+      Colors.white,
+    ),
     GradientBackground(Colors.purple, Colors.white),
     GradientBackground(Colors.pink, Colors.purple),
     GradientBackground(Colors.blue, Colors.blue),
@@ -64,7 +67,7 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
 
   @override
   void initState() {
-    _focusNode=FocusNode();
+    _focusNode = FocusNode();
     if (widget.initialValue.isEmpty) {
       _controller = QuillController.basic();
     } else {
@@ -75,7 +78,7 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
       );
     }
     _controller.document.changes.listen((event) {
-      if(!_focusNode.hasFocus){
+      if (!_focusNode.hasFocus) {
         _focusNode.requestFocus();
       }
       final delta = _controller.document.toDelta();
@@ -105,7 +108,7 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
           isUnderLine: hasUnderline,
           isItalic: hasItalic,
           isBold: hasBold,
-          color:'#${color?.substring(3)}',
+          color: '#${color?.substring(3)}',
         ),
       );
     });
@@ -128,74 +131,73 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
                       GestureDetector(
                         onTap: () {
                           setState(
-                                () =>
-                            _showGradientPicker = !_showGradientPicker,
+                            () => _showGradientPicker = !_showGradientPicker,
                           );
                           context
                               .read<CreatePostCubit>()
                               .setVerticalHorizontalOption(false);
                         },
-                        child: _selectedGradient != null ? Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 25,
-                          height: 25,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.black26),
-                            gradient:
+                        child:
                             _selectedGradient != null
-                                ? LinearGradient(
-                              colors: [
-                                _selectedGradient!.startColor,
-                                _selectedGradient!.endColor,
-                              ],
-                            )
-                                : null,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ) :
-
-                        SvgPicture.asset(
-                          _showGradientPicker
-                              ? AssetsManager.addBgColor
-                              : AssetsManager.changeBgColor,
-                        ),
+                                ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  width: 25,
+                                  height: 25,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black26),
+                                    gradient:
+                                        _selectedGradient != null
+                                            ? LinearGradient(
+                                              colors: [
+                                                _selectedGradient!.startColor,
+                                                _selectedGradient!.endColor,
+                                              ],
+                                            )
+                                            : null,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                )
+                                : SvgPicture.asset(
+                                  _showGradientPicker
+                                      ? AssetsManager.addBgColor
+                                      : AssetsManager.changeBgColor,
+                                ),
                       ),
                       if (_showGradientPicker)
                         Row(
                           children: [
                             const SizedBox(width: 8),
                             ...gradients.map(
-                                  (gradient) =>
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedGradient = gradient;
-                                        _showGradientPicker = false;
-                                        context
-                                            .read<CreatePostCubit>()
-                                            .setBackGroundGradiant(gradient);
-                                      });
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 2,
-                                      ),
-                                      width: 25,
-                                      height: 25,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            gradient.startColor,
-                                            gradient.endColor,
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                            color: Colors.black26),
-                                      ),
-                                    ),
+                              (gradient) => GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedGradient = gradient;
+                                    _showGradientPicker = false;
+                                    context
+                                        .read<CreatePostCubit>()
+                                        .setBackGroundGradiant(gradient);
+                                  });
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 2,
                                   ),
+                                  width: 25,
+                                  height: 25,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        gradient.startColor,
+                                        gradient.endColor,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: Colors.black26),
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -306,21 +308,22 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
         ),
         Gaps.vGap1,
         Container(
-          height: context
-              .read<CreatePostCubit>()
-              .state.selectedMedia.isEmpty ? 300.h:150.h,
+          height:
+              context.read<CreatePostCubit>().state.selectedMedia.isEmpty
+                  ? 300.h
+                  : 150.h,
           padding: EdgeInsetsDirectional.all(AppPadding.p4),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             gradient:
-            _selectedGradient != null
-                ? LinearGradient(
-              colors: [
-                _selectedGradient!.startColor,
-                _selectedGradient!.endColor,
-              ],
-            )
-                : null,
+                _selectedGradient != null
+                    ? LinearGradient(
+                      colors: [
+                        _selectedGradient!.startColor,
+                        _selectedGradient!.endColor,
+                      ],
+                    )
+                    : null,
             border: Border.all(
               color: ColorManager.disActive.withOpacity(0.2),
               width: AppSize.s2,
@@ -354,7 +357,6 @@ class _TextEditorWidgetState extends State<TextEditorWidget> {
             ),
           ),
         ),
-
       ],
     );
   }

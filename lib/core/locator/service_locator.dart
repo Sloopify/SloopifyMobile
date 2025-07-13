@@ -47,18 +47,8 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_fr
 import 'package:sloopify_mobile/features/create_story/data/create_stoty_provider/create_story_data_provider.dart';
 import 'package:sloopify_mobile/features/create_story/data/repository/create_story_repo.dart';
 import 'package:sloopify_mobile/features/create_story/domain/repository/create_story_repository.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/create_place_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_all_user_places_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_story_audios_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_story_feelings_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_story_friends_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_user_place_by_id_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_places.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_story_audio_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_story_feelings_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_story_friends_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/update_place_use_caes.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/play_audio_cubit/play_audio_cubit.dart';
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
 import 'package:sloopify_mobile/features/posts/presentation/blocs/fetch_comments_bloc/fetch_comments_bloc.dart';
 
@@ -91,9 +81,13 @@ Future<void> setupLocator() async {
     () =>
         LoginCubit(emailLoginUseCase: locator(), phoneLoginUseCase: locator()),
   );
-  locator.registerFactory(() => SignUpCubit(signupUseCase: locator()));
   locator.registerFactory(
-    () => VerifyAccountBySignupCubit(
+    () => SignUpCubit(
+      signupUseCase: locator(),
+    ),
+  );
+  locator.registerFactory(
+        () => VerifyAccountBySignupCubit(
       registerOtpUseCase: locator(),
       verifyOtpRegisterUseCase: locator(),
     ),
@@ -130,8 +124,6 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => CreatePostCubit(createPostUseCase: locator()));
   locator.registerFactory(
     () => FeelingsActivitiesCubit(
-      searchStoryFeelingsUseCase: locator(),
-      getStoryFeelingsUseCase: locator(),
       getActivitiesByCategoriesName: locator(),
       getCategoriesActivities: locator(),
       getFeelingsUseCase: locator(),
@@ -165,22 +157,11 @@ Future<void> setupLocator() async {
   locator.registerFactory(() => SocialMediaLoginCubit());
   locator.registerFactory(
     () => AddLocationCubit(
-      createStoryPlaces: locator(),
-      getAllStoryUserPlaces: locator(),
-      getStoryUserPlaceByIdUseCase: locator(),
-      updateStoryUserPlace: locator(),
       updatePlaceUseCase: locator(),
-      createPlaceUseCase: locator(),
-      searchPlaces: locator(),
-      getUserPlaceByIdUseCase: locator(),
-      getAllUserPlacesUseCase: locator(),
-      searchStoryPlaces: locator(),
-    ),
-  );
-  locator.registerFactory(
-    () => PlayAudioCubit(
-      searchStoryAudioUseCase: locator(),
-      getStoryAudiosUseCase: locator(),
+      createPlaceUseCase:  locator(),
+      searchPlaces:  locator(),
+      getUserPlaceByIdUseCase:  locator(),
+      getAllUserPlacesUseCase:  locator(),
     ),
   );
 
@@ -276,40 +257,13 @@ Future<void> setupLocator() async {
     () => UpdatePlaceUseCase(createPostRepo: locator()),
   );
   locator.registerLazySingleton(
-    () => CreatePostUseCase(createPostRepo: locator()),
+        () => CreatePostUseCase(createPostRepo: locator()),
   );
   locator.registerLazySingleton(
-    () => GetStoryFriendsUseCase(createStoryRepo: locator()),
+        () => GetStoryFriendsUseCase(createStoryRepo: locator()),
   );
   locator.registerLazySingleton(
-    () => SearchStoryFriendsUseCase(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => GetStoryFeelingsUseCase(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => SearchStoryFeelingsUseCase(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => CreateStoryPlaces(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => GetAllStoryUserPlaces(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => GetStoryUserPlaceByIdUseCase(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => SearchStoryPlaces(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => UpdateStoryUserPlace(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => GetStoryAudiosUseCase(createStoryRepo: locator()),
-  );
-  locator.registerLazySingleton(
-    () => SearchStoryAudioUseCase(createStoryRepo: locator()),
+        () => SearchStoryFriendsUseCase(createStoryRepo: locator()),
   );
 
   ///
@@ -323,7 +277,7 @@ Future<void> setupLocator() async {
     () => CreatePostRepoImpl(createPostDataProvider: locator()),
   );
   locator.registerLazySingleton<CreateStoryRepo>(
-    () => CreateStoryRepoImpl(createStoryDataProvider: locator()),
+        () => CreateStoryRepoImpl(createStoryDataProvider: locator()),
   );
   ////
   //////data source
@@ -335,7 +289,7 @@ Future<void> setupLocator() async {
     () => AccountsDataProviderImpl(client: locator()),
   );
   locator.registerLazySingleton<CreateStoryDataProvider>(
-    () => CreateStoryDataProviderImpl(client: locator()),
+        () => CreateStoryDataProviderImpl(client: locator()),
   );
 
   ///

@@ -18,9 +18,10 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/crop_im
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_media_cubit/edit_media_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/rotate_photo_cubit/rotate_photo_cubit.dart';
-import 'package:sloopify_mobile/features/create_posts/presentation/widgets/feelings_list_widget.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/play_audio_cubit/play_audio_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
+import 'package:sloopify_mobile/features/friend_list/screen/freindsRequests.dart';
+import 'package:sloopify_mobile/features/friend_list/screen/myFreinds.dart';
+import 'package:sloopify_mobile/features/friend_list/screen/suggestedFriendListPage.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
 import '../../features/app_wrapper/presentation/screens/app_wrapper.dart';
@@ -53,8 +54,6 @@ import '../../features/create_posts/presentation/screens/post_audience_screen.da
 import '../../features/create_story/presentation/screens/story_audience/choose_story_audience.dart'
     show StoryAudienceScreen;
 import '../../features/create_story/presentation/screens/story_audience/story_friends_list.dart';
-import '../../features/create_story/presentation/screens/story_audios.dart';
-import '../../features/create_story/presentation/screens/story_feelings_list.dart';
 import '../../features/home/presentation/screens/home_navigation_screen.dart';
 import '../../features/start_up/presenation/screens/on_boarding_screen.dart';
 
@@ -89,6 +88,24 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) {
             return SignupScreen();
+          },
+        );
+      case SuggestedFriendListPage.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return SuggestedFriendListPage();
+          },
+        );
+      case MyFriendsPage.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return MyFriendsPage();
+          },
+        );
+      case MyRequestsPage.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return MyRequestsPage();
           },
         );
       case VerifyAccountScreen.routeName:
@@ -282,25 +299,6 @@ class AppRouter {
             );
           },
         );
-      case StoryFeelingsList.routeName:
-        final arg = routeSettings.arguments as Map;
-        return MaterialPageRoute(
-          builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-           BlocProvider.value(
-                      value: arg["story_editor_cubit"] as StoryEditorCubit,
-                    ),
-                BlocProvider.value(
-                  value:
-                      arg["feelings_activities_cubit"]
-                          as FeelingsActivitiesCubit,
-                ),
-              ],
-              child: StoryFeelingsList(),
-            );
-          },
-        );
       case ActivitiesByCategories.routeName:
         final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
@@ -343,18 +341,16 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-               arg["fromStory"]==false? BlocProvider.value(
+                BlocProvider.value(
                   value: arg["create_post_cubit"] as CreatePostCubit,
-                ): BlocProvider.value(
-                 value: arg["story_editor_cubit"] as StoryEditorCubit,
-               ) ,
+                ),
                 BlocProvider.value(
                   value:
                       (arg["add_location_cubit"] as AddLocationCubit)
                         ..getAllUserPlaces(),
                 ),
               ],
-              child: AllUserPlacesScreen(fromStory: arg["fromStory"]??false,),
+              child: AllUserPlacesScreen(),
             );
           },
         );
@@ -468,23 +464,6 @@ class AppRouter {
                 ),
               ],
               child: StoryFriendsList(),
-            );
-          },
-        );
-      case StoryAudios.routeName:
-        final arg = routeSettings.arguments as Map;
-        return MaterialPageRoute(
-          builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider.value(
-                  value: arg["story_editor_cubit"] as StoryEditorCubit,
-                ),
-                BlocProvider(
-                  create:(context)=> arg["play_audio_cubit"] as PlayAudioCubit,
-                ),
-              ],
-              child: StoryAudios(),
             );
           },
         );

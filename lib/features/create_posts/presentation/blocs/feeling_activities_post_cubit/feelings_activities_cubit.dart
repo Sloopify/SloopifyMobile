@@ -6,8 +6,6 @@ import 'package:meta/meta.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/activiity_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/feeling_entity.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_story_feelings_use_case.dart';
-import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_story_feelings_use_case.dart';
 
 import '../../../../../core/errors/failures.dart';
 import '../../../domain/use_cases/get_activities_by_categories_name.dart';
@@ -23,8 +21,6 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
   final GetActivitiesByCategoriesName getActivitiesByCategoriesName;
   final GetCategoriesActivities getCategoriesActivities;
   final GetFeelingsUseCase getFeelingsUseCase;
-  final GetStoryFeelingsUseCase getStoryFeelingsUseCase;
-  final SearchStoryFeelingsUseCase searchStoryFeelingsUseCase;
   final SearchActivitiesByNameUseCase searchActivitiesByNameUseCase;
   final SearchCategoriesActivitiesByName searchCategoriesActivitiesByName;
   final SearchFeelingsUseCase searchFeelingsUseCase;
@@ -36,8 +32,6 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
     required this.searchActivitiesByNameUseCase,
     required this.searchCategoriesActivitiesByName,
     required this.searchFeelingsUseCase,
-    required this.searchStoryFeelingsUseCase,
-    required this.getStoryFeelingsUseCase,
   }) : super(FeelingsActivitiesState());
   final RefreshController feelingRefreshController = RefreshController();
   final RefreshController categoriesRefreshController = RefreshController();
@@ -50,10 +44,6 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
         getCategoriesActivityStatus: GetCategoriesActivityStatus.init,
       ),
     );
-  }
-
-  setFromStory() {
-    emit(state.copyWith(fromStory: true));
   }
 
   setSearchActivityName(String value) {
@@ -82,14 +72,7 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
       ),
     );
   }
-  selectFeelingsIcon(String value) {
-    emit(
-      state.copyWith(
-        getFeelingStatus: GetFeelingStatus.init,
-        selectedFeelingIcon: value
-      ),
-    );
-  }
+
   selectCategoryName(String value) {
     emit(
       state.copyWith(
@@ -119,16 +102,10 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
         ),
       );
     }
-    final res =
-        state.fromStory
-            ? await getStoryFeelingsUseCase.call(
-              page: state.feelingsPage,
-              perPage: 10,
-            )
-            : await getFeelingsUseCase.call(
-              page: state.feelingsPage,
-              perPage: 10,
-            );
+    final res = await getFeelingsUseCase.call(
+      page: state.feelingsPage,
+      perPage: 10,
+    );
     res.fold(
       (l) {
         feelingRefreshController.loadFailed();
@@ -165,18 +142,11 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
         ),
       );
     }
-    final res =
-        state.fromStory
-            ? await searchStoryFeelingsUseCase.call(
-              name: state.searchFeelingName,
-              page: state.feelingsPage,
-              perPage: 10,
-            )
-            : await searchFeelingsUseCase.call(
-              name: state.searchFeelingName,
-              perPage: 10,
-              page: state.feelingsPage,
-            );
+    final res = await searchFeelingsUseCase.call(
+      name: state.searchFeelingName,
+      perPage: 10,
+      page: state.feelingsPage,
+    );
     res.fold(
       (l) {
         feelingRefreshController.loadFailed();
@@ -414,10 +384,10 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
         } else {
           activitiesRefreshController.loadNoData();
         }
+
       },
     );
   }
-
   void onLoadMoreActivities() {
     if (!state.hasActivitiesReachedEnd) {
       state.searchActivityName.isEmpty

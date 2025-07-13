@@ -9,7 +9,6 @@ enum GetActivityStatus { init, loading, success, offline, error }
 class FeelingsActivitiesState extends Equatable {
   final List<FeelingEntity> allFeelings;
   final String selectedFeeling;
-  final String selectedFeelingIcon;
   final List<dynamic> categoriesActivity;
   final List<ActivityEntity> activities;
   final String selectedActivity;
@@ -27,16 +26,14 @@ class FeelingsActivitiesState extends Equatable {
   final bool hasFeelingsReachedEnd;
   final bool hasCategoriesReachedEnd;
   final bool hasActivitiesReachedEnd;
-  final bool fromStory;
 
   const FeelingsActivitiesState({
-    this.selectedFeeling='',
     this.activities = const [],
     this.selectedCategoryName = "",
     this.allFeelings = const [],
     this.categoriesActivity = const [],
     this.selectedActivity = "",
-    this.selectedFeelingIcon = "",
+    this.selectedFeeling = "",
     this.getCategoriesActivityStatus = GetCategoriesActivityStatus.init,
     this.getActivityStatus = GetActivityStatus.init,
     this.getFeelingStatus = GetFeelingStatus.init,
@@ -50,7 +47,6 @@ class FeelingsActivitiesState extends Equatable {
     this.hasActivitiesReachedEnd = false,
     this.hasCategoriesReachedEnd = false,
     this.hasFeelingsReachedEnd = false,
-    this.fromStory=false
   });
 
   @override
@@ -61,7 +57,6 @@ class FeelingsActivitiesState extends Equatable {
     categoriesActivity,
     selectedActivity,
     selectedFeeling,
-    selectedFeelingIcon,
     getCategoriesActivityStatus,
     getActivityStatus,
     getFeelingStatus,
@@ -76,7 +71,6 @@ class FeelingsActivitiesState extends Equatable {
     hasFeelingsReachedEnd,
     hasCategoriesReachedEnd,
     hasActivitiesReachedEnd,
-    fromStory
   ];
 
   FeelingsActivitiesState copyWith({
@@ -99,12 +93,8 @@ class FeelingsActivitiesState extends Equatable {
     bool? hasFeelingsReachedEnd,
     bool? hasCategoriesReachedEnd,
     bool? hasActivitiesReachedEnd,
-    String ? selectedFeelingIcon,
-    bool? fromStory
   }) {
     return FeelingsActivitiesState(
-      selectedFeelingIcon: selectedFeelingIcon??this.selectedFeelingIcon,
-      fromStory: fromStory??this.fromStory,
       selectedCategoryName: selectedCategoryName ?? this.selectedCategoryName,
       activitiesPage: activitiesPage ?? this.activitiesPage,
       categoriesPage: categoriesPage ?? this.categoriesPage,
