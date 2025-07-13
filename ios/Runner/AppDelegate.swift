@@ -11,6 +11,4 @@ import UIKit
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
-import GoogleMaps
 
-GMSServices.provideAPIKey("AIzaSyDm4JMcNRKD7HSY7KUjI6X4DMxsGPtS35w")

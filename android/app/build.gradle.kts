@@ -33,19 +33,19 @@ android {
         versionName = flutter.versionName
     }
 
-        signingConfigs {
-        create("release") {
-            storeFile =file("C:\\Users\\Nour-Alkhalel\\StudioProjects\\Sloopify_Mobile\\android\\sloopiy-release-key.jks")
-            storePassword= "sloopify"
-            keyAlias ="sloopify-key-alias"
-            keyPassword ="sloopify"
-        }
-    }
+//        signingConfigs {
+//        create("release") {
+//            storeFile =file("C:\\Users\\Nour-Alkhalel\\StudioProjects\\Sloopify_Mobile\\android\\sloopiy-release-key.jks")
+//            storePassword= "sloopify"
+//            keyAlias ="sloopify-key-alias"
+//            keyPassword ="sloopify"
+//        }
+//    }
 
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
-              signingConfig = signingConfigs.getByName("release")
+             // signingConfig = signingConfigs.getByName("release")
         }
     }
 

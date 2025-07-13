@@ -29,8 +29,6 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
-	<key>NSPhotoLibraryUsageDescription</key>
-    <string>We need access to my photo gallery to select images for create post.</string>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
@@ -49,5 +47,7 @@
 	<true/>
 	<key>io.flutter.embedded_views_preview</key>
     <true/>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to my photo gallery to select images for create post.</string>
 </dict>
 </plist>

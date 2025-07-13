@@ -8,9 +8,16 @@ class DeviceInfoApi {
 
 //android or ios
   static Future<String> getOperatingSystem() async {
-    final info = await _deviceInfo.androidInfo;
+    if(Platform.isAndroid){
+      final info = await _deviceInfo.androidInfo;
 
-    return '${Platform.operatingSystem} ${info.version.sdkInt}';
+      return '${Platform.operatingSystem} ${info.version.sdkInt}';
+    }else {
+      final info = await _deviceInfo.iosInfo;
+
+      return '${Platform.operatingSystem} ${info.systemVersion}';
+    }
+
   }
 
 

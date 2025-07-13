@@ -468,5 +468,6 @@ Future<Either<Failure, (String, String, String)>> getDeviceInfo() async {
   String? deviceModelInfo = await DeviceInfoApi.getDeviceInfo();
   String? deviceId = await DeviceInfoApi.getDeviceId();
   String? operationSystem = await DeviceInfoApi.getOperatingSystem();
-  return Right(('$deviceModelInfo', operationSystem, "$deviceId"));
+  print('tttttttt${operationSystem}');
+  return Right(('$deviceModelInfo', '${operationSystem}', "$deviceId"));
 }
