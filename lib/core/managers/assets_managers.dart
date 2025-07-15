@@ -81,6 +81,7 @@ class AssetsManager{
   static const String baseLottieURI = 'assets/lottie/';
   static const String success = '${baseLottieURI}success.json';
   static const String loading = '${baseLottieURI}loading.json';
+  static const String audioPlaying = '${baseLottieURI}audio_playing.json';
 
 
   static const String chatIcons = '${baseIconsURI}chat/';

@@ -125,6 +125,7 @@ class PlayAudioCubit extends Cubit<PlayAudioState> {
         state.copyWith(
           page: 1,
           hasReachedEnd: false,
+          selectedAudioUrl: '',
           audioFiles: [],
           getAudioStatus: GetAudioStatus.loading,
         ),

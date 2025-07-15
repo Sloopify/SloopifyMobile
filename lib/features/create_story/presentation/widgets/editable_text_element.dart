@@ -3,13 +3,15 @@ import 'package:sloopify_mobile/features/create_story/domain/entities/all_positi
 class EditableTextElement extends StatefulWidget {
   final PositionedTextElement textElement;
   final GlobalKey widgetKey;
+  final Function()? onTap;
   final Function(PositionedTextElement updatedElement) onElementChanged;
 
   const EditableTextElement({
     Key? key,
     required this.textElement,
     required this.onElementChanged,
-    required this.widgetKey
+    required this.widgetKey,
+    this.onTap
   }) : super(key: key);
 
   @override
@@ -32,10 +34,6 @@ class _EditableTextElementState extends State<EditableTextElement> {
   void initState() {
     super.initState();
   }
-
-
-
-
 
   // Helper to convert string alignment to TextAlign
   TextAlign _stringToTextAlign(String? alignString) {
@@ -123,11 +121,11 @@ class _EditableTextElementState extends State<EditableTextElement> {
   @override
   Widget build(BuildContext context) {
     final textProps = widget.textElement.textPropertiesForStory;
-
     return Positioned(
       left: _position.dx,
       top: _position.dy,
       child: GestureDetector(
+        onTap: widget.onTap,
         onScaleStart: _onScaleStart,
         onScaleUpdate: _onScaleUpdate,
         child: Transform(

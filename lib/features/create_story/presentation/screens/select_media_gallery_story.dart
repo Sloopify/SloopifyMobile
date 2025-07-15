@@ -8,6 +8,7 @@ import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
+import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_state.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_editor_screen.dart';
@@ -113,34 +114,13 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
           context.read<StoryEditorCubit>().toggleSelection(asset);
         } else {
           context.read<StoryEditorCubit>().selectOneMedia(asset);
-          final file = await asset.file;
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) {
-                return MultiBlocProvider(
-                  providers: [
-                    BlocProvider.value(value: context.read<StoryEditorCubit>()),
-                    BlocProvider(create: (context) => TextEditingCubit()),
-                    BlocProvider(create: (context) => DrawingStoryCubit()),
-                    BlocProvider(
-                      create: (context) => CalculateTempCubit(),
-                    ),
-                    BlocProvider.value(value: context.read<FeelingsActivitiesCubit>()),
-                    BlocProvider.value(value: context.read<AddLocationCubit>()),
-
-                  ],
-                  child: StoryEditorScreen(
-                    media: MediaEntity(
-                      file: file,
-                      order: 1,
-                      isVideoFile: asset.type==AssetType.video,
-                      id: asset.id,
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
+          print(  context.read<StoryEditorCubit>().state.selectedEditedMedia);
+          Navigator.of(context).pushNamed(StoryEditorScreen.routeName,arguments: {
+            "story_editor_cubit":context.read<StoryEditorCubit>(),
+            "post_friends_cubit":context.read<PostFriendsCubit>(),
+            "add_location_cubit":context.read<AddLocationCubit>(),
+            "feelings_activities_cubit":context.read<FeelingsActivitiesCubit>(),
+          });
         }
       },
       child: BlocBuilder<StoryEditorCubit, StoryEditorState>(
@@ -179,7 +159,8 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
                   child: Container(
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      shape: BoxShape.circle,
+                      color: isSelected?ColorManager.primaryColor:ColorManager.white,
                       border: Border.all(
                         color: ColorManager.primaryColor,
                         width: 2,
@@ -198,7 +179,7 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
                                       .toString()
                                   : 0.toString(),
                               style: AppTheme.bodyText3.copyWith(
-                                color: ColorManager.primaryColor,
+                                color: ColorManager.white,
                               ),
                             )
                             : SizedBox.shrink(),
@@ -329,7 +310,12 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
                                   .setFinalListOfMediaFiles(
                                     await updatedMediaList,
                                   );
-                              Navigator.of(context).pop();
+                              Navigator.of(context).pushNamed(StoryEditorScreen.routeName,arguments: {
+                                "story_editor_cubit":context.read<StoryEditorCubit>(),
+                                "post_friends_cubit":context.read<PostFriendsCubit>(),
+                                "add_location_cubit":context.read<AddLocationCubit>(),
+                                "feelings_activities_cubit":context.read<FeelingsActivitiesCubit>(),
+                              });
                             },
                             backgroundColor: ColorManager.primaryColor,
                             width: MediaQuery.of(context).size.width * 0.5,
