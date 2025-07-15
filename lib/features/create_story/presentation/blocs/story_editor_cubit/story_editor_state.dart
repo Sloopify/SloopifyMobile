@@ -5,18 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/media_story.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_audience/choose_story_audience.dart';
 
 import '../../../../create_posts/presentation/screens/post_audience_screen.dart';
 import '../../../domain/entities/positioned_element_entity.dart';
 import '../../../domain/entities/text_properties_story.dart';
-
+enum StoryType{text,media}
 class StoryEditorState extends Equatable {
+  final StoryType storyType;
   final List<AssetEntity> selectedMedia;
   final String content;
   final TextPropertiesForStory? textProperties;
-  final List<MediaEntity>? mediaFiles;
+  final List<MediaStory>? mediaFiles;
   final List<String> backgroundColors;
   final List<PositionedElement> positionedElements;
   final PositionedElement? currentElement;
@@ -26,6 +28,7 @@ class StoryEditorState extends Equatable {
   final List<int> friendExcept;
   final String? gifUrl;
   final List<DrawingElement> drawingElements;
+  final MediaStory selectedEditedMedia;
   const StoryEditorState({
     this.selectedMedia=const [],
     this.content = "",
@@ -39,7 +42,9 @@ class StoryEditorState extends Equatable {
     this.gifUrl,
     this.mediaFiles,
     this.drawingElements=const [],
-    this.currentElement
+    this.currentElement,
+    this.storyType=StoryType.text,
+    this.selectedEditedMedia=const MediaStory()
 
   });
   StoryEditorState copyWith({
@@ -53,17 +58,19 @@ class StoryEditorState extends Equatable {
     List<int>? specificFriends,
     List<int>? friendExcept,
     String? gifUrl,
-    List<MediaEntity>? mediaFiles,
+    List<MediaStory>? mediaFiles,
     List<DrawingElement> ?drawingElements,
-    EditingMode? editingMode,
     bool ?isToolBarVisible,
     Color?drawingColor,
     double? drawingWidth,
     DrawingElement? currentLine,
-    PositionedElement? currentOne
+    PositionedElement? currentOne,
+    StoryType ?storyType,
+    MediaStory? selectedEditedMedia
 
   }) {
     return StoryEditorState(
+      selectedEditedMedia: selectedEditedMedia??this.selectedEditedMedia,
       selectedMedia: selectedMedia ?? this.selectedMedia,
       content: content ?? this.content,
       textProperties: textProperties ?? this.textProperties,
@@ -76,7 +83,8 @@ class StoryEditorState extends Equatable {
       gifUrl: gifUrl ?? this.gifUrl,
       mediaFiles: mediaFiles??this.mediaFiles,
       drawingElements: drawingElements??this.drawingElements,
-      currentElement: currentOne??currentElement
+      currentElement: currentOne??currentElement,
+      storyType: storyType??this.storyType
 
     );
   }

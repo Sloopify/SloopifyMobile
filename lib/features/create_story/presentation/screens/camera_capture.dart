@@ -10,18 +10,19 @@ import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
-import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/media_story.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/screens/media_editor_screen.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_editor_screen.dart';
+import 'package:uuid/uuid.dart';
 
-import '../blocs/drawing_story/drawing_story_cubit.dart';
+import '../../../create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
+import '../../../create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
+import '../../../create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
+import '../blocs/story_editor_cubit/story_editor_state.dart';
 
 class CameraCaptureScreen extends StatefulWidget {
   const CameraCaptureScreen({Key? key}) : super(key: key);
-
+static const routeName= "camera_capture";
   @override
   State<CameraCaptureScreen> createState() => _CameraCaptureScreenState();
 }
@@ -38,10 +39,6 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
   void initState() {
     super.initState();
     _initializeCamera();
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: [SystemUiOverlay.bottom],
-    );
   }
 
   Future<void> _initializeCamera() async {
@@ -58,12 +55,6 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
   @override
   void dispose() {
     _controller?.dispose();
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: ColorManager.white,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
     super.dispose();
   }
 
@@ -72,38 +63,21 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
       try {
         final XFile image = await _controller!.takePicture();
         File file = File(image.path);
-        final MediaEntity mediaEntity = MediaEntity(
-          id: '',
+        final MediaStory mediaStory = MediaStory(
+          id: Uuid().v4(),
           file: file,
           order: 1,
           isVideoFile: false,
         );
         context.read<StoryEditorCubit>().addCameraPhotoOrVideoToMediaFiles(
-          mediaEntity,
+          mediaStory,
         );
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) {
-              return MultiBlocProvider(
-                providers: [
-                  BlocProvider.value(
-                    value: context.read<StoryEditorCubit>(),
-                  ),
-                  BlocProvider(
-                    create: (context) => TextEditingCubit(),
-                  ),
-                  BlocProvider(
-                    create: (context) => DrawingStoryCubit(),
-                  ),
-                  BlocProvider(
-                    create: (context) => CalculateTempCubit(),
-                  ),
-                ],
-                child: StoryEditorScreen(media: mediaEntity),
-              );
-            },
-          ),
-        );
+        Navigator.of(context).pushNamed(StoryEditorScreen.routeName,arguments: {
+          "story_editor_cubit":context.read<StoryEditorCubit>(),
+          "post_friends_cubit":context.read<PostFriendsCubit>(),
+          "add_location_cubit":context.read<AddLocationCubit>(),
+          "feelings_activities_cubit":context.read<FeelingsActivitiesCubit>(),
+        });
         // For now, we'll just navigate back
       } catch (e) {
         print("Error taking picture: $e");
@@ -120,14 +94,14 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
             _isRecording = false;
           });
           File file = File(video.path);
-          final MediaEntity mediaEntity = MediaEntity(
-            id: '',
+          final MediaStory mediaStory = MediaStory(
+            id: Uuid().v4(),
             file: file,
             order: 1,
             isVideoFile: true,
           );
           context.read<StoryEditorCubit>().addCameraPhotoOrVideoToMediaFiles(
-            mediaEntity,
+            mediaStory,
           );
         } catch (e) {
           print("Error stopping video recording: $e");

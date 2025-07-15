@@ -8,34 +8,38 @@ import 'package:uuid/uuid.dart';
 
 class TextInputOverlay extends StatefulWidget {
   final Function() onTextSubmitted;
-  const TextInputOverlay({super.key,required this.onTextSubmitted});
+  FocusNode focusNode;
+  final bool fromTextStory;
+
+  TextInputOverlay({
+    super.key,
+    required this.onTextSubmitted,
+    required this.focusNode,
+    this.fromTextStory = false,
+  });
 
   @override
   State<TextInputOverlay> createState() => _TextInputOverlayState();
 }
 
 class _TextInputOverlayState extends State<TextInputOverlay> {
-  late FocusNode _textFocusNode;
   late TextEditingController _textEditingController;
   String initialText = '';
-  final _uuid= Uuid().v4();
+  final _uuid = Uuid().v4();
 
   @override
   void initState() {
     final cubit = context.read<TextEditingCubit>();
     initialText = cubit.state.positionedTextElement.text;
-    _textFocusNode = FocusNode();
     _textEditingController = TextEditingController(text: initialText);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).requestFocus(_textFocusNode);
+      FocusScope.of(context).requestFocus(widget.focusNode);
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    _textFocusNode.dispose();
     _textEditingController.dispose();
     super.dispose();
   }
@@ -86,21 +90,13 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
             Positioned.fill(
               child: GestureDetector(
                 onTap: () {
-                  if (_textFocusNode.hasFocus) {
-                    _textFocusNode.unfocus();
-                    context.read<TextEditingCubit>().addTextAlignment(
-                      PositionedTextElement(
-                        scale:state.positionedTextElement.scale ,
-                        textPropertiesForStory: state.textPropertiesForStory,
-                        offset: state.positionedTextElement.offset,
-                        id: _uuid,
-                        rotation: state.positionedTextElement.rotation,
-                        positionedElementStoryTheme:
-                            null,
-                        size: state.positionedTextElement.size,
-                        text: _textEditingController.text,
-                      ),
-                    );
+                  if (widget.focusNode.hasFocus) {
+                      context.read<TextEditingCubit>().submitText(
+                        _textEditingController.text,
+                      );
+
+                    widget.focusNode.unfocus();
+                    widget.onTextSubmitted();
                   }
                 },
                 child: Container(
@@ -117,7 +113,7 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
                 child: IntrinsicWidth(
                   child: TextField(
                     controller: _textEditingController,
-                    focusNode: _textFocusNode,
+                    focusNode: widget.focusNode,
                     textAlign: _stringToTextAlign(
                       state.textPropertiesForStory.alignment,
                     ),
@@ -167,21 +163,50 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.done,
                     onSubmitted: (text) {
-                      context.read<TextEditingCubit>().addTextAlignment(
-                        PositionedTextElement(
-                          scale:state.positionedTextElement.scale ,
-                          textPropertiesForStory: state.textPropertiesForStory,
-                          offset: state.positionedTextElement.offset,
-                          id: Uuid().v4(),
-                          rotation: state.positionedTextElement.rotation,
-                          positionedElementStoryTheme:
-                          null,
-                          size: state.positionedTextElement.size,
+                      final cubit = context.read<TextEditingCubit>();
+                      final state = cubit.state;
+
+                      if (state.isEditingExistingText) {
+                        // Edit mode: update existing text in list
+                        final updated = state.positionedTextElement.copyWith(
                           text: _textEditingController.text,
-                        ),
-                      );
-                      widget.onTextSubmitted();
-                      _textFocusNode.unfocus(); // Dismiss keyboard
+                          textProperty: state.textPropertiesForStory,
+                        );
+
+                        final updatedList = List<PositionedTextElement>.from(
+                          state.allTextAlignment,
+                        );
+                        final index = updatedList.indexWhere(
+                          (e) => e.id == updated.id,
+                        );
+                        if (index != -1) {
+                          updatedList[index] = updated;
+
+                          cubit.emit(
+                            state.copyWith(
+                              allTextAlignment: updatedList,
+                              isEditingPositionedText: false, // reset to normal
+                            ),
+                          );
+                        }
+                      } else {
+                        // New text
+                        final newText = PositionedTextElement(
+                          id: Uuid().v4(),
+                          text: _textEditingController.text,
+                          textPropertiesForStory: state.textPropertiesForStory,
+                          offset: Offset(100, 100),
+                          scale: 1.0,
+                          rotation: 0.0,
+                          size: Size.zero,
+                          positionedElementStoryTheme: null,
+                        );
+
+                        cubit.addTextAlignment(newText);
+                      }
+
+                      widget.onTextSubmitted(); // hide overlay
+                      widget.focusNode.unfocus();
                     },
                   ),
                 ),
@@ -189,7 +214,7 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
             ),
 
             // Text Editing Toolbar (Vertical on left)
-            TextEditingToolbar(),
+            if (!widget.fromTextStory) TextEditingToolbar(),
           ],
         );
       },

@@ -272,15 +272,19 @@ class TemperatureElement extends PositionedElement {
 
 class AudioElement extends PositionedElement {
   final int audioId;
+  final String audioName;
+  final String audioImage;
 
   AudioElement({
     required this.audioId,
-    required super.offset,
+    required this.audioName,
+    required this.audioImage,
+     super.offset,
     required super.id,
-    required super.rotation,
-    required super.positionedElementStoryTheme,
-    required super.size,
-    required super.scale,
+     super.rotation,
+     super.positionedElementStoryTheme,
+     super.size,
+     super.scale,
   });
 
   @override
@@ -296,6 +300,9 @@ class AudioElement extends PositionedElement {
     Size? size,
     int? audioId,
     double? scale,
+    String ?audioName,
+    String? audioImage,
+
   }) {
     return AudioElement(
       audioId: audioId ?? this.audioId,
@@ -306,6 +313,8 @@ class AudioElement extends PositionedElement {
           positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
+      audioImage: audioImage??this.audioImage,
+      audioName: audioName??this.audioName
     );
   }
 }

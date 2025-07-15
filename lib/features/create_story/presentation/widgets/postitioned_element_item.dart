@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gif_view/gif_view.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
@@ -100,12 +101,12 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
       child: GestureDetector(
         onScaleStart: _onScaleStart,
         onScaleUpdate: _onScaleUpdate,
-        child: Transform(
-          transform:
-          Matrix4.identity()
-            ..translate(0.0, 0.0)
-            ..rotateZ(_rotation)
-            ..scale(_scale),
+        child: Transform.translate(
+        offset: Offset.zero,
+        child: Transform.rotate(
+        angle: _rotation,
+        child: Transform.scale(
+        scale: _scale,
           child:
           widget.positionedElement is StickerElement
               ? GifView.network(
@@ -126,19 +127,19 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
           ),
         ),
       ),
-    );
+    )));
   }
 
   Widget _buildMainPostionedItem(BuildContext context) {
     final elementTextStyle = AppTheme.headline4.copyWith(
       fontWeight: FontWeight.w500,
       color:
-      _initStoryTheme == PositionedElementStoryTheme.white
-          ? ColorManager.black
-          : _initStoryTheme ==
-          PositionedElementStoryTheme.focusedWithPrimaryColor
-          ? ColorManager.white
-          : ColorManager.primaryColor,
+          _initStoryTheme == PositionedElementStoryTheme.white
+              ? ColorManager.black
+              : _initStoryTheme ==
+                  PositionedElementStoryTheme.focusedWithPrimaryColor
+              ? ColorManager.white
+              : ColorManager.primaryColor,
     );
     if (widget.positionedElement is PositionedMentionElement) {
       return Row(
@@ -146,9 +147,9 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
           SvgPicture.asset(
             AssetsManager.storyMention,
             color:
-            _initStoryTheme == PositionedElementStoryTheme.white
-                ? null
-                : ColorManager.primaryColor,
+                _initStoryTheme == PositionedElementStoryTheme.white
+                    ? null
+                    : ColorManager.primaryColor,
           ),
           Gaps.hGap1,
           Text(
@@ -191,18 +192,49 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
         ],
       );
     } else if (widget.positionedElement is PositionedElementWithLocationId) {
-      return Row(children: [
-        SvgPicture.asset(AssetsManager.location),
-        Gaps.hGap1,
-        Text(
-          '${(widget.positionedElement as PositionedElementWithLocationId)
-              .countryName}, ${(widget
-              .positionedElement as PositionedElementWithLocationId).cityName}',
-          style: elementTextStyle,
-        ),
-      ]);
-    } else
-      return SizedBox.shrink();
+      return Row(
+        children: [
+          SvgPicture.asset(AssetsManager.location),
+          Gaps.hGap1,
+          Text(
+            '${(widget.positionedElement as PositionedElementWithLocationId).countryName}, ${(widget.positionedElement as PositionedElementWithLocationId).cityName}',
+            style: elementTextStyle,
+          ),
+        ],
+      );
+    } else if (widget.positionedElement is AudioElement) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Stack(
+            children: [
+              Positioned.fill(
+                child: GeneralImage.circular(
+                  radius: 30,
+                  isNetworkImage: true,
+                  placeHolder: SvgPicture.asset(AssetsManager.logo),
+                  image: (widget.positionedElement as AudioElement).audioImage,
+                ),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Lottie.asset(
+                  AssetsManager.audioPlaying,
+                  width: MediaQuery.of(context).size.width * 0.1,
+                  height: MediaQuery.of(context).size.width * 0.1,
+                ),
+              ),
+            ],
+          ),
+          Gaps.hGap1,
+          Text(
+            (widget.positionedElement as AudioElement).audioName,
+            style: elementTextStyle,
+          ),
+        ],
+      );
+    }
+    return SizedBox.shrink();
   }
 
   String getWeatherEmoji(double tempCelsius) {
