@@ -44,7 +44,7 @@ class _MainPositionedWidgetState extends State<MainPositionedWidget> {
               color: getBorderColorDependsOnTheme(widget.theme)),
           borderRadius: BorderRadius.circular(10),
           boxShadow:
-          widget.theme == PositionedElementStoryTheme.normalWithBorder
+          widget.theme == PositionedElementStoryTheme.normalWithBorder || widget.theme==PositionedElementStoryTheme.focusedWithPrimaryShade
               ? null
               : [
             BoxShadow(
@@ -69,7 +69,7 @@ class _MainPositionedWidgetState extends State<MainPositionedWidget> {
       case PositionedElementStoryTheme.focusedWithPrimaryColor:
         return ColorManager.primaryColor;
       case PositionedElementStoryTheme.focusedWithPrimaryShade:
-        return ColorManager.primaryShade4.withOpacity(0.25);
+        return ColorManager.primaryColor.withOpacity(0.4);
     }
   }
 
@@ -82,7 +82,7 @@ class _MainPositionedWidgetState extends State<MainPositionedWidget> {
       case PositionedElementStoryTheme.focusedWithPrimaryColor:
         return ColorManager.primaryColor;
       case PositionedElementStoryTheme.focusedWithPrimaryShade:
-        return ColorManager.primaryShade4;
+        return ColorManager.primaryColor.withOpacity(0.4);
     }
   }
 

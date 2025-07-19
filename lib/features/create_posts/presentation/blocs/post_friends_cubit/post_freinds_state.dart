@@ -13,6 +13,8 @@ class PostFriendsState extends Equatable {
   final int page;
   final bool hasReachedEnd;
   final bool fromStory;
+  final int selectedMentionFriendId;
+  final String selectedMentionName;
 
   const PostFriendsState({
     this.getAllFriendStatus = GetAllFriendStatus.init,
@@ -24,7 +26,9 @@ class PostFriendsState extends Equatable {
     this.page=0,
     this.hasReachedEnd=true,
     this.selectedMentionFriends=const [],
-     this.fromStory=false
+     this.fromStory=false,
+    this.selectedMentionFriendId=0,
+    this.selectedMentionName=''
 
 
   });
@@ -41,7 +45,9 @@ class PostFriendsState extends Equatable {
     selectedMentionFriends,
     hasReachedEnd,
     page,
-    fromStory
+    fromStory,
+    selectedMentionFriendId,
+    selectedMentionName
 
   ];
 
@@ -59,6 +65,8 @@ class PostFriendsState extends Equatable {
     int? page,
     bool ? hasReachedEnd,
     bool? fromStory,
+   int? selectedMentionFriendId,
+    String? selectedMentionName
 
   }) {
     return PostFriendsState(
@@ -71,7 +79,9 @@ class PostFriendsState extends Equatable {
       searchName: searchName ?? this.searchName,
       selectedFriendsExcept: selectedFriendsExcept??this.selectedFriendsExcept,
       selectedSpecificFriends: selectedSpecificFriends??this.selectedSpecificFriends,
-      fromStory: fromStory??this.fromStory
+      fromStory: fromStory??this.fromStory,
+      selectedMentionFriendId: selectedMentionFriendId??this.selectedMentionFriendId,
+      selectedMentionName: selectedMentionName??this.selectedMentionName
     );
   }
 }

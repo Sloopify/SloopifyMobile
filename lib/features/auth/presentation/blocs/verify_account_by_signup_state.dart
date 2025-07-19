@@ -32,7 +32,7 @@ class VerifyAccountBySignupState extends Equatable {
   factory VerifyAccountBySignupState.empty() {
     return VerifyAccountBySignupState(
       isTimerFinished: false,
-      timerSeconds: 60,
+      timerSeconds: 300,
       errorMessage: "",
       otpDataEntity: OtpDataEntity.fromEmpty(),
       otpSendType: OtpSendType.email,

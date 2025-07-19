@@ -63,7 +63,7 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
     }
 
     final albums = await PhotoManager.getAssetPathList(
-      type: RequestType.all,
+      type:widget.isMultiSelection?RequestType.image: RequestType.all,
       onlyAll: false,
     );
 
@@ -113,8 +113,8 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
         if (widget.isMultiSelection) {
           context.read<StoryEditorCubit>().toggleSelection(asset);
         } else {
-          context.read<StoryEditorCubit>().selectOneMedia(asset);
-          print(  context.read<StoryEditorCubit>().state.selectedEditedMedia);
+          await context.read<StoryEditorCubit>().selectOneMedia(asset);
+          print(  context.read<StoryEditorCubit>().state.mediaFiles);
           Navigator.of(context).pushNamed(StoryEditorScreen.routeName,arguments: {
             "story_editor_cubit":context.read<StoryEditorCubit>(),
             "post_friends_cubit":context.read<PostFriendsCubit>(),

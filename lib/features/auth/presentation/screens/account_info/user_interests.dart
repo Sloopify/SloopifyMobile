@@ -55,13 +55,7 @@ class _UserInterestsState extends State<UserInterests> {
             appBar: getCustomAppBar(
               context: context,
               title: "",
-              onArrowBack: () {
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop(());
-                } else {
-                  SystemNavigator.pop();
-                }
-              },
+              withArrowBack: false,
             ),
             body: SafeArea(
               child: Stack(
@@ -207,7 +201,8 @@ class _UserInterestsState extends State<UserInterests> {
                             onLoading:
                                 () =>
                                     context.read<InterestCubit>().onLoadMore(),
-                            footer: CustomFooter(height: 100,
+                            footer: CustomFooter(
+                              height: 100,
                               loadStyle: LoadStyle.ShowAlways,
                               builder: (context, mode) {
                                 if (mode == LoadStatus.loading) {
@@ -215,14 +210,19 @@ class _UserInterestsState extends State<UserInterests> {
                                     child: CircularProgressIndicator(),
                                   );
                                 } else if (mode == LoadStatus.noMore) {
-                                  return  SizedBox.shrink();
+                                  return SizedBox.shrink();
                                 } else {
                                   return SizedBox.shrink();
                                 }
                               },
                             ),
                             child: GridView.builder(
-                              padding:  EdgeInsets.only(left: AppPadding.p16,right: AppPadding.p16,top: AppPadding.p16,bottom: AppPadding.p50),
+                              padding: EdgeInsets.only(
+                                left: AppPadding.p16,
+                                right: AppPadding.p16,
+                                top: AppPadding.p16,
+                                bottom: AppPadding.p50,
+                              ),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
@@ -276,13 +276,25 @@ class _UserInterestsState extends State<UserInterests> {
                             CompleteInterestsStatus.loading,
                         onPressed:
                             state.completeInterestsStatus ==
-                                    CompleteInterestsStatus.loading
+                                        CompleteInterestsStatus.loading ||
+                                    state.selectedInterestIds.isNotEmpty
                                 ? () {}
                                 : () {
                                   cubit.submitInterests();
                                 },
                         label: "continue",
-                        backgroundColor: ColorManager.primaryColor,
+                        backgroundColor:
+                            state.selectedInterestIds.isEmpty
+                                ? ColorManager.disActive.withOpacity(0.4)
+                                : ColorManager.primaryColor,
+                        borderSide:
+                            state.selectedInterestIds.isEmpty
+                                ? BorderSide(
+                                  color: ColorManager.disActive.withOpacity(
+                                    0.4,
+                                  ),
+                                )
+                                : null,
                         width: MediaQuery.of(context).size.width * 0.5,
                       ),
                     ),
@@ -301,9 +313,9 @@ class _UserInterestsState extends State<UserInterests> {
       Navigator.of(context).pushNamed(GenderIdentity.routeName);
     } else if (state.completeInterestsStatus ==
         CompleteInterestsStatus.offline) {
-      showSnackBar(context, "no_internet_connection".tr(),isOffline: true);
+      showSnackBar(context, "no_internet_connection".tr(), isOffline: true);
     } else if (state.completeInterestsStatus == CompleteInterestsStatus.error) {
-      showSnackBar(context, state.errorMessage,isError: true);
+      showSnackBar(context, state.errorMessage, isError: true);
     }
   }
 }

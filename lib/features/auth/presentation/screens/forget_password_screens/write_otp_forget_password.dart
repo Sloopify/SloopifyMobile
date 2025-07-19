@@ -105,33 +105,72 @@ class WriteOtpForgetPassword extends StatelessWidget {
                       ),
                     ),
                     Gaps.vGap2,
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Resend code in',
-                            style: AppTheme.headline4.copyWith(
-                              fontWeight: FontWeight.w500,
+                    if (!state.isTimerFinished) ...[
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Resend code in ',
+                              style: AppTheme.headline4.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text: ' 54 ',
-                            style: AppTheme.headline4.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: ColorManager.primaryColor,
+                            TextSpan(
+                              text: formatDuration(state.timerSeconds),
+                              style: AppTheme.headline4.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: ColorManager.primaryColor,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text: 's',
-                            style: AppTheme.headline4.copyWith(
-                              fontWeight: FontWeight.w500,
+                            TextSpan(
+                              text: ' m',
+                              style: AppTheme.headline4.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+                    ] else ...[
+                      InkWell(
+                        onTap:
+                        state.otpSendStatus ==OtpSendStatus.init
+                            ? () {
+                          if (state.isTimerFinished) {
+                            context
+                                .read<ForgetPasswordCubit>()
+                                .requestOtp(fromReset: true);
+                          }
+                        }
+                            : () {},
+                        child: Text(
+                          state.otpSendStatus == OtpSendStatus.loading
+                              ? "Re-sending code..."
+                              : state.otpSendStatus == OtpSendStatus.init
+                              ? "Resend code"
+                              : "",
+                          style: AppTheme.headline4.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: ColorManager.black,
+                          ),
+                        ),
+                      ),
+                    ],
                     Gaps.vGap8,
                     CustomElevatedButton(
+                      backgroundColor:
+                      state.verifyOtpEntity.otp.length != 6
+                          ? ColorManager.disActive.withOpacity(0.2)
+                          : ColorManager.primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      borderSide:
+                      state.verifyOtpEntity.otp.length != 6
+                          ? BorderSide(
+                        color: ColorManager.disActive.withOpacity(
+                          0.2,
+                        ),
+                      )
+                          : null,
                       isLoading:
                       state.verifyOtpStatus ==
                           VerifyOtpStatus.loading,
@@ -141,11 +180,14 @@ class WriteOtpForgetPassword extends StatelessWidget {
                           VerifyOtpStatus.loading
                           ? () {}
                           : () {
-                        context.read<ForgetPasswordCubit>().verifyOtpLogin();
+                        if (state.verifyOtpEntity.otp.length != 6) {
+                          return;
+                        }else{
+                          context.read<ForgetPasswordCubit>().verifyOtpLogin();
+
+                        }
                       },
                       isBold: true,
-                      backgroundColor: ColorManager.primaryColor,
-                      padding: EdgeInsets.symmetric(vertical: 4),
                       width: MediaQuery.of(context).size.width * 0.8,
                     ),
                   ],
@@ -170,5 +212,12 @@ class WriteOtpForgetPassword extends StatelessWidget {
     } else if (state.verifyOtpStatus == VerifyOtpStatus.error) {
       showSnackBar(context, state.errorMessage,isError: true);
     }
+  }
+  String formatDuration(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    final minutesStr = minutes.toString().padLeft(2, '0');
+    final secondsStr = remainingSeconds.toString().padLeft(2, '0');
+    return '$minutesStr:$secondsStr';
   }
 }

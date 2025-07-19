@@ -21,12 +21,19 @@ import '../../../../core/utils/helper/snackbar.dart';
 import '../widgets/country_code_widget.dart';
 import '../widgets/swith_sendotp_type.dart';
 
-class LoginWithOtpCode extends StatelessWidget {
+class LoginWithOtpCode extends StatefulWidget {
   LoginWithOtpCode({super.key});
 
+  static const routeName = "login_with_code";
+
+  @override
+  State<LoginWithOtpCode> createState() => _LoginWithOtpCodeState();
+}
+
+class _LoginWithOtpCodeState extends State<LoginWithOtpCode> {
   final _formKey = GlobalKey<FormState>();
 
-  static const routeName = "login_with_code";
+  TextEditingController phoneController = TextEditingController(text: "09");
 
   @override
   Widget build(BuildContext context) {
@@ -122,58 +129,81 @@ class LoginWithOtpCode extends StatelessWidget {
                         ),
 
                         if (state.otpDataEntity.type == OtpSendType.phone) ...[
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                flex: 1,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom:
-                                    context
-                                        .read<LoginWithOtpCubit>()
-                                        .state
-                                        .hasPhoneNumberError
-                                        ? 16.0
-                                        : 0.0,
-                                  ),
-                                  child: CountryCodeWidget(
-                                    onChanged: (value) {
-                                      context
-                                          .read<LoginWithOtpCubit>()
-                                          .setDialCode(value);
-                                    },
-                                  ),
+                              Text(
+                                "mobile_number".tr(),
+                                style: AppTheme.headline4.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color:
+                                  state.otpDataEntity.phoneNumbers!
+                                      .isEmpty
+                                      ? ColorManager.disActive
+                                      .withOpacity(0.5)
+                                      : ColorManager.black,
                                 ),
                               ),
-                              Gaps.hGap2,
-                              Expanded(
-                                flex: 3,
-                                child: CustomTextField(
-                                  initialValue:
-                                      state.otpDataEntity.phoneNumbers,
-                                  labelText: 'mobile_number'.tr(),
-                                  onChanged: (value) {
-                                    context
-                                        .read<LoginWithOtpCubit>()
-                                        .setPhoneNumber(value);
-                                  },
-                                  withTitle: true,
-                                  hintText: 'mobile_number2'.tr(),
-                                  /*icon: Icons.email,*/
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                  validator:
-                                      (value) {
-                                        final err= Validator.phoneNumberValidator(
-                                        value!,
-                                        context,
-                                      );
-                                        context.read<LoginWithOtpCubit>().setHasPhoneNumberError(err!=null);
-                                        return err;
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                        context
+                                            .read<LoginWithOtpCubit>()
+                                            .state
+                                            .hasPhoneNumberError
+                                            ? 16.0
+                                            : 0.0,
+                                      ),
+                                      child: CountryCodeWidget(
+                                        onChangedPhonePrefix: (value){
+                                          setState(() {
+                                            phoneController.text=value;
+                                          });
+                                        },
+                                        onChanged: (value) {
+                                          context
+                                              .read<LoginWithOtpCubit>()
+                                              .setDialCode(value);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Gaps.hGap2,
+                                  Expanded(
+                                    flex: 3,
+                                    child: CustomTextField(
+                                      initialValue:
+                                         null,
+                                      controller: phoneController,
+                                      labelText: 'mobile_number'.tr(),
+                                      onChanged: (value) {
+                                        context
+                                            .read<LoginWithOtpCubit>()
+                                            .setPhoneNumber(value);
                                       },
-                                ),
+                                      withTitle: false,
+                                      hintText: 'mobile_number2'.tr(),
+                                      /*icon: Icons.email,*/
+                                      keyboardType: TextInputType.number,
+                                      textInputAction: TextInputAction.next,
+                                      validator:
+                                          (value) {
+                                            final err= Validator.phoneNumberValidator(
+                                            value!,
+                                            context,
+                                          );
+                                            context.read<LoginWithOtpCubit>().setHasPhoneNumberError(err!=null);
+                                            return err;
+                                          },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

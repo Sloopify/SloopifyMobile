@@ -404,7 +404,6 @@ class StickerElement extends PositionedElement {
 
 class ClockElement extends PositionedElement {
   final DateTime dateTime;
-  final String clockTheme;
 
   ClockElement({
     required super.offset,
@@ -412,7 +411,6 @@ class ClockElement extends PositionedElement {
     super.size,
     super.rotation,
     required super.id,
-    required this.clockTheme,
     required this.dateTime,
     required super.scale,
   });
@@ -433,7 +431,6 @@ class ClockElement extends PositionedElement {
   }) {
     return ClockElement(
       dateTime: time ?? dateTime,
-      clockTheme: theme ?? this.clockTheme,
       id: id,
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,

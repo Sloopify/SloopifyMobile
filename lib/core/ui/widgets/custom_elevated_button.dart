@@ -59,9 +59,13 @@ class CustomElevatedButton extends StatelessWidget {
 
   Widget _buildElevatedWithIcon(bool? isRounded, BuildContext context) {
     return Container(
+      height: 50,
       width: width ?? MediaQuery.of(context).size.width * 0.9,
       decoration: BoxDecoration(
-        border: Border.all(color: borderSide?.color??ColorManager.primaryColor,width: borderSide?.width??1),
+        border: Border.all(
+          color: borderSide?.color ?? ColorManager.primaryColor,
+          width: borderSide?.width ?? 1,
+        ),
         borderRadius: BorderRadius.circular(10),
         color: backgroundColor,
         boxShadow: [
@@ -79,8 +83,10 @@ class CustomElevatedButton extends StatelessWidget {
         onPressed: onPressed,
         label:
             isLoading
-                ? CircularProgressIndicator(
-                  color: loadingColor ?? ColorManager.white,
+                ? FittedBox(
+                  child: CircularProgressIndicator(
+                    color: loadingColor ?? ColorManager.white,
+                  ),
                 )
                 : FittedBox(
                   child: Text(
@@ -109,9 +115,13 @@ class CustomElevatedButton extends StatelessWidget {
 
   Widget _buildElevatedWithoutIcon(bool? isRounded, BuildContext context) {
     return Container(
+      height: 50,
       width: width ?? MediaQuery.of(context).size.width * 0.9,
       decoration: BoxDecoration(
-        border: Border.all(color: borderSide?.color??ColorManager.primaryColor,width: borderSide?.width??1),
+        border: Border.all(
+          color: borderSide?.color ?? ColorManager.primaryColor,
+          width: borderSide?.width ?? 1,
+        ),
         borderRadius: BorderRadius.circular(10),
         color: backgroundColor,
         boxShadow: [
@@ -129,11 +139,12 @@ class CustomElevatedButton extends StatelessWidget {
           padding: WidgetStatePropertyAll(padding),
           backgroundColor: WidgetStatePropertyAll(backgroundColor),
           foregroundColor: WidgetStatePropertyAll(foregroundColor),
-
         ),
         child:
             isLoading
-                ? CircularProgressIndicator(color: ColorManager.white)
+                ? FittedBox(
+                  child: CircularProgressIndicator(color: ColorManager.white),
+                )
                 : FittedBox(
                   child: Text(
                     textAlign: TextAlign.center,
@@ -156,9 +167,13 @@ class CustomElevatedButton extends StatelessWidget {
 
   _buildElevatedWithSvg(bool? isRounded, BuildContext context) {
     return Container(
+      height: 50,
       width: width ?? MediaQuery.of(context).size.width * 0.9,
       decoration: BoxDecoration(
-        border: Border.all(color: borderSide?.color??ColorManager.primaryColor,width: borderSide?.width??1),
+        border: Border.all(
+          color: borderSide?.color ?? ColorManager.primaryColor,
+          width: borderSide?.width ?? 1,
+        ),
         borderRadius: BorderRadius.circular(10),
         color: backgroundColor,
         boxShadow: [
@@ -179,53 +194,53 @@ class CustomElevatedButton extends StatelessWidget {
         ),
         child:
             isLoading
-                ? CircularProgressIndicator(color: ColorManager.white)
+                ? FittedBox(child: CircularProgressIndicator(color: ColorManager.white))
                 : FittedBox(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (svgAlignment == IconAlignment.end) ...[
-                        if(label.isNotEmpty)
-                    ...[    Text(
-                      label,
-                      textAlign: TextAlign.center,
-                      style:
-                      btnTextStyle ??
-                          AppTheme.bodyText1.copyWith(
-                            fontSize: 18,
-                            fontWeight:
-                            isBold
-                                ? FontWeight.w500
-                                : FontWeight.w400,
-                            color: foregroundColor ?? Colors.white,
+                        if (label.isNotEmpty) ...[
+                          Text(
+                            label,
+                            textAlign: TextAlign.center,
+                            style:
+                                btnTextStyle ??
+                                AppTheme.bodyText1.copyWith(
+                                  fontSize: 18,
+                                  fontWeight:
+                                      isBold
+                                          ? FontWeight.w500
+                                          : FontWeight.w400,
+                                  color: foregroundColor ?? Colors.white,
+                                ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                      Gaps.hGap2,],
+                          Gaps.hGap2,
+                        ],
                         svgPic!,
                       ] else ...[
                         svgPic!,
-                        if(label.isNotEmpty)...[
+                        if (label.isNotEmpty) ...[
                           Gaps.hGap2,
                           Text(
                             label,
                             textAlign: TextAlign.center,
                             style:
-                            btnTextStyle ??
+                                btnTextStyle ??
                                 AppTheme.bodyText1.copyWith(
                                   fontSize: 18,
                                   fontWeight:
-                                  isBold
-                                      ? FontWeight.w500
-                                      : FontWeight.w400,
+                                      isBold
+                                          ? FontWeight.w500
+                                          : FontWeight.w400,
                                   color: foregroundColor ?? Colors.white,
                                 ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
-
                       ],
                     ],
                   ),

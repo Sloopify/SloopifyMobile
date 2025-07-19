@@ -362,14 +362,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
+                if(arg["fromStory"]==false)
                 BlocProvider.value(
                   value: arg["create_post_cubit"] as CreatePostCubit,
                 ),
+                if(arg['fromStory']==true)
+                  BlocProvider.value(
+                    value: arg["story_editor_cubit"] as StoryEditorCubit,
+                  ),
                 BlocProvider.value(
                   value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
-              child: MentionFriends(),
+              child: MentionFriends(fromStory: arg["fromStory"]??false,
+              ),
             );
           },
         );
@@ -572,7 +578,7 @@ class AppRouter {
             return MultiBlocProvider(
               providers: [
                 BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
                 BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
                 BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
               ],
@@ -610,7 +616,7 @@ class AppRouter {
                 BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
                 BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
                 BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
-                BlocProvider(create: (context) => locator<TextEditingCubit>()),
+                BlocProvider(create: (context) => locator<TextEditingCubit>()..setFromTextEditor()),
                 BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
                 BlocProvider(
                   create: (context) => locator<CalculateTempCubit>(),

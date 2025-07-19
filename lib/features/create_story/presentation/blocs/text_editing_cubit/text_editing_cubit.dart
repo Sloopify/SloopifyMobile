@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
+import 'package:sloopify_mobile/core/ui/widgets/text_editor_widget.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/text_properties_story.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_state.dart';
@@ -41,9 +42,29 @@ class TextEditingCubit extends Cubit<TextEditingState> {
   }
 
   void addTextAlignment(PositionedTextElement element) {
+    emit(state.copyWith(newOne: element));
     List<PositionedTextElement> newList = List.from(state.allTextAlignment);
     newList.add(element);
+    print(newList);
     emit(state.copyWith(allTextAlignment: newList));
+  }
+
+  void updateTextElement(PositionedTextElement element,String text){
+    final updatedList = List<PositionedTextElement>.from(
+      state.allTextAlignment,
+    );
+    final current = state.positionedTextElement.copyWith(text: text);
+
+    final index = state.allTextAlignment.indexWhere(
+          (e) => e.id == element.id,
+    );
+    print('nnnnnnnnnnn${state.positionedTextElement.text}');
+    print(index);
+    if (index != -1) {
+      updatedList[index]=current;
+      state.allTextAlignment[index]=current;
+      emit(state.copyWith(allTextAlignment: updatedList));
+    }
   }
 
   void changeTextOffset(Offset offsets) {
@@ -58,10 +79,18 @@ class TextEditingCubit extends Cubit<TextEditingState> {
     emit(state.copyWith(fontSize: fontSize));
   }
 
-  void updateSelectedPositionedText(String id) {
-    final currentElement =
-        state.allTextAlignment.where((e) => e.id == id).first;
-    emit(state.copyWith(newOne: currentElement));
+  void updateSelectedPositionedText(PositionedTextElement element) {
+    final updatedList = List<PositionedTextElement>.from(
+      state.allTextAlignment,
+    );
+    final index = updatedList.indexWhere(
+          (e) => e.id == element.id,
+    );
+    if(index!=-1){
+      state.allTextAlignment[index] = element;
+      updatedList[index]=element;
+    }
+    emit(state.copyWith(allTextAlignment: updatedList));
   }
   void setEditingExistingText(bool editing) {
     emit(state.copyWith(isEditingPositionedText: editing));
@@ -70,11 +99,12 @@ class TextEditingCubit extends Cubit<TextEditingState> {
   void clearCurrentText() {
     emit(TextEditingState.fromEmpty());
   }
-  void submitText(String newText) {
-    final updated = state.positionedTextElement.copyWith(text: newText);
-    emit(state.copyWith(
-        newOne: updated,
-        isEditingPositionedText:true,
-        ));
+  void setFromTextEditor() {
+    emit(state.copyWith(fromTextStory: true));
   }
+
+  void clearAll(){
+    emit(TextEditingState.fromEmpty());
+  }
+
 }

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:sloopify_mobile/core/ui/widgets/text_editor_widget.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/media_entity.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/media_story.dart';
@@ -29,13 +30,15 @@ class StoryEditorState extends Equatable {
   final String? gifUrl;
   final List<DrawingElement> drawingElements;
   final MediaStory selectedEditedMedia;
+  final GradientBackground? gradientBackground;
+  final List<PositionedTextElement>? textElements;
   const StoryEditorState({
     this.selectedMedia=const [],
     this.content = "",
     this.textProperties,
     this.backgroundColors = const [],
     this.positionedElements = const [],
-    this.isVideoMuted = false,
+    this.isVideoMuted =false,
     this.privacy = StoryAudience.public,
     this.specificFriends = const [],
     this.friendExcept = const [],
@@ -44,7 +47,9 @@ class StoryEditorState extends Equatable {
     this.drawingElements=const [],
     this.currentElement,
     this.storyType=StoryType.text,
-    this.selectedEditedMedia=const MediaStory()
+    this.selectedEditedMedia=const MediaStory(),
+    this.gradientBackground,
+    this.textElements
 
   });
   StoryEditorState copyWith({
@@ -66,10 +71,13 @@ class StoryEditorState extends Equatable {
     DrawingElement? currentLine,
     PositionedElement? currentOne,
     StoryType ?storyType,
-    MediaStory? selectedEditedMedia
+    MediaStory? selectedEditedMedia,
+    GradientBackground? gradiant,
+    List<PositionedTextElement>? textElements,
 
   }) {
     return StoryEditorState(
+      gradientBackground: gradiant??this.gradientBackground,
       selectedEditedMedia: selectedEditedMedia??this.selectedEditedMedia,
       selectedMedia: selectedMedia ?? this.selectedMedia,
       content: content ?? this.content,
@@ -84,7 +92,8 @@ class StoryEditorState extends Equatable {
       mediaFiles: mediaFiles??this.mediaFiles,
       drawingElements: drawingElements??this.drawingElements,
       currentElement: currentOne??currentElement,
-      storyType: storyType??this.storyType
+      storyType: storyType??this.storyType,
+      textElements: textElements??this.textElements
 
     );
   }
@@ -102,7 +111,9 @@ class StoryEditorState extends Equatable {
     gifUrl,
     mediaFiles,
     drawingElements,
-    currentElement
+    currentElement,
+    gradientBackground,
+    textElements
 
   ];
 }

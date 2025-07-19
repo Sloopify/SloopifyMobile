@@ -30,7 +30,6 @@ class InteractiveMediaItemState extends State<InteractiveMediaItem> {
   late Offset _startFocalPoint;
   late double _initialScale;
   late double _initialRotation;
-
   @override
   void initState() {
     super.initState();
@@ -46,6 +45,8 @@ class InteractiveMediaItemState extends State<InteractiveMediaItem> {
     _scale = widget.media.scale ?? _scale;
     _rotation = widget.media.rotateAngle ?? _rotation;
   }
+
+
   @override
   Widget build(BuildContext context) {
     return   Positioned(
@@ -53,16 +54,16 @@ class InteractiveMediaItemState extends State<InteractiveMediaItem> {
       top: _offset.dy,
       child: GestureDetector(
         onScaleStart: (details) {
-          _startFocalPoint = details.focalPoint;
-          _initialOffset = details.focalPoint;
-          _initialScale = _scale;
-          _initialRotation = _rotation;
+            _startFocalPoint = details.focalPoint;
+            _initialOffset = _offset;
+            _initialScale = _scale;
+            _initialRotation = _rotation;
+
         },
         onScaleUpdate: (details) {
           setState(() {
             _scale = (_initialScale * details.scale).clamp(0.3, 4.0);
             _rotation = _initialRotation + details.rotation;
-
             // Update the position based on finger movement
             final delta = details.focalPoint - _startFocalPoint;
             _offset = _initialOffset + delta;
