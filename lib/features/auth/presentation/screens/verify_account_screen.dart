@@ -53,6 +53,7 @@ class VerifyAccountScreen extends StatelessWidget {
               appBar: getCustomAppBar(
                 context: context,
                 title: 'verify_account'.tr(),
+                withArrowBack: fromSignUp?true:false,
                 onArrowBack: () {
                   if (Navigator.of(context).canPop()) {
                     Navigator.of(context).pop(());

@@ -8,34 +8,48 @@ import 'package:uuid/uuid.dart';
 
 class TextInputOverlay extends StatefulWidget {
   final Function() onTextSubmitted;
-  const TextInputOverlay({super.key,required this.onTextSubmitted});
+  FocusNode focusNode;
+  final bool fromTextStory;
+
+  TextInputOverlay({
+    super.key,
+    required this.onTextSubmitted,
+    required this.focusNode,
+    this.fromTextStory = false,
+  });
 
   @override
   State<TextInputOverlay> createState() => _TextInputOverlayState();
 }
 
 class _TextInputOverlayState extends State<TextInputOverlay> {
-  late FocusNode _textFocusNode;
   late TextEditingController _textEditingController;
-  String initialText = '';
-  final _uuid= Uuid().v4();
+  String _initialText = '';
+  final _uuid = Uuid().v4();
 
   @override
   void initState() {
     final cubit = context.read<TextEditingCubit>();
-    initialText = cubit.state.positionedTextElement.text;
-    _textFocusNode = FocusNode();
-    _textEditingController = TextEditingController(text: initialText);
-
+    _textEditingController = TextEditingController(
+      text: cubit.state.positionedTextElement.text,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).requestFocus(_textFocusNode);
+      FocusScope.of(context).requestFocus(widget.focusNode);
     });
     super.initState();
   }
 
   @override
+  void didChangeDependencies() {
+    final cubit = context.read<TextEditingCubit>();
+    _textEditingController = TextEditingController(
+      text: cubit.state.positionedTextElement.text,
+    );
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
-    _textFocusNode.dispose();
     _textEditingController.dispose();
     super.dispose();
   }
@@ -80,27 +94,38 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
 
     return BlocBuilder<TextEditingCubit, TextEditingState>(
       builder: (context, state) {
+        final currentText = state.positionedTextElement.text;
+        print(currentText);
+        print('ffffffffffff${_textEditingController.text}');
+          _textEditingController.text = currentText;
+
+        print(state.positionedTextElement.text);
         return Stack(
           children: [
             // GestureDetector to dismiss keyboard when tapping outside TextField
             Positioned.fill(
               child: GestureDetector(
                 onTap: () {
-                  if (_textFocusNode.hasFocus) {
-                    _textFocusNode.unfocus();
-                    context.read<TextEditingCubit>().addTextAlignment(
-                      PositionedTextElement(
-                        scale:state.positionedTextElement.scale ,
-                        textPropertiesForStory: state.textPropertiesForStory,
-                        offset: state.positionedTextElement.offset,
-                        id: _uuid,
-                        rotation: state.positionedTextElement.rotation,
-                        positionedElementStoryTheme:
-                            null,
-                        size: state.positionedTextElement.size,
-                        text: _textEditingController.text,
-                      ),
-                    );
+                  if (widget.focusNode.hasFocus) {
+                    // if (state.isEditingExistingText) {
+                    //   context.read<TextEditingCubit>().updateTextElement(_textEditingController.text);
+                    // } else {
+                    //   final newText = PositionedTextElement(
+                    //     id: Uuid().v4(),
+                    //     text: _textEditingController.text,
+                    //     textPropertiesForStory: state.positionedTextElement.textPropertiesForStory,
+                    //     offset: Offset((MediaQuery.of(context).size.width/2), (MediaQuery.of(context).size.height/2) ),
+                    //     scale: 1.0,
+                    //     rotation: 0.0,
+                    //     size: Size.zero,
+                    //     positionedElementStoryTheme: null,
+                    //   );
+                    //   context.read<TextEditingCubit>().addTextAlignment(newText);
+                    // }
+                    widget.focusNode.unfocus();
+                    widget.onTextSubmitted();
+                  }else{
+                    return;
                   }
                 },
                 child: Container(
@@ -110,32 +135,51 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
             ),
             // Text Input Field
             Positioned(
-              left: 0,
-              right: 0,
+              left: 10,
+              right: 10,
               top: textInputPosition.dy - 25, // Adjust for TextField height
               child: Center(
                 child: IntrinsicWidth(
                   child: TextField(
                     controller: _textEditingController,
-                    focusNode: _textFocusNode,
+                    focusNode: widget.focusNode,
                     textAlign: _stringToTextAlign(
-                      state.textPropertiesForStory.alignment,
+                      state
+                          .positionedTextElement
+                          .textPropertiesForStory
+                          .alignment,
                     ),
                     autofocus: true,
                     style: TextStyle(
-                      color: state.textPropertiesForStory.color,
-                      fontSize: state.textPropertiesForStory.fontSize,
+                      color:
+                          state
+                              .textPropertiesForStory
+                              .color,
+                      fontSize:
+                          state
+                              .textPropertiesForStory
+                              .fontSize,
                       // Assuming a fixed font size for input
                       fontWeight: _getFontWeight(
                         state.textPropertiesForStory.bold,
                       ),
                       fontStyle: _getFontStyle(
-                        state.textPropertiesForStory.italic,
+                        state
+
+                            .textPropertiesForStory
+                            .italic,
                       ),
                       decoration: _getTextDecoration(
-                        state.textPropertiesForStory.underline,
+                        state
+
+                            .textPropertiesForStory
+                            .underline,
                       ),
-                      fontFamily: state.textPropertiesForStory.fontType,
+                      fontFamily:
+                          state
+
+                              .textPropertiesForStory
+                              .fontType,
                     ),
                     decoration: InputDecoration(
                       disabledBorder: InputBorder.none,
@@ -145,19 +189,37 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
                       focusedErrorBorder: InputBorder.none,
                       hintText: "write something",
                       hintStyle: TextStyle(
-                        color: state.textPropertiesForStory.color,
-                        fontSize: state.textPropertiesForStory.fontSize,
+                        color:
+                            state
+
+                                .textPropertiesForStory
+                                .color,
+                        fontSize:
+                            state
+
+                                .textPropertiesForStory
+                                .fontSize,
                         // Assuming a fixed font size for input
                         fontWeight: _getFontWeight(
-                          state.textPropertiesForStory.bold,
+                          state
+
+                              .textPropertiesForStory
+                              .bold,
                         ),
                         fontStyle: _getFontStyle(
-                          state.textPropertiesForStory.italic,
+                          state
+
+                              .textPropertiesForStory
+                              .italic,
                         ),
                         decoration: _getTextDecoration(
-                          state.textPropertiesForStory.underline,
+                          state.textPropertiesForStory
+                              .underline,
                         ),
-                        fontFamily: state.textPropertiesForStory.fontType,
+                        fontFamily:
+                            state
+                                .textPropertiesForStory
+                                .fontType,
                       ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
@@ -167,21 +229,33 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.done,
                     onSubmitted: (text) {
-                      context.read<TextEditingCubit>().addTextAlignment(
-                        PositionedTextElement(
-                          scale:state.positionedTextElement.scale ,
-                          textPropertiesForStory: state.textPropertiesForStory,
-                          offset: state.positionedTextElement.offset,
-                          id: Uuid().v4(),
-                          rotation: state.positionedTextElement.rotation,
-                          positionedElementStoryTheme:
-                          null,
-                          size: state.positionedTextElement.size,
-                          text: _textEditingController.text,
+                      final newText = PositionedTextElement(
+                        id: Uuid().v4(),
+                        text: _textEditingController.text,
+                        textPropertiesForStory:
+                            state.textPropertiesForStory,
+                        offset: Offset(
+                          (MediaQuery.of(context).size.width / 2),
+                          (MediaQuery.of(context).size.height / 2),
                         ),
+                        scale: 1.0,
+                        rotation: 0.0,
+                        size: Size.zero,
+                        positionedElementStoryTheme: null,
                       );
-                      widget.onTextSubmitted();
-                      _textFocusNode.unfocus(); // Dismiss keyboard
+                      if (state.isEditingExistingText) {
+                        final updatedText = state.positionedTextElement
+                            .copyWith(text: _textEditingController.text);
+                        context.read<TextEditingCubit>().updateTextElement(
+                          updatedText,text
+                        );
+                      } else {
+                        context.read<TextEditingCubit>().addTextAlignment(
+                          newText,
+                        );
+                      }
+                      widget.onTextSubmitted(); // hide overlay
+                      widget.focusNode.unfocus();
                     },
                   ),
                 ),
@@ -189,7 +263,7 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
             ),
 
             // Text Editing Toolbar (Vertical on left)
-            TextEditingToolbar(),
+            if (!widget.fromTextStory) TextEditingToolbar(),
           ],
         );
       },

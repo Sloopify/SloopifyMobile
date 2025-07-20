@@ -272,15 +272,19 @@ class TemperatureElement extends PositionedElement {
 
 class AudioElement extends PositionedElement {
   final int audioId;
+  final String audioName;
+  final String audioImage;
 
   AudioElement({
     required this.audioId,
-    required super.offset,
+    required this.audioName,
+    required this.audioImage,
+     super.offset,
     required super.id,
-    required super.rotation,
-    required super.positionedElementStoryTheme,
-    required super.size,
-    required super.scale,
+     super.rotation,
+     super.positionedElementStoryTheme,
+     super.size,
+     super.scale,
   });
 
   @override
@@ -296,6 +300,9 @@ class AudioElement extends PositionedElement {
     Size? size,
     int? audioId,
     double? scale,
+    String ?audioName,
+    String? audioImage,
+
   }) {
     return AudioElement(
       audioId: audioId ?? this.audioId,
@@ -306,6 +313,8 @@ class AudioElement extends PositionedElement {
           positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
+      audioImage: audioImage??this.audioImage,
+      audioName: audioName??this.audioName
     );
   }
 }
@@ -395,7 +404,6 @@ class StickerElement extends PositionedElement {
 
 class ClockElement extends PositionedElement {
   final DateTime dateTime;
-  final String clockTheme;
 
   ClockElement({
     required super.offset,
@@ -403,7 +411,6 @@ class ClockElement extends PositionedElement {
     super.size,
     super.rotation,
     required super.id,
-    required this.clockTheme,
     required this.dateTime,
     required super.scale,
   });
@@ -424,7 +431,6 @@ class ClockElement extends PositionedElement {
   }) {
     return ClockElement(
       dateTime: time ?? dateTime,
-      clockTheme: theme ?? this.clockTheme,
       id: id,
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,

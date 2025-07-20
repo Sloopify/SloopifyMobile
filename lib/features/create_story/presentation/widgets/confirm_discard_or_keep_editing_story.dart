@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing_story/drawing_story_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/managers/app_gaps.dart';
@@ -37,6 +41,9 @@ class ConfirmDiscardOrKeepEditingStory extends StatelessWidget {
           _buildOption(
             text: "Discard Story",
             onTap: () {
+              context.read<StoryEditorCubit>().clearAll();
+              context.read<TextEditingCubit>().clearAll();
+              context.read<DrawingStoryCubit>().clearAll();
               Navigator.of(context).pop();
               Navigator.of(context).pop();
             },

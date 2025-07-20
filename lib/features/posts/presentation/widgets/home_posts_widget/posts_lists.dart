@@ -43,7 +43,6 @@ class PostsLists extends StatelessWidget {
                 ),
                 PollOption(
                   id: 'option3',
-
                   title: Text('option3', style: AppTheme.bodyText3),
                   votes: 20,
                 ),

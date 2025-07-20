@@ -1,3 +1,4 @@
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +21,19 @@ import '../../../domain/entities/otp_data_entity.dart';
 import '../../widgets/country_code_widget.dart';
 import '../../widgets/swith_sendotp_type.dart';
 
-class OtpForgetPassword extends StatelessWidget {
+class OtpForgetPassword extends StatefulWidget {
   OtpForgetPassword({super.key});
 
-  final _formKey = GlobalKey<FormState>();
   static const routeName = "otp_forget_password";
+
+  @override
+  State<OtpForgetPassword> createState() => _OtpForgetPasswordState();
+}
+
+class _OtpForgetPasswordState extends State<OtpForgetPassword> {
+  final _formKey = GlobalKey<FormState>();
+
+  TextEditingController phoneController = TextEditingController(text: "09");
 
   @override
   Widget build(BuildContext context) {
@@ -117,64 +126,89 @@ class OtpForgetPassword extends StatelessWidget {
                         ),
                         if (state.otpDataEntity.type ==
                             OtpSendType.phone) ...[
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                flex: 1,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom:
-                                    context
-                                        .read<
-                                        ForgetPasswordCubit
-                                    >()
-                                        .state
-                                        .hasPhoneNumberError
-                                        ? 16.0
-                                        : 0.0,
-                                  ),
-                                  child: CountryCodeWidget(
-                                    onChanged: (value) {
-                                      context
-                                          .read<ForgetPasswordCubit>()
-                                          .setDialCode(value);
-                                    },
-                                  ),
+                              Text(
+                                "mobile_number".tr(),
+                                style: AppTheme.headline4.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color:
+                                  state
+                                      .otpDataEntity
+                                      .phoneNumbers!
+                                      .isEmpty
+                                      ? ColorManager.disActive
+                                      .withOpacity(0.5)
+                                      : ColorManager.black,
                                 ),
                               ),
-                              Gaps.hGap2,
-                              Expanded(
-                                flex: 3,
-                                child: CustomTextField(
-                                  initialValue:
-                                  state.otpDataEntity.phoneNumbers,
-                                  labelText: 'mobile_number'.tr(),
-                                  onChanged: (value) {
-                                    context
-                                        .read<ForgetPasswordCubit>()
-                                        .setPhoneNumber(value);
-                                  },
-                                  withTitle: true,
-                                  hintText: 'mobile_number2'.tr(),
-                                  /*icon: Icons.email,*/
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                  validator: (value) {
-                                    final err =
-                                    Validator.phoneNumberValidator(
-                                      value!,
-                                      context,
-                                    );
-                                    context
-                                        .read<ForgetPasswordCubit>()
-                                        .setHasPhoneNumberError(
-                                      err != null,
-                                    );
-                                    return err;
-                                  },
-                                ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                        context
+                                            .read<
+                                            ForgetPasswordCubit
+                                        >()
+                                            .state
+                                            .hasPhoneNumberError
+                                            ? 16.0
+                                            : 0.0,
+                                      ),
+                                      child: CountryCodeWidget(
+                                        onChangedPhonePrefix: (value){
+                                          setState(() {
+                                            phoneController.text=value;
+                                          });
+                                        },
+                                        onChanged: (value) {
+                                          context
+                                              .read<ForgetPasswordCubit>()
+                                              .setDialCode(value);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Gaps.hGap2,
+                                  Expanded(
+                                    flex: 3,
+                                    child: CustomTextField(
+                                      initialValue:
+                                    null,
+                                      controller: phoneController,
+                                      labelText: 'mobile_number'.tr(),
+                                      onChanged: (value) {
+                                        context
+                                            .read<ForgetPasswordCubit>()
+                                            .setPhoneNumber(value);
+                                      },
+                                      withTitle: true,
+                                      hintText: 'mobile_number2'.tr(),
+                                      /*icon: Icons.email,*/
+                                      keyboardType: TextInputType.number,
+                                      textInputAction: TextInputAction.next,
+                                      validator: (value) {
+                                        final err =
+                                        Validator.phoneNumberValidator(
+                                          value!,
+                                          context,
+                                        );
+                                        context
+                                            .read<ForgetPasswordCubit>()
+                                            .setHasPhoneNumberError(
+                                          err != null,
+                                        );
+                                        return err;
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -243,7 +277,7 @@ class OtpForgetPassword extends StatelessWidget {
       Navigator.pushNamed(
         context,
         WriteOtpForgetPassword.routeName,
-        arguments: {"forgetPasswordCubit": context.read<ForgetPasswordCubit>()},
+        arguments: {"forgetPasswordCubit": context.read<ForgetPasswordCubit>()..startTimer()},
       );
     } else if (state.otpSendStatus == OtpSendStatus.offline) {
       showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);

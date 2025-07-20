@@ -9,6 +9,7 @@ import 'package:sloopify_mobile/features/auth/domain/use_cases/verify_otp_code_l
 import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_otp_code.dart';
 
 import '../../../../../core/errors/failures.dart';
+import '../../../../../core/utils/helper/country_code_helper.dart';
 import '../../../domain/entities/otp_login_data_entity.dart';
 import '../../../domain/use_cases/opt_login_use_case.dart';
 
@@ -47,7 +48,7 @@ class LoginCubit extends Cubit<LoginState> {
   }
   void setDialCode(String dialCode) {
     emit(
-      state.copyWith(countryCode: dialCode, loginStatus: LoginStatus.init),
+      state.copyWith(countryCode: dialCode, loginStatus: LoginStatus.init, ),
     );
   }
 

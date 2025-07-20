@@ -17,7 +17,7 @@ class FeelingModel extends FeelingEntity {
       status: json["status"] ?? "",
       updatedAt: json["updatedAt"]??"",
       createdAt: json["createdAt"]??"",
-      mobileIcon: json["mobileIcon"]??"",
+      mobileIcon: json["mobile_icon"]??"",
     );
   }
 }

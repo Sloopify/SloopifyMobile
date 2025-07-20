@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/audio_entity.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/media_story.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_story_audios_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_story_audio_use_case.dart';
 
@@ -54,7 +55,6 @@ class PlayAudioCubit extends Cubit<PlayAudioState> {
       ),
     );
   }
-
   setAudioName(String value) {
     emit(
       state.copyWith(
@@ -125,6 +125,7 @@ class PlayAudioCubit extends Cubit<PlayAudioState> {
         state.copyWith(
           page: 1,
           hasReachedEnd: false,
+          selectedAudioUrl: '',
           audioFiles: [],
           getAudioStatus: GetAudioStatus.loading,
         ),

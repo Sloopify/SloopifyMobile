@@ -16,6 +16,8 @@ class ForgetPasswordState extends Equatable {
   final SubmitForgetPasswordStatus submitForgetPasswordStatus;
   final bool hasPhoneNumberError;
   final String errorMessage;
+  final int timerSeconds;
+  final bool isTimerFinished;
 
   const ForgetPasswordState({
     required this.newPassword,
@@ -26,7 +28,9 @@ class ForgetPasswordState extends Equatable {
     required this.verifyOtpStatus,
     required this.otpSendStatus,
     required this.hasPhoneNumberError,
-    required this.errorMessage
+    required this.errorMessage,
+    required this.timerSeconds,
+    required this.isTimerFinished
   });
 
   @override
@@ -40,11 +44,15 @@ class ForgetPasswordState extends Equatable {
     verifyOtpStatus,
     submitForgetPasswordStatus,
     hasPhoneNumberError,
-    errorMessage
+    errorMessage,
+    timerSeconds,
+    isTimerFinished
   ];
 
   factory ForgetPasswordState.empty() {
     return ForgetPasswordState(
+      isTimerFinished: false,
+      timerSeconds: 300,
       newPassword: "",
       otpDataEntity: OtpDataEntity.fromEmpty(),
       verifyOtpEntity: VerifyOtpEntity.fromEmpty(),
@@ -71,9 +79,13 @@ class ForgetPasswordState extends Equatable {
     VerifyOtpStatus? verifyOtpStatus,
     SubmitForgetPasswordStatus? submitForgetPasswordStatus,
     bool? hasPhoneNumberError,
-    String? errorMessage
+    String? errorMessage,
+    bool? isTimerFinished,
+    int ? timerSeconds
   }) {
     return ForgetPasswordState(
+      timerSeconds: timerSeconds??this.timerSeconds,
+      isTimerFinished: isTimerFinished??this.isTimerFinished,
       errorMessage: errorMessage??this.errorMessage,
       hasPhoneNumberError: hasPhoneNumberError??this.hasPhoneNumberError,
       newPassword: newPassword ?? this.newPassword,

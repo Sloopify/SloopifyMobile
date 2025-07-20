@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sloopify_mobile/core/managers/color_manager.dart';
 
 import '../blocs/drawing_story/drawing_story_cubit.dart';
 
@@ -20,7 +21,8 @@ class DrawingColorPallete extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             children:
             [
-              Colors.red,
+              ColorManager.primaryColor,
+              ColorManager.offWhite,
               Colors.blue,
               Colors.green,
               Colors.yellow,

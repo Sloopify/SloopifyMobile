@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
+import 'package:sloopify_mobile/core/utils/helper/country_code_helper.dart';
 
 class CountryCodeWidget extends StatefulWidget {
   final Function(String dialCode) onChanged;
+  final Function(String phonePrefix) onChangedPhonePrefix;
 
-  const CountryCodeWidget({super.key,required this.onChanged});
+  const CountryCodeWidget({super.key,required this.onChanged,required this.onChangedPhonePrefix});
 
   @override
   State<CountryCodeWidget> createState() => _CountryCodeWidgetState();
@@ -15,6 +17,7 @@ class CountryCodeWidget extends StatefulWidget {
 
 class _CountryCodeWidgetState extends State<CountryCodeWidget> {
    String dialCode="+963";
+   String phoneHint="09";
 
 
 
@@ -56,10 +59,13 @@ class _CountryCodeWidgetState extends State<CountryCodeWidget> {
                   MediaQuery.of(context).size.height * 0.6,
                 ),
                 onChanged: (value) {
+                  final data = countryMobilePrefixes[value.code];
                   setState(() {
                     dialCode=value.dialCode??"+963";
+                    phoneHint=data?['prefix']??"";
                   });
                   widget.onChanged(dialCode);
+                  widget.onChangedPhonePrefix(phoneHint);
                 },
                 // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
                 initialSelection: 'Sy',

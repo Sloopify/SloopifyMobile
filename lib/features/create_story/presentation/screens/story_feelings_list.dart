@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 
@@ -193,6 +194,7 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
     return BlocBuilder<FeelingsActivitiesCubit, FeelingsActivitiesState>(
       builder: (context, state) {
         print(state.selectedFeeling);
+        print(feeling.mobileIcon);
         return InkWell(
           onTap: () {
             if (context.read<FeelingsActivitiesCubit>().state.selectedFeeling ==
@@ -216,11 +218,7 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
             ),
             child: Row(
               children: [
-                GeneralImage.circular(
-                  radius: 25,
-                  isNetworkImage: true,
-                  image: feeling.mobileIcon,
-                ),
+              SvgPicture.network(feeling.mobileIcon),
                 Gaps.hGap1,
                 Text(
                   feeling.name,

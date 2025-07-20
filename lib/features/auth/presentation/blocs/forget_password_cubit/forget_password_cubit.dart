@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -22,6 +24,7 @@ class ForgetPasswordCubit extends Cubit<ForgetPasswordState> {
     required this.verifyCodeForgetPasswordUseCase,
     required this.requestCodeForgetPasswordUseCase,
   }) : super(ForgetPasswordState.empty());
+  Timer? _timer;
 
   void setLoginType(OtpSendType otpType) {
     emit(
@@ -32,7 +35,30 @@ class ForgetPasswordCubit extends Cubit<ForgetPasswordState> {
   void setEmail(String email) {
     emit(state.copyWith(email: email, otpSendStatus: OtpSendStatus.init));
   }
-
+  Future<void> startTimer() async {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (state.timerSeconds > 0) {
+        emit(
+          state.copyWith(
+              timerSeconds: state.timerSeconds - 1,
+              isTimerFinished: false,
+              otpSendStatus: OtpSendStatus.init,
+              verifyOtpStatus: VerifyOtpStatus.init
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+              timerSeconds: 0,
+              isTimerFinished: true,
+              otpSendStatus: OtpSendStatus.init,
+              verifyOtpStatus: VerifyOtpStatus.init
+          ),
+        );
+        _timer?.cancel();
+      }
+    });
+  }
   void setNewPassword(String password) {
     emit(
       state.copyWith(
@@ -94,7 +120,7 @@ class ForgetPasswordCubit extends Cubit<ForgetPasswordState> {
     );
   }
 
-  void requestOtp() async {
+  void requestOtp({bool fromReset=false}) async {
     if (state.otpDataEntity.type == OtpSendType.phone) {
       if (state.otpDataEntity.countryCode == "+963") {
         setFullMobileNumber(
@@ -115,7 +141,7 @@ class ForgetPasswordCubit extends Cubit<ForgetPasswordState> {
         _mapFailureToState(emit, f, state);
       },
       (data) async {
-        emit(state.copyWith(otpSendStatus: OtpSendStatus.success));
+        emit(state.copyWith(otpSendStatus:fromReset?OtpSendStatus.init: OtpSendStatus.success));
       },
     );
   }

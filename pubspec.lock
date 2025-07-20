@@ -682,14 +682,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
-  flutter_lints:
-    dependency: "direct main"
-    description:
-      name: flutter_lints
-      sha256: "5398f14efa795ffb7a33e9b6a08798b26a180edac4ad7db3f231e40f82ce11e1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0"
   flutter_localizations:
     dependency: transitive
     description: flutter
@@ -752,7 +744,7 @@ packages:
     source: hosted
     version: "2.2.0"
   flutter_test:
-    dependency: "direct main"
+    dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -1057,6 +1049,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  icons_launcher:
+    dependency: "direct main"
+    description:
+      name: icons_launcher
+      sha256: adaa4d5e30358954fe7817b77cd937700477cfcd06ba39268d49c20efdd7ed01
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.7"
   image:
     dependency: "direct main"
     description:
@@ -1241,14 +1241,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  lints:
-    dependency: transitive
-    description:
-      name: lints
-      sha256: c35bb79562d980e9a453fc715854e1ed39e24e7d0297a880ef54e17f9874a9d7
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.1"
   logger:
     dependency: "direct main"
     description:
@@ -1878,6 +1870,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  universal_io:
+    dependency: transitive
+    description:
+      name: universal_io
+      sha256: "1722b2dcc462b4b2f3ee7d188dad008b6eb4c40bbd03a3de451d82c78bba9aad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
   url_launcher:
     dependency: transitive
     description:
