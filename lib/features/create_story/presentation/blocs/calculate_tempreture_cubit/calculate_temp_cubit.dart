@@ -16,8 +16,7 @@ class CalculateTempCubit extends Cubit<CalculateTempState> {
     emit(state.copyWith(status: CalculateTempStatus.loading));
     final position = await LocationService.getLocationCoords();
     if (position != null) {
-      pragma('nnnnnnnnnnnnnnn${position.lng}');
-      return await fetchWeatherDetails(position.lat, position.lng);
+      return await fetchTemperature(position.lat, position.lng);
     }
     return null;
   }
@@ -48,16 +47,19 @@ class CalculateTempCubit extends Cubit<CalculateTempState> {
       final data = jsonDecode(response.body);
       if (data != null) {
         final temp = data['main']['temp'].toDouble();
-        print('ttttttttttttttt${temp}');
         final iconCode = data['weather'][0]['icon'];
-        print('iccccon${iconCode}');
         final isDay = iconCode.contains('d');
-        print('dddddddddddddddddd${isDay}');
         final weatherCode = data['weather'][0]['id'];
-        print('weather code ${weatherCode}');
         String weatherIcon = getWeatherSticker();
+        final TemperatureElement temperatureElement = TemperatureElement(
+          value: state.tempC,
+          id: Uuid().v4(),
+          weatherCode: state.weatherCode,
+          isDay: state.isDay,
+        );
         emit(
           state.copyWith(
+            element: temperatureElement,
             tempC: temp,
             isDay: isDay,
             weatherCode: weatherCode,
@@ -65,14 +67,6 @@ class CalculateTempCubit extends Cubit<CalculateTempState> {
             weatherIcon: weatherIcon,
           ),
         );
-        final TemperatureElement temperatureElement = TemperatureElement(
-          value: state.tempC,
-          id: Uuid().v4(),
-          weatherCode: state.weatherIcon,
-          isDay: state.isDay,
-        );
-        emit(state.copyWith(element: temperatureElement));
-
       }
     } else {
       emit(state.copyWith(status: CalculateTempStatus.error));

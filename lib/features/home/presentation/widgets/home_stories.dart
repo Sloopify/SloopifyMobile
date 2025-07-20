@@ -40,7 +40,20 @@ class HomeStories extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.of(context).pushNamed(CreateStoryFirstStep.routeName);
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) =>
+                          MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) => StoryEditorCubit(),
+                              ),
+                              BlocProvider(create: (context) => locator<FeelingsActivitiesCubit>()),
+                              BlocProvider(create: (context) => locator<PostFriendsCubit>()),
+                              BlocProvider(create: (context) => locator<AddLocationCubit>()),
+
+                            ],
+                            child: CreateStoryFirstStep(),
+                          )));
                 },
                 child: SvgPicture.asset(AssetsManager.addStory),
               ),

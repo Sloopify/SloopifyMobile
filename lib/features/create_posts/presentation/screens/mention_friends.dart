@@ -10,24 +10,22 @@ import 'package:sloopify_mobile/core/ui/widgets/custom_footer.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_text_field.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/select_frind_item.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../blocs/post_friends_cubit/post_freinds_cubit.dart';
 
 class MentionFriends extends StatelessWidget {
-  final bool fromStory;
   static const routeName = "mention_friends";
 
-  const MentionFriends({super.key,this.fromStory=false});
+  const MentionFriends({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: getCustomAppBar(
-          context: context,
-          title:
-          "Mention friends"
+        context: context,
+        title:
+       "Mention friends"
       ),
       body: SafeArea(
         child: Padding(
@@ -77,123 +75,98 @@ class MentionFriends extends StatelessWidget {
                   ),
                   Gaps.vGap3,
                   if (state.getAllFriendStatus ==
-                      GetAllFriendStatus.loading &&
-                      state.allFriends.isEmpty) ...[
+                      GetAllFriendStatus.loading && state.allFriends.isEmpty) ...[
                     Center(child: CircularProgressIndicator()),
-                  ] else
-                    if (state.getAllFriendStatus ==
-                        GetAllFriendStatus.offline) ...[
-                      Center(
-                        child: Text(
-                          "you are offline",
-                          style: AppTheme.headline4,
+                  ] else if (state.getAllFriendStatus ==
+                      GetAllFriendStatus.offline) ...[
+                    Center(
+                      child: Text(
+                        "you are offline",
+                        style: AppTheme.headline4,
+                      ),
+                    ),
+                  ] else if (state.getAllFriendStatus ==
+                      GetAllFriendStatus.error) ...[
+                    Center(
+                      child: Text(
+                        state.errorMessage,
+                        style: AppTheme.headline4,
+                      ),
+                    ),
+                  ] else...[
+                    Expanded(
+                      child: SmartRefresher(
+                        controller:
+                        context
+                            .read<PostFriendsCubit>()
+                            .refreshController,
+                        enablePullUp: true,
+                        enablePullDown: true,
+                        onRefresh:
+                            () =>
+                            context
+                                .read<PostFriendsCubit>()
+                                .onRefresh(),
+                        onLoading:
+                            () =>
+                            context
+                                .read<PostFriendsCubit>()
+                                .onLoadMore(),
+                        footer: customFooter,
+                        child: ListView.separated(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          itemCount: state.allFriends.length,
+                          itemBuilder: (context, index) {
+                            bool isSelcetd = state.selectedMentionFriends
+                                .contains(state.allFriends[index].id);
+                            return SelectFriendItem(
+                              friendEntity: state.allFriends[index],
+                              onChanged: (value) {
+                                context
+                                    .read<PostFriendsCubit>()
+                                    .toggleSelectionMentionFriends(
+                                  state.allFriends[index].id,
+                                );
+                                context
+                                    .read<CreatePostCubit>()
+                                    .setMentionFriends(
+                                  state.selectedMentionFriends,
+                                );
+                              },
+                              initValue: isSelcetd,
+                            );
+                          },
+                          separatorBuilder: (
+                              BuildContext context,
+                              int index,
+                              ) {
+                            return Gaps.vGap2;
+                          },
                         ),
                       ),
-                    ] else
-                      if (state.getAllFriendStatus ==
-                          GetAllFriendStatus.error) ...[
-                        Center(
-                          child: Text(
-                            state.errorMessage,
-                            style: AppTheme.headline4,
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        height: 50,
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        margin: EdgeInsets.symmetric(vertical: 20),
+                        width: double.infinity,
+                        color: ColorManager.white,
+                        child: CustomElevatedButton(
+                          label: "Done",
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          borderSide: BorderSide(
+                            color: ColorManager.primaryColor.withOpacity(0.3),
                           ),
+                          backgroundColor: ColorManager.primaryColor.withOpacity(0.3),
                         ),
-                      ] else
-                        ...[
-                          Expanded(
-                            child: SmartRefresher(
-                              controller:
-                              context
-                                  .read<PostFriendsCubit>()
-                                  .refreshController,
-                              enablePullUp: true,
-                              enablePullDown: true,
-                              onRefresh:
-                                  () =>
-                                  context
-                                      .read<PostFriendsCubit>()
-                                      .onRefresh(),
-                              onLoading:
-                                  () =>
-                                  context
-                                      .read<PostFriendsCubit>()
-                                      .onLoadMore(),
-                              footer: customFooter,
-                              child: ListView.separated(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                itemCount: state.allFriends.length,
-                                itemBuilder: (context, index) {
-                                  bool isSelcetd = fromStory ? state
-                                      .selectedMentionFriendId ==
-                                      state.allFriends[index].id : state
-                                      .selectedMentionFriends
-                                      .contains(state.allFriends[index].id);
-                                  return SelectFriendItem(
-                                    friendEntity: state.allFriends[index],
-                                    onChanged: (value) {
-                                      if (!fromStory) {
-                                        context
-                                            .read<PostFriendsCubit>()
-                                            .toggleSelectionMentionFriends(
-                                          state.allFriends[index].id,
-                                        );
-                                        context
-                                            .read<CreatePostCubit>()
-                                            .setMentionFriends(
-                                          state.selectedMentionFriends,
-                                        );
-                                      } else {
-                                        context
-                                            .read<PostFriendsCubit>()
-                                            .selectMentionFriends(
-                                            state.allFriends[index].id,
-                                            '${state.allFriends[index]
-                                                .firstName} ${state
-                                                .allFriends[index].lastName}');
-                                        context
-                                            .read<StoryEditorCubit>()
-                                            .addMentionElement(friendId: state
-                                            .selectedMentionFriendId,
-                                            friendName: state.selectedMentionName);
-                                      }
-                                    },
-                                    initValue: isSelcetd,
-                                  );
-                                },
-                                separatorBuilder: (BuildContext context,
-                                    int index,) {
-                                  return Gaps.vGap2;
-                                },
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Container(
-                              height: 50,
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              margin: EdgeInsets.symmetric(vertical: 20),
-                              width: double.infinity,
-                              color: ColorManager.white,
-                              child: CustomElevatedButton(
-                                label: "Done",
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                width: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width * 0.7,
-                                borderSide: BorderSide(
-                                  color: ColorManager.primaryColor.withOpacity(
-                                      0.3),
-                                ),
-                                backgroundColor: ColorManager.primaryColor
-                                    .withOpacity(0.3),
-                              ),
-                            ),
-                          ),
-                        ]
+                      ),
+                    ),
+                  ]
 
                 ],
               );

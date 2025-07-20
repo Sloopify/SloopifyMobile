@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:sloopify_mobile/core/managers/app_gaps.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/managers/color_manager.dart';
@@ -11,15 +8,11 @@ import '../../../../core/managers/theme_manager.dart';
 class AudioPlayerWidget extends StatefulWidget {
   final String voice;
   final String audioName;
-  final String audioImage;
-  final int audioId;
 
   const AudioPlayerWidget({
     super.key,
     required this.voice,
     required this.audioName,
-    required this.audioImage,
-    required this.audioId,
   });
 
   @override
@@ -35,7 +28,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   void initState() {
     super.initState();
     player.setUrl(widget.voice);
-    player.play();
 
     initializePlayer();
     player.playerStateStream.listen((state) {
@@ -72,6 +64,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       initializePlayer();
       player.play();
       setState(() {});
+
     }
   }
 
@@ -87,22 +80,18 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       height: 60,
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(AppPadding.p10),
-      decoration: BoxDecoration(color: ColorManager.primaryColor),
+      decoration: BoxDecoration(color: ColorManager.white),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             widget.audioName,
-            style: AppTheme.headline3.copyWith(
-              fontWeight: FontWeight.w500,
-              color: ColorManager.white,
-            ),
+            style: AppTheme.headline4.copyWith(fontWeight: FontWeight.w500),
           ),
           Spacer(),
           _playIcon(),
-          Gaps.hGap1,
-          _buildSelectAudioIcon(context),
         ],
       ),
     );
@@ -113,30 +102,18 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       onTap: () {
         handlePlaying();
       },
-      child: Icon(
-        player.playing ? Icons.pause : Icons.square,
-        color: ColorManager.white,
-      ),
-    );
-  }
-
-  Widget _buildSelectAudioIcon(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        context.read<StoryEditorCubit>().addAudioElement(
-          audioId: widget.audioId,
-          audioImage: widget.audioImage,
-          audioName: widget.audioName,
-        );
-        Navigator.of(context).pop();
-      },
       child: Container(
-        padding: EdgeInsets.all(AppPadding.p8),
+        alignment: Alignment.center,
+        width: 34,
+        height: 34,
         decoration: BoxDecoration(
-          color: ColorManager.white,
+          color: Colors.black12,
           shape: BoxShape.circle,
         ),
-        child: Icon(Icons.arrow_forward, color: ColorManager.black),
+        child: Icon(
+          player.playing ? Icons.pause : Icons.square,
+          color: ColorManager.white,
+        ),
       ),
     );
   }

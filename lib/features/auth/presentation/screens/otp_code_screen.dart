@@ -37,8 +37,8 @@ class OtpCodeScreen extends StatelessWidget {
     return Scaffold(
       appBar: getCustomAppBar(context: context),
       body: BlocConsumer<
-          VerifyAccountBySignupCubit,
-          VerifyAccountBySignupState
+        VerifyAccountBySignupCubit,
+        VerifyAccountBySignupState
       >(
         listener: (context, state) {
           _buildVerifyCodeListener(state, context);
@@ -65,18 +65,14 @@ class OtpCodeScreen extends StatelessWidget {
                     ),
                     Gaps.vGap1,
                     Text(
-                      'Code has been sent to your ${state.otpSendType ==
-                          OtpSendType.phone ? 'phone number' : "E-mail"}',
+                      'Code has been sent to your ${state.otpSendType == OtpSendType.phone ? 'phone number' : "E-mail"}',
                       style: AppTheme.bodyText3.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     Gaps.vGap1,
                     SizedBox(
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.8,
+                      width: MediaQuery.of(context).size.width * 0.8,
                       child: PinCodeTextField(
                         errorTextMargin: EdgeInsets.only(top: AppPadding.p4),
                         errorTextSpace: 20,
@@ -147,14 +143,14 @@ class OtpCodeScreen extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: formatDuration(state.timerSeconds),
+                              text: state.timerSeconds.toString(),
                               style: AppTheme.headline4.copyWith(
                                 fontWeight: FontWeight.w500,
                                 color: ColorManager.primaryColor,
                               ),
                             ),
                             TextSpan(
-                              text: ' m',
+                              text: ' s',
                               style: AppTheme.headline4.copyWith(
                                 fontWeight: FontWeight.w500,
                               ),
@@ -162,101 +158,74 @@ class OtpCodeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ] else
-                      ...[
-                        InkWell(
-                          onTap: state.otpRegisterStatus==OtpRegisterStatus.init?() {
-                            if (state.isTimerFinished) {
-                              context
-                                  .read<VerifyAccountBySignupCubit>()
-                                  .registerOtp(
-                                fromReset: true,
-                                email:
-                                fromSignUp
-                                    ? email ?? ""
-                                    : context
-                                    .read<AuthRepo>()
-                                    .getUserInfo()
-                                    ?.email ??
-                                    "",
+                    ] else ...[
+                      InkWell(
+                        onTap: () {
+                          if (state.isTimerFinished) {
+                            context.read<VerifyAccountBySignupCubit>().registerOtp(
+                              fromReset: true,
+                              email:
+                                  fromSignUp
+                                      ? email ?? ""
+                                      : context
+                                              .read<AuthRepo>()
+                                              .getUserInfo()
+                                              ?.email ??
+                                          "",
 
-                                phoneNumber:
-                                fromSignUp
-                                    ? phoneNumber ?? ""
-                                    : "${context
-                                    .read<AuthRepo>()
-                                    .getUserInfo()
-                                    ?.phoneNumberEntity
-                                    .code}${context
-                                    .read<AuthRepo>()
-                                    .getUserInfo()
-                                    ?.phoneNumberEntity
-                                    .phoneNumber}",
-                              );
-                            }
-                          }:(){},
-                          child:  Text(
-                            state.otpRegisterStatus == OtpRegisterStatus.loading
-                                ? "Re-sending code..."
-                                : state.otpRegisterStatus == OtpRegisterStatus.init
-                                ? "Resend code"
-                                : "",
-                            style: AppTheme.headline4.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: ColorManager.black,
-                            ),
+                              phoneNumber:
+                                  fromSignUp
+                                      ? phoneNumber ?? ""
+                                      : "${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.code}${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.phoneNumber}",
+                            );
+                          }
+                        },
+                        child: Text(
+                          "Resend code",
+                          style: AppTheme.headline4.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: ColorManager.black,
                           ),
                         ),
-                      ],
+                      ),
+                    ],
                     Gaps.vGap4,
                     InkWell(
                       onTap:
-                      state.verifyRegisterOtpStatus ==
-                          VerifyRegisterOtpStatus.loading
-                          ? () {}
-                          : () {
-                        if (state.verifyOtpEntity.otp.length != 6) {
-                          return;
-                        } else {
-                          context
-                              .read<VerifyAccountBySignupCubit>()
-                              .verifyOtpLogin(
-                            email:
-                            fromSignUp
-                                ? email ?? ""
-                                : context
-                                .read<AuthRepo>()
-                                .getUserInfo()
-                                ?.email ??
-                                "",
-                            phoneNumber:
-                            fromSignUp
-                                ? phoneNumber ?? ""
-                                : "${context
-                                .read<AuthRepo>()
-                                .getUserInfo()
-                                ?.phoneNumberEntity
-                                .code}${context
-                                .read<AuthRepo>()
-                                .getUserInfo()
-                                ?.phoneNumberEntity
-                                .phoneNumber}",
-                          );
-                        }
-                      },
+                          state.verifyRegisterOtpStatus ==
+                                  VerifyRegisterOtpStatus.loading
+                              ? () {}
+                              : () {
+                                if (state.verifyOtpEntity.otp.length != 6) {
+                                  return;
+                                } else {
+                                  context
+                                      .read<VerifyAccountBySignupCubit>()
+                                      .verifyOtpLogin(
+                                        email:
+                                            fromSignUp
+                                                ? email ?? ""
+                                                : context
+                                                        .read<AuthRepo>()
+                                                        .getUserInfo()
+                                                        ?.email ??
+                                                    "",
+                                        phoneNumber:
+                                            fromSignUp
+                                                ? phoneNumber ?? ""
+                                                : "${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.code}${context.read<AuthRepo>().getUserInfo()?.phoneNumberEntity.phoneNumber}",
+                                      );
+                                }
+                              },
                       child: Container(
-                        height: 50,
                         alignment: Alignment.center,
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width * 0.7,
+                        width: MediaQuery.of(context).size.width * 0.7,
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color:
-                          state.verifyOtpEntity.otp.length != 6
-                              ? ColorManager.disActive.withOpacity(0.3)
-                              : ColorManager.primaryColor,
+                              state.verifyOtpEntity.otp.length != 6
+                                  ? ColorManager.disActive.withOpacity(0.3)
+                                  : ColorManager.primaryColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -268,22 +237,16 @@ class OtpCodeScreen extends StatelessWidget {
                           ],
                         ),
                         child:
-                        state.verifyRegisterOtpStatus ==
-                            VerifyRegisterOtpStatus.loading
-                            ? FittedBox(
-                              child: CircularProgressIndicator(
-                                                        color: ColorManager.white,
-                                                      ),
-                            )
-                            : FittedBox(
-                              child: Text(
-                                                        "verify",
-                                                        style: AppTheme.headline4.copyWith(
-                              color: ColorManager.white,
-                              fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                            ),
+                            state.verifyRegisterOtpStatus ==
+                                    VerifyRegisterOtpStatus.loading
+                                ? CircularProgressIndicator(color: ColorManager.white,)
+                                : Text(
+                                  "verify",
+                                  style: AppTheme.headline4.copyWith(
+                                    color: ColorManager.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                       ),
                     ),
                   ],
@@ -296,8 +259,10 @@ class OtpCodeScreen extends StatelessWidget {
     );
   }
 
-  void _buildVerifyCodeListener(VerifyAccountBySignupState state,
-      BuildContext context,) {
+  void _buildVerifyCodeListener(
+    VerifyAccountBySignupState state,
+    BuildContext context,
+  ) {
     if (state.verifyRegisterOtpStatus == VerifyRegisterOtpStatus.success) {
       showSnackBar(
         context,
@@ -307,21 +272,13 @@ class OtpCodeScreen extends StatelessWidget {
       Navigator.pushNamedAndRemoveUntil(
         context,
         AppWrapper.routeName,
-            (route) => false,
+        (route) => false,
       );
     } else if (state.verifyRegisterOtpStatus ==
         VerifyRegisterOtpStatus.offline) {
-      showSnackBar(context, 'no_internet_connection'.tr(), isOffline: true);
+      showSnackBar(context, 'no_internet_connection'.tr(),isOffline: true);
     } else if (state.verifyRegisterOtpStatus == VerifyRegisterOtpStatus.error) {
-      showSnackBar(context, state.errorMessage, isError: true);
+      showSnackBar(context, state.errorMessage,isError: true);
     }
-  }
-
-  String formatDuration(int seconds) {
-    final minutes = seconds ~/ 60;
-    final remainingSeconds = seconds % 60;
-    final minutesStr = minutes.toString().padLeft(2, '0');
-    final secondsStr = remainingSeconds.toString().padLeft(2, '0');
-    return '$minutesStr:$secondsStr';
   }
 }

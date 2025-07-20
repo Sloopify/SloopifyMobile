@@ -4,6 +4,7 @@ import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
+import 'package:sloopify_mobile/features/inbox/presentation/screen/inbox_page.dart';
 
 import '../../../chat_system/presentation/screens/inbox_messages_screen.dart';
 
@@ -31,10 +32,13 @@ class HomeHeader extends StatelessWidget {
               SvgPicture.asset(AssetsManager.notification),
               Gaps.hGap8,
               InkWell(
-                onTap: (){
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>InboxMessagesScreen()));
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => InboxScreen()),
+                  );
                 },
-                  child: SvgPicture.asset(AssetsManager.messages)),
+                child: SvgPicture.asset(AssetsManager.messages),
+              ),
             ],
           ),
         ],

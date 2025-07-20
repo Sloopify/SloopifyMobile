@@ -129,14 +129,14 @@ class WriteOtpCodeScreen extends StatelessWidget {
                                 ),
                               ),
                               TextSpan(
-                                text: formatDuration(state.timerSeconds),
+                                text: state.timerSeconds.toString(),
                                 style: AppTheme.headline4.copyWith(
                                   fontWeight: FontWeight.w500,
                                   color: ColorManager.primaryColor,
                                 ),
                               ),
                               TextSpan(
-                                text: ' m',
+                                text: ' s',
                                 style: AppTheme.headline4.copyWith(
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -146,22 +146,15 @@ class WriteOtpCodeScreen extends StatelessWidget {
                         ),
                       ] else ...[
                         InkWell(
-                          onTap:
-                              state.otpLoginStatus == OtpLoginStatus.init
-                                  ? () {
-                                    if (state.isTimerFinished) {
-                                      context
-                                          .read<LoginWithOtpCubit>()
-                                          .otpLogin(fromReset: true);
-                                    }
-                                  }
-                                  : () {},
+                          onTap: () {
+                            if (state.isTimerFinished) {
+                              context.read<LoginWithOtpCubit>().otpLogin(
+                                fromReset: true,
+                              );
+                            }
+                          },
                           child: Text(
-                            state.otpLoginStatus == OtpLoginStatus.loading
-                                ? "Re-sending code..."
-                                : state.otpLoginStatus == OtpLoginStatus.init
-                                ? "Resend code"
-                                : "",
+                            "Resend code",
                             style: AppTheme.headline4.copyWith(
                               fontWeight: FontWeight.w500,
                               color: ColorManager.black,
@@ -188,12 +181,10 @@ class WriteOtpCodeScreen extends StatelessWidget {
                                 : () {
                                   if (state.verifyOtpEntity.otp.length != 6) {
                                     return;
-                                  } else{
-                                    context
-                                        .read<LoginWithOtpCubit>()
-                                        .verifyOtpLogin();
-                                  }
-
+                                  } else {}
+                                  context
+                                      .read<LoginWithOtpCubit>()
+                                      .verifyOtpLogin();
                                 },
                         isBold: true,
                         backgroundColor:
@@ -205,7 +196,7 @@ class WriteOtpCodeScreen extends StatelessWidget {
                             state.verifyOtpEntity.otp.length != 6
                                 ? BorderSide(
                                   color: ColorManager.disActive.withOpacity(
-                                    0.2,
+                                    0.3,
                                   ),
                                 )
                                 : null,
@@ -238,12 +229,5 @@ class WriteOtpCodeScreen extends StatelessWidget {
     } else if (state.verifyOtpLoginStatus == VerifyOtpLoginStatus.error) {
       showSnackBar(context, state.errorMessage);
     }
-  }
-  String formatDuration(int seconds) {
-    final minutes = seconds ~/ 60;
-    final remainingSeconds = seconds % 60;
-    final minutesStr = minutes.toString().padLeft(2, '0');
-    final secondsStr = remainingSeconds.toString().padLeft(2, '0');
-    return '$minutesStr:$secondsStr';
   }
 }

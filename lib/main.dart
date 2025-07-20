@@ -28,36 +28,34 @@ Future<void> main() async {
       fallbackLocale: const Locale('en'),
       startLocale: Locale('en'),
       saveLocale: true,
-      child: MyApp(authRepo: AuthRepoImpl(),),
+      child: MyApp(authRepo: AuthRepoImpl()),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepo authRepo;
-  const MyApp({super.key,required this.authRepo});
+  const MyApp({super.key, required this.authRepo});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        RepositoryProvider(
-          create: (context) => authRepo,
-        ),
+        RepositoryProvider(create: (context) => authRepo),
         BlocProvider(
-          create: (context) => AuthenticationBloc(
-            authRepository: authRepo,
-            verifyTokenUseCase: sl.locator<VerifyTokenUseCase>(),
-          ),
+          create:
+              (context) => AuthenticationBloc(
+                authRepository: authRepo,
+                verifyTokenUseCase: sl.locator<VerifyTokenUseCase>(),
+              ),
         ),
       ],
       child: ScreenUtilInit(
         //my emulator Nexus 6 width and height
         designSize: const Size(411.42857142857144, 683.4285714285714),
         builder:
-            (context, child) =>
-            MaterialApp(
+            (context, child) => MaterialApp(
               debugShowCheckedModeBanner: false,
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: LanguagesManager.languages.values.toList(),
@@ -70,6 +68,4 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-
-
 }

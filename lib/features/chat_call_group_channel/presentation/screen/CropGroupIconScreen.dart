@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
-import 'package:sloopify_mobile/features/chat_friend/presentation/bloc/group/group_icon_picker_bloc.dart';
-import 'package:sloopify_mobile/features/chat_friend/presentation/bloc/group/group_icon_picker_state.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/group/group_icon_picker_bloc.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/group/group_icon_picker_state.dart';
 
 class CropGroupIconScreen extends StatelessWidget {
   const CropGroupIconScreen({super.key});

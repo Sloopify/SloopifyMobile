@@ -6,12 +6,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_manager/photo_manager.dart';
 import 'package:sloopify_mobile/core/utils/location_service.dart';
-import 'package:sloopify_mobile/features/create_story/domain/entities/media_story.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_state.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_audience/choose_story_audience.dart';
 
-import '../../../../../core/ui/widgets/text_editor_widget.dart';
 import '../../../../../core/utils/helper/postioned_element_story_theme.dart';
 import '../../../../create_posts/domain/entities/media_entity.dart';
 import '../../../domain/entities/all_positioned_element.dart';
@@ -19,6 +17,8 @@ import 'package:uuid/uuid.dart';
 
 import '../../../domain/entities/story_entity.dart';
 import '../../../domain/entities/text_properties_story.dart';
+
+enum EditingMode { normal, draw, text, sticker }
 
 class StoryEditorCubit extends Cubit<StoryEditorState> {
   StoryEditorCubit() : super(const StoryEditorState());
@@ -34,47 +34,8 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     emit(state.copyWith(selectedMedia: updated));
   }
 
-  selectOneMedia(AssetEntity asset) async {
-    final file = await asset.file;
-    final MediaStory mediaStory = MediaStory(
-      file: file,
-      isVideoFile: asset.type == AssetType.video,
-      id: Uuid().v4(),
-    );
+  void selectOneMedia(AssetEntity asset) {
     emit(state.copyWith(selectedMedia: [...state.selectedMedia, asset]));
-    final List<MediaStory> media = List.from(state.mediaFiles ?? []);
-    media.add(mediaStory);
-    emit(state.copyWith(mediaFiles: media));
-  }
-
-  void updateSingleMedia(MediaStory updatedMedia) {
-    final List<MediaStory> current = List.from(state.mediaFiles ?? []);
-    final index = current.indexWhere((e) => e.id == updatedMedia.id);
-    if (index != -1) {
-      current[index] = updatedMedia;
-      emit(state.copyWith(mediaFiles: current));
-    }
-  }
-
-  // void toggleVideoMute(MediaStory updatedMedia) {
-  //   final List<MediaStory> current = List.from(state.mediaFiles ?? []);
-  //   final index = current.indexWhere((e) => e.id == updatedMedia.id);
-  //   if (index != -1) {
-  //     current[index] = updatedMedia;
-  //     current[index].copyWith(isVideoMuted: !(updatedMedia.isVideoFile));
-  //     emit(state.copyWith(mediaFiles: current));
-  //   }
-  // }
-  void onUpdateAttributeOneMedia(double scale, Offset offset, double rotation) {
-    final currentOne = state.mediaFiles!.first;
-    final updatedMedia = currentOne.copyWith(
-      scale: scale,
-      rotateAngle: rotation,
-      offset: offset,
-    );
-    emit(state.copyWith(selectedEditedMedia: updatedMedia));
-    List<MediaStory> elements = List.from(state.mediaFiles ?? []);
-    elements.add(updatedMedia);
   }
 
   void clearSelection() => emit(state.copyWith(selectedMedia: []));
@@ -111,17 +72,49 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     );
   }
 
-  addTextElement({required List<PositionedTextElement> newElement}) {
-    emit(state.copyWith(textElements: newElement));
-  }
-
-  void setBackGroundGradiant(GradientBackground gradiant) {
-    emit(
-      state.copyWith(
-        backgroundColors: gradientToArray(gradiant),
-        gradiant: gradiant,
+  addTextElement({
+    required String text,
+    Color? color,
+    String? fontType,
+    bool? bold,
+    bool? italic,
+    bool? underline,
+    String? alignment,
+    required int id,
+    Offset? offset,
+    Size? size,
+    double? rotation,
+    double? scale,
+  }) {
+    final currentTextProperties =
+        state.textProperties ?? TextPropertiesForStory.empty();
+    final newElement = PositionedTextElement(
+      scale: scale,
+      text: text,
+      id: Uuid().v4(),
+      offset: offset,
+      size: size,
+      rotation: rotation,
+      positionedElementStoryTheme: null,
+      textPropertiesForStory: currentTextProperties.copyWith(
+        color: color,
+        alignment: alignment,
+        bold: bold,
+        fontType: fontType,
+        italic: italic,
+        underline: underline,
       ),
     );
+    emit(
+      state.copyWith(
+        positionedElements: List.from(state.positionedElements)
+          ..add(newElement),
+      ),
+    );
+  }
+
+  void updateBackgroundColors(List<String> colors) {
+    emit(state.copyWith(backgroundColors: colors));
   }
 
   void toggleVideoMute() {
@@ -140,7 +133,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     required int id,
     required String cityName,
     required String countryName,
-    Offset? offset,
+     Offset? offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
@@ -177,16 +170,16 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   }
 
   void addClockElement({
-     Offset? offset,
+    required Offset offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
     double? scale,
-
   }) {
     final newElement = ClockElement(
       scale: scale,
       dateTime: DateTime.now(),
+      clockTheme: "",
       id: Uuid().v4(),
       offset: offset,
       positionedElementStoryTheme: theme,
@@ -204,12 +197,12 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   void addFeelingElement({
     required int feelingId,
     required String feelingName,
-    Offset? offset,
+     Offset? offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
     double? scale,
-    required String feelingIcon,
+    required String feelingIcon
   }) {
     final newElement = FeelingElement(
       feelingIcon: feelingIcon,
@@ -241,17 +234,13 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void addAudioElement({
     required int audioId,
-    Offset? offset,
-    required String audioName,
-    required String audioImage,
+    required Offset offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
     double? scale,
   }) {
     final newElement = AudioElement(
-      audioImage: audioImage,
-      audioName: audioName,
       scale: scale,
       id: Uuid().v4(),
       audioId: audioId,
@@ -297,7 +286,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void addStickerElement({
     required String gifUrl,
-    Offset? offset,
+     Offset ? offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
@@ -320,8 +309,17 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     );
   }
 
-  void addDrawingElement(List<DrawingElement> elements) {
-    emit(state.copyWith(drawingElements: elements));
+  void addDrawingElement(List<Offset> points, Color color, double strokeWidth) {
+    final newElement = DrawingElement(
+      points: points,
+      color: color,
+      strokeWidth: strokeWidth,
+    );
+    emit(
+      state.copyWith(
+        drawingElements: List.from(state.drawingElements)..add(newElement),
+      ),
+    );
   }
 
   void clearDrawing() {
@@ -335,6 +333,10 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       )..removeLast();
       emit(state.copyWith(drawingElements: updatedDrawingElements));
     }
+  }
+
+  changeEditorMode(EditingMode mode) {
+    emit(state.copyWith(editingMode: mode));
   }
 
   void changeDrawingColor(Color color) {
@@ -354,102 +356,86 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     emit(state.copyWith(drawingElements: newList));
   }
 
-  void updateSelectedPositioned(PositionedElement element) {
-    List<PositionedElement> elements = List.from(state.positionedElements);
-    int index= elements.indexWhere((e)=>e.id==element.id);
-    emit(state.copyWith(currentOne: element));
-    if(index!=-1){
-      elements[index]=element;
-      emit(state.copyWith(positionedElements: elements));
-    }
+  void updateSelectedPositioned(String id) {
+   List<PositionedElement> elements=List.from(state.positionedElements);
+  final PositionedElement currentOne= elements.where((e)=>e.id==id).first;
+    emit(state.copyWith(currentOne: currentOne));
   }
-
   void togglePositionedTheme(PositionedElementStoryTheme theme) {
-    List<PositionedElement> elements = List.from(state.positionedElements);
-    final newElement = state.currentElement?.copyWith(
-      positionedElementStoryTheme: theme,
-    );
+    final newElement= state.currentElement?.copyWith(positionedElementStoryTheme: theme);
     emit(state.copyWith(currentOne: newElement));
-    int index= elements.indexWhere((e)=>e.id==newElement?.id);
-    if(index!=-1){
-      elements[index]=newElement!;
-      emit(state.copyWith(positionedElements:elements));
-    }
+
   }
 
-  clearAll() {
-    emit(StoryEditorState());
+  void updatePositionedElement(
+    String id,
+    Offset? newOffset,
+    Size? newSize,
+    double? newRotation,
+    double? scale,
+  ) {
+    final updatedElements =
+        state.positionedElements.map((element) {
+          if (element.id == id) {
+            if (element is PositionedElementWithLocationId) {
+              return element.copyWith(
+                offset: newOffset,
+                size: newSize,
+                rotation: newRotation,
+              );
+            } else if (element is PositionedMentionElement) {
+              return element.copyWith(
+                offset: newOffset,
+                size: newSize,
+                rotation: newRotation,
+              );
+            } else if (element is ClockElement) {
+              return element.copyWith(
+                offset: newOffset,
+                size: newSize,
+                rotation: newRotation,
+              );
+            } else if (element is FeelingElement) {
+              return element.copyWith(
+                offset: newOffset,
+                size: newSize,
+                rotation: newRotation,
+              );
+            } else if (element is TemperatureElement) {
+              return element.copyWith(
+                offset: newOffset,
+                size: newSize,
+                rotation: newRotation,
+              );
+            } else if (element is AudioElement) {
+              return element.copyWith(
+                offset: newOffset,
+                size: newSize,
+                rotation: newRotation,
+              );
+            } else if (element is PollElement) {
+              return element.copyWith(
+                offset: newOffset,
+                size: newSize,
+                rotation: newRotation,
+              );
+            } else if (element is StickerElement) {
+              return element.copyWith(
+                offset: newOffset,
+                size: newSize,
+                rotation: newRotation,
+              );
+            }
+          }
+          return element;
+        }).toList();
+    emit(state.copyWith(positionedElements: updatedElements));
   }
-
-  // void updatePositionedElement(
-  //   String id,
-  //   Offset? newOffset,
-  //   Size? newSize,
-  //   double? newRotation,
-  //   double? scale,
-  // ) {
-  //   final updatedElements =
-  //       state.positionedElements.map((element) {
-  //         if (element.id == id) {
-  //           if (element is PositionedElementWithLocationId) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is PositionedMentionElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is ClockElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is FeelingElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is TemperatureElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is AudioElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is PollElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is StickerElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           }
-  //         }
-  //         return element;
-  //       }).toList();
-  //   emit(state.copyWith(positionedElements: updatedElements));
-  // }
 
   void removePositionedElement(String id) {
-    final List<PositionedElement> current=state.positionedElements;
-    current.removeWhere((element) => element.id == id);
-    emit(state.copyWith(positionedElements: current));
+    final updatedElements =
+        state.positionedElements.where((element) => element.id != id).toList();
+    emit(state.copyWith(positionedElements: updatedElements));
   }
 
   // Method to convert current state to StoryEntity for backend submission
@@ -498,11 +484,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     );
   }
 
-  Future<List<MediaStory>> convertToOrderedMediaEntities(
+  Future<List<MediaEntity>> convertToOrderedMediaEntities(
     List<AssetEntity> selectedAssets,
-    List<MediaStory> previousEntities,
+    List<MediaEntity> previousEntities,
   ) async {
-    final List<MediaStory> result = [];
+    final List<MediaEntity> result = [];
 
     for (int i = 0; i < selectedAssets.length; i++) {
       final asset = selectedAssets[i];
@@ -512,8 +498,8 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       final existing = previousEntities.firstWhere(
         (e) => e.file?.path == file?.path,
         orElse:
-            () => MediaStory(
-              id: Uuid().v4(),
+            () => MediaEntity(
+              id: '',
               file: file!,
               order: i + 1,
               isVideoFile: asset.type == AssetType.video,
@@ -528,21 +514,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     return result;
   }
 
-  void setFinalListOfMediaFiles(List<MediaStory> media) {
+  void setFinalListOfMediaFiles(List<MediaEntity> media) {
     emit(state.copyWith(mediaFiles: media));
   }
 
-  void addCameraPhotoOrVideoToMediaFiles(MediaStory media) {
-    emit(state.copyWith(mediaFiles: [...state.mediaFiles ?? [], media]));
-  }
-
-  List<String> gradientToArray(GradientBackground gradient) {
-    String formatColor(Color color) {
-      // Mask out the alpha (top 8 bits) and convert to 6-character hex
-      String hex = (color.value & 0x00FFFFFF).toRadixString(16).padLeft(6, '0');
-      return '#$hex';
-    }
-
-    return [formatColor(gradient.startColor), formatColor(gradient.endColor)];
+  void addCameraPhotoOrVideoToMediaFiles(MediaEntity mediaEntity) {
+    emit(state.copyWith(mediaFiles: [...state.mediaFiles ?? [], mediaEntity]));
   }
 }

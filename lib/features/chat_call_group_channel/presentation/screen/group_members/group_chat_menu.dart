@@ -1,6 +1,6 @@
 // group_chat_menu.dart
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/chat_friend/presentation/screen/group_members/more_options_sheet.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/group_members/more_options_sheet.dart';
 
 PopupMenuButton<int> groupChatMenu(BuildContext context, bool isAdmin) {
   return PopupMenuButton<int>(

@@ -8,21 +8,15 @@ class TextEditingState extends Equatable {
   final TextPropertiesForStory textPropertiesForStory;
   final PositionedTextElement positionedTextElement;
   final List<PositionedTextElement> allTextAlignment;
-  final bool isEditingExistingText;
-  final bool fromTextStory;
 
   TextEditingState({
     required this.positionedTextElement,
     required this.textPropertiesForStory,
-    required this.allTextAlignment,
-    required this.isEditingExistingText,
-    required this.fromTextStory
+    required this.allTextAlignment
   });
 
   factory TextEditingState.fromEmpty() {
     return TextEditingState(
-      fromTextStory: false,
-      isEditingExistingText: false,
       positionedTextElement: PositionedTextElement(
         textPropertiesForStory: TextPropertiesForStory.empty(),
         offset: Offset(0, 0),
@@ -53,12 +47,8 @@ class TextEditingState extends Equatable {
     String? text,
     List<PositionedTextElement>? allTextAlignment,
     PositionedTextElement? newOne,
-    bool ? isEditingPositionedText,
-    bool? fromTextStory
   }) {
     return TextEditingState(
-      fromTextStory:fromTextStory??this.fromTextStory ,
-      isEditingExistingText: isEditingPositionedText??isEditingExistingText,
       positionedTextElement:newOne?? positionedTextElement.copyWith(
         text: text ?? positionedTextElement.text,
         size: size ?? positionedTextElement.size,
@@ -82,5 +72,5 @@ class TextEditingState extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object?> get props => [textPropertiesForStory,positionedTextElement,allTextAlignment,isEditingExistingText];
+  List<Object?> get props => [textPropertiesForStory,positionedTextElement,allTextAlignment];
 }

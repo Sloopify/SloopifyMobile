@@ -58,11 +58,7 @@ import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_st
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_story_feelings_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/search_story_friends_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/update_place_use_caes.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing_story/drawing_story_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/play_audio_cubit/play_audio_cubit.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
 import 'package:sloopify_mobile/features/posts/presentation/blocs/fetch_comments_bloc/fetch_comments_bloc.dart';
 
@@ -185,22 +181,6 @@ Future<void> setupLocator() async {
     () => PlayAudioCubit(
       searchStoryAudioUseCase: locator(),
       getStoryAudiosUseCase: locator(),
-    ),
-  );
-  locator.registerFactory(
-        () => StoryEditorCubit(
-    ),
-  );
-  locator.registerFactory(
-        () => DrawingStoryCubit(
-    ),
-  );
-  locator.registerFactory(
-        () => CalculateTempCubit(
-    ),
-  );
-  locator.registerFactory(
-        () => TextEditingCubit(
     ),
   );
 

@@ -41,7 +41,7 @@ class LoginWithOtpState extends Equatable {
   factory LoginWithOtpState.empty() {
     return LoginWithOtpState(
       isTimerFinished: false,
-      timerSeconds: 300,
+      timerSeconds: 60,
       hasPhoneNumberError: false,
       verifyOtpEntity: VerifyOtpEntity.fromEmpty(),
       verifyOtpLoginStatus: VerifyOtpLoginStatus.init,
