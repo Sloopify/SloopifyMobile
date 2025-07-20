@@ -135,7 +135,6 @@ class CreatePost extends StatelessWidget {
                                           ?.image,
                                   isNetworkImage: true,
                                   radius: 60,
-                                  fit: BoxFit.cover,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(

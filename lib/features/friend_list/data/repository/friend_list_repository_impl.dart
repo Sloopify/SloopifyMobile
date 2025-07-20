@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:sloopify_mobile/features/friend_list/domain/repository/friend_list_repository.dart';
 
 import '../../domain/entities/friend.dart';
@@ -13,7 +14,7 @@ class FriendListRepositoryImpl implements FriendListRepository {
       (index) => Friend(
         id: index.toString(),
         name: 'User $index',
-        avatarUrl: 'https://via.placeholder.com/150',
+        avatarUrl: Image.asset("assets/images/friendlist/inbox.png"),
         isFriend: false,
       ),
     );

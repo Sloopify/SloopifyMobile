@@ -24,7 +24,7 @@ class LoginDataEntity extends Equatable {
       fullFormatedNumber: "",
       email: '',
       password: '',
-      phoneNumber: '09',
+      phoneNumber: '',
       loginType: LoginType.email,
       rememberMe: false,
       countryCode: "+963"

@@ -9,8 +9,6 @@ import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/utils/helper/api_keys.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
-import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
-import 'package:sloopify_mobile/features/create_posts/presentation/screens/mention_friends.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/feelings_list_widget.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_state.dart';
@@ -83,23 +81,10 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                     text: 'Mention',
                     asset: AssetsManager.storyMention,
                     onTap: () {
-                      Navigator.of(context)
-                          .pushNamed(
-                            MentionFriends.routeName,
-                            arguments: {
-                              "post_friends_cubit":
-                                  context.read<PostFriendsCubit>()
-                                    ..setFromStory()
-                                    ..getFriendsList(),
-                              "story_editor_cubit":
-                                  context.read<StoryEditorCubit>(),
-                              "fromStory": true,
-                            },
-                          )
-                          .then((value) {
-                            Navigator.of(context).pop();
-                          });
-                      ;
+                      context.read<StoryEditorCubit>().addMentionElement(
+                        friendId: 1,
+                        friendName: 'Nour Alkhalil',
+                      );
                     },
                   ),
                   _buildElementOption(
@@ -128,26 +113,22 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                     context: context,
                     text: 'Clock',
                     asset: AssetsManager.storyClock,
-                    onTap: () {
-                      context.read<StoryEditorCubit>().addClockElement();
-                      Navigator.of(context).pop();
-                    },
+                    onTap: () {},
                   ),
                   BlocBuilder<CalculateTempCubit, CalculateTempState>(
                     builder: (context, state) {
                       if (state.temperatureElement != null) {
                         return _buildElementOption(
-                          asset: null,
                           context: context,
                           text:
-                              '${state.weatherIcon} ${state.temperatureElement!.value.toStringAsFixed(1)}',
+                              '${state.temperatureElement!.value}${state.weatherCode}',
+                          asset: AssetsManager.storyWeather,
                           onTap: () {
                             context
                                 .read<StoryEditorCubit>()
                                 .addTemperatureElement(
                                   state.temperatureElement!,
                                 );
-                            Navigator.of(context).pop();
                           },
                         );
                       } else
@@ -165,20 +146,16 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                     text: 'Feeling',
                     asset: AssetsManager.storyFeeling,
                     onTap: () {
-                      Navigator.of(context)
-                          .pushNamed(
-                            StoryFeelingsList.routeName,
-                            arguments: {
-                              "story_editor_cubit":
-                                  context.read<StoryEditorCubit>(),
-                              "feelings_activities_cubit":
-                                  context.read<FeelingsActivitiesCubit>()
-                                    ..setFromStory(),
-                            },
-                          )
-                          .then((value) {
-                            Navigator.of(context).pop();
-                          });
+                      Navigator.of(context).pushNamed(
+                        StoryFeelingsList.routeName,
+                        arguments: {
+                          "story_editor_cubit":
+                              context.read<StoryEditorCubit>(),
+                          "feelings_activities_cubit":
+                              context.read<FeelingsActivitiesCubit>()
+                                ..setFromStory(),
+                        },
+                      );
                     },
                   ),
                   _buildElementOption(
@@ -186,9 +163,7 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                     text: 'Gif',
                     asset: AssetsManager.storyGif,
                     onTap: () {
-                      pickGif(context).then((value) {
-                        Navigator.of(context).pop();
-                      });
+                      pickGif(context);
                     },
                   ),
                 ],
@@ -202,15 +177,12 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
 
   Widget _buildElementOption({
     required String text,
-    required String? asset,
+    required String asset,
     required Function() onTap,
     required BuildContext context,
   }) {
     return InkWell(
-      onTap: () {
-        onTap();
-        //Navigator.of(context).pop();
-      },
+      onTap: onTap,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.35,
         padding: EdgeInsets.symmetric(
@@ -233,7 +205,6 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if(asset!=null)
             SvgPicture.asset(asset),
             Gaps.hGap1,
             Text(

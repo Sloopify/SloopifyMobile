@@ -169,15 +169,6 @@ class PostFriendsCubit extends Cubit<PostFriendsState> {
     emit(state.copyWith(selectedMentionFriends: mentionedListFriends));
   }
 
-  void selectMentionFriends(int friendId, String name) {
-    emit(
-      state.copyWith(
-        selectedMentionName: name,
-        selectedMentionFriendId: friendId,
-      ),
-    );
-  }
-
   void toggleSelectFriendsExcept(int friendId) {
     List<int> newSelectedFriendsExcept = List.from(state.selectedFriendsExcept);
     if (!(newSelectedFriendsExcept.contains(friendId))) {

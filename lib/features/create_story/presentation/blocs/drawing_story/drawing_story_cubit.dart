@@ -30,11 +30,9 @@ class DrawingStoryCubit extends Cubit<DrawingState> {
   void changeCurrentLine(List<Offset> points) {
     emit(state.copyWith(currentPoints: points));
   }
-
   void emptyCurrentPoints() {
     emit(state.copyWith(currentPoints: []));
   }
-
   void addNewLine(Offset points) {
     List<Offset> newLines = [...state.currentPoints];
     newLines.add(points);
@@ -50,9 +48,5 @@ class DrawingStoryCubit extends Cubit<DrawingState> {
     List<DrawingElement> newList = List.from(state.lines);
     newList.add(drawingElement);
     emit(state.copyWith(lines: newList));
-  }
-
-  void clearAll() {
-    emit(DrawingState());
   }
 }

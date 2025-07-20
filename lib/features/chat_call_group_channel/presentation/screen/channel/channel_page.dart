@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
-import 'package:sloopify_mobile/features/chat_friend/presentation/bloc/channel/channel_bloc.dart';
-import 'package:sloopify_mobile/features/chat_friend/presentation/bloc/channel/channel_event.dart';
-import 'package:sloopify_mobile/features/chat_friend/presentation/bloc/channel/channel_state.dart';
-import 'package:sloopify_mobile/features/chat_friend/presentation/widgets/channel/channel_item.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/channel/channel_bloc.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/channel/channel_event.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/channel/channel_state.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/widgets/channel/channel_item.dart';
 
 class ChannelsPage extends StatelessWidget {
   const ChannelsPage({super.key});

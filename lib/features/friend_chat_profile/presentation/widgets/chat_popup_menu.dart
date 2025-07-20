@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sloopify_mobile/features/chat_media/data/datasources/media_local_datasource.dart';
 import 'package:sloopify_mobile/features/chat_media/data/repository/media_repository_impl.dart';
 import 'package:sloopify_mobile/features/chat_media/domain/usecases/fetch_media_by_date.dart';
-import 'package:sloopify_mobile/features/chat_media/presentation/bloc/chat_friend_cubit.dart';
 import 'package:sloopify_mobile/features/chat_media/presentation/bloc/chat_media_cubit.dart';
 import 'package:sloopify_mobile/features/chat_media/presentation/bloc/link_cubit.dart';
 import 'package:sloopify_mobile/features/chat_media/presentation/screen/chat_media_page.dart';

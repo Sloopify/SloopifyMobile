@@ -7,6 +7,7 @@ import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_elevated_button.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_text_field.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/domain/entities/user.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/post_audience_screen.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/select_frind_item.dart';
@@ -18,7 +19,12 @@ import '../blocs/post_friends_cubit/post_freinds_cubit.dart';
 class FriendsList extends StatelessWidget {
   static const routeName = "friends_list_post";
 
-  const FriendsList({super.key});
+  const FriendsList({
+    super.key,
+    required friends,
+    required List<User> selected,
+    required Null Function(dynamic u) onToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -111,11 +117,11 @@ class FriendsList extends StatelessWidget {
                         ),
                       ] else ...[
                         if (context
-                                    .read<CreatePostCubit>()
-                                    .state
-                                    .regularPostEntity
-                                    .postAudience ==
-                                PostAudience.specificFriends) ...[
+                                .read<CreatePostCubit>()
+                                .state
+                                .regularPostEntity
+                                .postAudience ==
+                            PostAudience.specificFriends) ...[
                           Expanded(
                             child: SmartRefresher(
                               controller:
@@ -186,11 +192,11 @@ class FriendsList extends StatelessWidget {
                             ),
                           ),
                         ] else if (context
-                                    .read<CreatePostCubit>()
-                                    .state
-                                    .regularPostEntity
-                                    .postAudience ==
-                                PostAudience.friendsExcept ) ...[
+                                .read<CreatePostCubit>()
+                                .state
+                                .regularPostEntity
+                                .postAudience ==
+                            PostAudience.friendsExcept) ...[
                           Expanded(
                             child: SmartRefresher(
                               controller:

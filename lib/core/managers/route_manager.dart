@@ -12,6 +12,20 @@ import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_ot
 import 'package:sloopify_mobile/features/auth/presentation/screens/otp_code_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/verify_account_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/write_otp_code_screen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/friend_chat/friend_chat_state.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/channel/ChannelDetailScreen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/channel/channel_page.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/group_members/group_detail_screen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/group_screen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/video_call_screen.dart';
+
+import 'package:sloopify_mobile/features/chat_media/presentation/screen/chat_media_page.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/chat_Notification_Settings.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/chat_background_screen.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/chat_theme_screen.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/color_picker_screen.dart';
+
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/choose_from_gallery.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/crop_image_cubit/crop_image_cubit.dart';
@@ -19,15 +33,15 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_me
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/rotate_photo_cubit/rotate_photo_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/feelings_list_widget.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing_story/drawing_story_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/play_audio_cubit/play_audio_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/screens/friend_chat_profile.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/friendship_request.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/myRequests.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/myFreinds.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/suggestedFriendListPage.dart';
-import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
+import 'package:sloopify_mobile/features/inbox/presentation/screen/inbox_page.dart';
+import 'package:sloopify_mobile/features/profile/presentation/screen/profile_page.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
 import '../../features/app_wrapper/presentation/screens/app_wrapper.dart';
@@ -57,16 +71,11 @@ import '../../features/create_posts/presentation/screens/places/add_new_place.da
 import '../../features/create_posts/presentation/screens/places/all_user_places_screen.dart';
 import '../../features/create_posts/presentation/screens/places/location_map_screen.dart';
 import '../../features/create_posts/presentation/screens/post_audience_screen.dart';
-import '../../features/create_story/presentation/screens/camera_capture.dart';
-import '../../features/create_story/presentation/screens/create_Story_first_step.dart';
-import '../../features/create_story/presentation/screens/select_media_gallery_story.dart';
 import '../../features/create_story/presentation/screens/story_audience/choose_story_audience.dart'
     show StoryAudienceScreen;
 import '../../features/create_story/presentation/screens/story_audience/story_friends_list.dart';
 import '../../features/create_story/presentation/screens/story_audios.dart';
-import '../../features/create_story/presentation/screens/story_editor_screen.dart';
 import '../../features/create_story/presentation/screens/story_feelings_list.dart';
-import '../../features/create_story/presentation/screens/text_story_editor.dart';
 import '../../features/home/presentation/screens/home_navigation_screen.dart';
 import '../../features/start_up/presenation/screens/on_boarding_screen.dart';
 
@@ -91,16 +100,105 @@ class AppRouter {
             return OnBoardingScreen();
           },
         );
+      case ProfilePage.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return ProfilePage();
+          },
+        );
       case WelcomeScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
             return WelcomeScreen();
           },
         );
+      case GroupDetailScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return GroupDetailScreen();
+          },
+        );
+      case ChannelDetailPage.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return ChannelDetailPage(admins: []);
+          },
+        );
+      case ChannelsPage.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return ChannelsPage();
+          },
+        );
+      case ChatThemeScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return ChatThemeScreen();
+          },
+        );
+      case ChatBackgroundScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return ChatBackgroundScreen();
+          },
+        );
+      case FriendChatProfileView.routeName:
+        return MaterialPageRoute(
+          builder: (context) => const FriendChatProfileView(),
+        );
+
+      // case ChatSearchScreen.routeName:
+      //   return MaterialPageRoute(
+      //     builder: (context) => const ChatSearchScreen(),
+      //   );
+
+      case GroupCreateScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) => const GroupCreateScreen(),
+        );
+
+      case ChatMediaPage.routeName:
+        return MaterialPageRoute(builder: (context) => const ChatMediaPage());
+
+      case ChatNotificationSettingsScreen.routeName:
+        return MaterialPageRoute(
+          builder:
+              (context) => const ChatNotificationSettingsScreen(
+                selected: MuteDuration.hours24,
+                isMuted: true,
+              ),
+        );
+
+      case ChatThemeScreen.routeName:
+        return MaterialPageRoute(builder: (context) => const ChatThemeScreen());
+
+      // case MoreOptionsScreen.routeName:
+      //   return MaterialPageRoute(
+      //     builder: (context) => const MoreOptionsScreen(),
+      //   );
+
+      case ColorPickerScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return ColorPickerScreen();
+          },
+        );
+      case ChooseFromGallery.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return ChooseFromGallery();
+          },
+        );
       case SignupScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
             return SignupScreen();
+          },
+        );
+      case VideoCallScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return VideoCallScreen();
           },
         );
       case SuggestedFriendListPage.routeName:
@@ -119,6 +217,12 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) {
             return FriendshipRequestPage();
+          },
+        );
+      case InboxScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return InboxScreen();
           },
         );
       case MyRequestsPage.routeName:
@@ -283,20 +387,9 @@ class AppRouter {
           },
         );
       case FriendsList.routeName:
-        final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
           builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider.value(
-                  value: arg["create_post_cubit"] as CreatePostCubit,
-                ),
-                BlocProvider.value(
-                  value: arg["post_friends_cubit"] as PostFriendsCubit,
-                ),
-              ],
-              child: FriendsList(),
-            );
+            return FriendsList(friends: null, selected: [], onToggle: (u) {});
           },
         );
       case FeelingsActivitiesScreen.routeName:
@@ -362,20 +455,14 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                if(arg["fromStory"]==false)
                 BlocProvider.value(
                   value: arg["create_post_cubit"] as CreatePostCubit,
                 ),
-                if(arg['fromStory']==true)
-                  BlocProvider.value(
-                    value: arg["story_editor_cubit"] as StoryEditorCubit,
-                  ),
                 BlocProvider.value(
                   value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
-              child: MentionFriends(fromStory: arg["fromStory"]??false,
-              ),
+              child: MentionFriends(),
             );
           },
         );
@@ -530,99 +617,6 @@ class AppRouter {
                 ),
               ],
               child: StoryAudios(),
-            );
-          },
-        );
-      case CreateStoryFirstStep.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider(create: (context) => locator<StoryEditorCubit>()),
-                BlocProvider(
-                  create: (context) => locator<FeelingsActivitiesCubit>(),
-                ),
-                BlocProvider(create: (context) => locator<PostFriendsCubit>()),
-                BlocProvider(create: (context) => locator<AddLocationCubit>()),
-              ],
-              child: CreateStoryFirstStep(),
-            );
-          },
-        );
-      case SelectMediaGalleryStory.routeName:
-        final arg = routeSettings.arguments as Map;
-        return MaterialPageRoute(
-          builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
-                BlocProvider(create: (context) => locator<TextEditingCubit>()),
-                BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
-                BlocProvider(
-                  create: (context) => locator<CalculateTempCubit>(),
-                ),
-              ],
-              child: SelectMediaGalleryStory(
-                isMultiSelection: arg["isMultiSelection"],
-              ),
-            );
-          },
-        );
-      case CameraCaptureScreen.routeName:
-        final arg = routeSettings.arguments as Map;
-        return MaterialPageRoute(
-          builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
-              ],
-              child: CameraCaptureScreen(),
-            );
-          },
-        );
-      case StoryEditorScreen.routeName:
-        final arg = routeSettings.arguments as Map;
-        return MaterialPageRoute(
-          builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
-                BlocProvider(create: (context) => locator<TextEditingCubit>()),
-                BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
-                BlocProvider(
-                  create: (context) => locator<CalculateTempCubit>(),
-                ),
-              ],
-              child: StoryEditorScreen(),
-            );
-          },
-        );
-      case TextStoryEditor.routeName:
-        final arg = routeSettings.arguments as Map;
-        return MaterialPageRoute(
-          builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
-                BlocProvider(create: (context) => locator<TextEditingCubit>()..setFromTextEditor()),
-                BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
-                BlocProvider(
-                  create: (context) => locator<CalculateTempCubit>(),
-                ),
-              ],
-              child: TextStoryEditor(),
             );
           },
         );

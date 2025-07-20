@@ -3,7 +3,7 @@ import 'package:sloopify_mobile/features/create_story/domain/entities/all_positi
 enum CalculateTempStatus{init,loading,success,error,offline}
 class CalculateTempState extends Equatable {
   final double tempC;
-  final int weatherCode;
+  final dynamic weatherCode;
   final bool isDay;
   final String weatherIcon;
   final CalculateTempStatus calculateTempStatus;
@@ -11,7 +11,7 @@ class CalculateTempState extends Equatable {
 
   const CalculateTempState({
     this.tempC = 0.0,
-    this.weatherCode=0,
+    this.weatherCode = '',
     this.isDay = true,
     this.weatherIcon = '',
     this.calculateTempStatus=CalculateTempStatus.init,
@@ -24,7 +24,7 @@ class CalculateTempState extends Equatable {
 
   CalculateTempState copyWith({
     double? tempC,
-    int? weatherCode,
+    String? weatherCode,
     bool? isDay,
     String? weatherIcon,
     CalculateTempStatus? status,

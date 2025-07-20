@@ -1,8 +1,8 @@
-// lib/features/chat_friend/presentation/pages/channel_detail_page.dart
+// lib/features/chat_call_group_channel/presentation/pages/channel_detail_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
-import 'package:sloopify_mobile/features/chat_friend/data/models/ChannelUser_Model.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/data/models/ChannelUser_Model.dart';
 
 class ChannelDetailPage extends StatelessWidget {
   final String currentUserId = 'user_1'; // You can replace with passed-in value

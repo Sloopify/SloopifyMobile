@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
@@ -169,7 +168,6 @@ class _FeelingsListWidgetState extends State<FeelingsListWidget> {
           },
       child: BlocBuilder<FeelingsActivitiesCubit, FeelingsActivitiesState>(
           builder: (context, state) {
-            print(feeling.mobileIcon);
             print(state.selectedFeeling);
             return Container(
               padding: EdgeInsets.all(AppPadding.p8),
@@ -182,7 +180,11 @@ class _FeelingsListWidgetState extends State<FeelingsListWidget> {
               ),
               child: Row(
                 children: [
-                  SvgPicture.network(feeling.mobileIcon,),
+                  GeneralImage.circular(
+                    radius: 25,
+                    isNetworkImage: true,
+                    image: feeling.mobileIcon,
+                  ),
                   Gaps.hGap1,
                   Text(
                     feeling.name,

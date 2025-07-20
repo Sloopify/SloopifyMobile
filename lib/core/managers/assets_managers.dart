@@ -81,7 +81,6 @@ class AssetsManager{
   static const String baseLottieURI = 'assets/lottie/';
   static const String success = '${baseLottieURI}success.json';
   static const String loading = '${baseLottieURI}loading.json';
-  static const String audioPlaying = '${baseLottieURI}audio_playing.json';
 
 
   static const String chatIcons = '${baseIconsURI}chat/';
@@ -183,8 +182,6 @@ class AssetsManager{
   static const String storyPoll = '${baseCreateStoryIcons}story_poll.svg';
   static const String storyWeather = '${baseCreateStoryIcons}story_weather.svg';
   static const String storyAudio = '${baseCreateStoryIcons}story_music.svg';
-  static const String muteVideo = '${baseCreateStoryIcons}mute_video.svg';
-  static const String storyPrivacy = '${baseCreateStoryIcons}story_privacy.svg';
 
 
   //////////////////******************notification ******/////////////////

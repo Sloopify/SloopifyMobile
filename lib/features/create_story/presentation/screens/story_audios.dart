@@ -33,8 +33,6 @@ class _StoryAudiosState extends State<StoryAudios> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PlayAudioCubit, PlayAudioState>(
-  builder: (context, state) {
     return Scaffold(
       appBar: getCustomAppBar(
         context: context,
@@ -42,7 +40,10 @@ class _StoryAudiosState extends State<StoryAudios> {
         withArrowBack: true,
       ),
       body: SafeArea(
-        child:  Padding(
+        child: BlocBuilder<PlayAudioCubit, PlayAudioState>(
+          builder: (context, state) {
+            print(state.selectedAudioUrl);
+            return Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: AppPadding.p20,
                 vertical: AppPadding.p10,
@@ -130,26 +131,27 @@ class _StoryAudiosState extends State<StoryAudios> {
                         ),
                       ),
                     ),
+                    if (state.selectedAudioUrl.isNotEmpty)
+                      SafeArea(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: AudioPlayerWidget(
+                              voice: state.selectedAudioUrl,
+                              audioName: state.selectedAudioName,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ],
               ),
-
+            );
+          },
         ),
       ),
-      bottomSheet:
-          state.selectedAudioUrl.isNotEmpty
-              ? SafeArea(
-                child: AudioPlayerWidget(
-                  audioId: state.selectedAudioId,
-                  audioImage: state.selectedAudioImage,
-                  voice: state.selectedAudioUrl,
-                  audioName: state.selectedAudioName,
-                ),
-              )
-              : null,
     );
-  },
-);
   }
 
   Widget _buildAudioItem(AudioEntity audio, BuildContext context) {
