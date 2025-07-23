@@ -33,15 +33,15 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/edit_me
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/rotate_photo_cubit/rotate_photo_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/feelings_list_widget.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing_story/drawing_story_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/play_audio_cubit/play_audio_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
-import 'package:sloopify_mobile/features/friend_chat_profile/presentation/screens/friend_chat_profile.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/friendship_request.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/myRequests.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/myFreinds.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/suggestedFriendListPage.dart';
-import 'package:sloopify_mobile/features/inbox/presentation/screen/inbox_page.dart';
-import 'package:sloopify_mobile/features/profile/presentation/screen/profile_page.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
 import '../../features/app_wrapper/presentation/screens/app_wrapper.dart';
@@ -71,11 +71,16 @@ import '../../features/create_posts/presentation/screens/places/add_new_place.da
 import '../../features/create_posts/presentation/screens/places/all_user_places_screen.dart';
 import '../../features/create_posts/presentation/screens/places/location_map_screen.dart';
 import '../../features/create_posts/presentation/screens/post_audience_screen.dart';
+import '../../features/create_story/presentation/screens/camera_capture.dart';
+import '../../features/create_story/presentation/screens/create_Story_first_step.dart';
+import '../../features/create_story/presentation/screens/select_media_gallery_story.dart';
 import '../../features/create_story/presentation/screens/story_audience/choose_story_audience.dart'
     show StoryAudienceScreen;
 import '../../features/create_story/presentation/screens/story_audience/story_friends_list.dart';
 import '../../features/create_story/presentation/screens/story_audios.dart';
+import '../../features/create_story/presentation/screens/story_editor_screen.dart';
 import '../../features/create_story/presentation/screens/story_feelings_list.dart';
+import '../../features/create_story/presentation/screens/text_story_editor.dart';
 import '../../features/home/presentation/screens/home_navigation_screen.dart';
 import '../../features/start_up/presenation/screens/on_boarding_screen.dart';
 
@@ -100,105 +105,16 @@ class AppRouter {
             return OnBoardingScreen();
           },
         );
-      case ProfilePage.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return ProfilePage();
-          },
-        );
       case WelcomeScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
             return WelcomeScreen();
           },
         );
-      case GroupDetailScreen.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return GroupDetailScreen();
-          },
-        );
-      case ChannelDetailPage.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return ChannelDetailPage(admins: []);
-          },
-        );
-      case ChannelsPage.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return ChannelsPage();
-          },
-        );
-      case ChatThemeScreen.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return ChatThemeScreen();
-          },
-        );
-      case ChatBackgroundScreen.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return ChatBackgroundScreen();
-          },
-        );
-      case FriendChatProfileView.routeName:
-        return MaterialPageRoute(
-          builder: (context) => const FriendChatProfileView(),
-        );
-
-      // case ChatSearchScreen.routeName:
-      //   return MaterialPageRoute(
-      //     builder: (context) => const ChatSearchScreen(),
-      //   );
-
-      case GroupCreateScreen.routeName:
-        return MaterialPageRoute(
-          builder: (context) => const GroupCreateScreen(),
-        );
-
-      case ChatMediaPage.routeName:
-        return MaterialPageRoute(builder: (context) => const ChatMediaPage());
-
-      case ChatNotificationSettingsScreen.routeName:
-        return MaterialPageRoute(
-          builder:
-              (context) => const ChatNotificationSettingsScreen(
-                selected: MuteDuration.hours24,
-                isMuted: true,
-              ),
-        );
-
-      case ChatThemeScreen.routeName:
-        return MaterialPageRoute(builder: (context) => const ChatThemeScreen());
-
-      // case MoreOptionsScreen.routeName:
-      //   return MaterialPageRoute(
-      //     builder: (context) => const MoreOptionsScreen(),
-      //   );
-
-      case ColorPickerScreen.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return ColorPickerScreen();
-          },
-        );
-      case ChooseFromGallery.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return ChooseFromGallery();
-          },
-        );
       case SignupScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
             return SignupScreen();
-          },
-        );
-      case VideoCallScreen.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return VideoCallScreen();
           },
         );
       case SuggestedFriendListPage.routeName:
@@ -221,8 +137,10 @@ class AppRouter {
         );
       case InboxScreen.routeName:
       case FriendListPage.routeName:
+      case FriendListPage.routeName:
         return MaterialPageRoute(
           builder: (context) {
+            return FriendListPage();
             return FriendListPage();
           },
         );
@@ -235,7 +153,7 @@ class AppRouter {
       case MyRequestsPage.routeName:
         return MaterialPageRoute(
           builder: (context) {
-            return MyRequestsPage(token: '');
+            return MyRequestsPage();
           },
         );
       case VerifyAccountScreen.routeName:
