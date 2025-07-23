@@ -220,6 +220,13 @@ class AppRouter {
           },
         );
       case InboxScreen.routeName:
+      case FriendListPage.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return FriendListPage();
+          },
+        );
+      case InboxScreen.routeName:
         return MaterialPageRoute(
           builder: (context) {
             return InboxScreen();
@@ -387,9 +394,20 @@ class AppRouter {
           },
         );
       case FriendsList.routeName:
+        final arg = routeSettings.arguments as Map;
         return MaterialPageRoute(
           builder: (context) {
-            return FriendsList(friends: null, selected: [], onToggle: (u) {});
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+              ],
+              child: FriendsList(),
+            );
           },
         );
       case FeelingsActivitiesScreen.routeName:
@@ -455,14 +473,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
+                if(arg["fromStory"]==false)
                 BlocProvider.value(
                   value: arg["create_post_cubit"] as CreatePostCubit,
                 ),
+                if(arg['fromStory']==true)
+                  BlocProvider.value(
+                    value: arg["story_editor_cubit"] as StoryEditorCubit,
+                  ),
                 BlocProvider.value(
                   value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
-              child: MentionFriends(),
+              child: MentionFriends(fromStory: arg["fromStory"]??false,
+              ),
             );
           },
         );
@@ -617,6 +641,99 @@ class AppRouter {
                 ),
               ],
               child: StoryAudios(),
+            );
+          },
+        );
+      case CreateStoryFirstStep.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(create: (context) => locator<StoryEditorCubit>()),
+                BlocProvider(
+                  create: (context) => locator<FeelingsActivitiesCubit>(),
+                ),
+                BlocProvider(create: (context) => locator<PostFriendsCubit>()),
+                BlocProvider(create: (context) => locator<AddLocationCubit>()),
+              ],
+              child: CreateStoryFirstStep(),
+            );
+          },
+        );
+      case SelectMediaGalleryStory.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
+                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
+                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
+                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider(create: (context) => locator<TextEditingCubit>()),
+                BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
+                BlocProvider(
+                  create: (context) => locator<CalculateTempCubit>(),
+                ),
+              ],
+              child: SelectMediaGalleryStory(
+                isMultiSelection: arg["isMultiSelection"],
+              ),
+            );
+          },
+        );
+      case CameraCaptureScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
+                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
+                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
+                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+              ],
+              child: CameraCaptureScreen(),
+            );
+          },
+        );
+      case StoryEditorScreen.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
+                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
+                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
+                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider(create: (context) => locator<TextEditingCubit>()),
+                BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
+                BlocProvider(
+                  create: (context) => locator<CalculateTempCubit>(),
+                ),
+              ],
+              child: StoryEditorScreen(),
+            );
+          },
+        );
+      case TextStoryEditor.routeName:
+        final arg = routeSettings.arguments as Map;
+        return MaterialPageRoute(
+          builder: (context) {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
+                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
+                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
+                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider(create: (context) => locator<TextEditingCubit>()..setFromTextEditor()),
+                BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
+                BlocProvider(
+                  create: (context) => locator<CalculateTempCubit>(),
+                ),
+              ],
+              child: TextStoryEditor(),
             );
           },
         );
