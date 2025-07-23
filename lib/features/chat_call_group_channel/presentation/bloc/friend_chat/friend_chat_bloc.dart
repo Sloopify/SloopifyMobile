@@ -1,7 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sloopify_mobile/features/chat_call_group_channel/data/models/friend_chat_message_model.dart';
 import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/friend_chat/friend_chat_event.dart';
 import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/friend_chat/friend_chat_state.dart';
+
+import '../../../data/models/friend_chat_message_model.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ChatBloc()

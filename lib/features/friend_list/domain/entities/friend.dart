@@ -1,9 +1,7 @@
-import 'package:flutter/widgets.dart';
-
 class Friend {
   final String id;
   final String name;
-  final Image avatarUrl;
+  final String avatarUrl;
   final bool isFriend;
 
   Friend({

@@ -7,24 +7,26 @@ class SortBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildOption(context, Icons.arrow_upward, "Newest first"),
-          _buildOption(context, Icons.arrow_downward, "Oldest first"),
-          _buildOption(context, Icons.sort_by_alpha, "Sort from A to Z"),
-          _buildOption(
-            context,
-            Icons.sort_by_alpha_rounded,
-            "Sort from Z to A",
-          ),
-        ],
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildOption(context, Icons.arrow_upward, "Newest first"),
+            _buildOption(context, Icons.arrow_downward, "Oldest first"),
+            _buildOption(context, Icons.sort_by_alpha, "Sort from A to Z"),
+            _buildOption(
+              context,
+              Icons.sort_by_alpha_rounded,
+              "Sort from Z to A",
+            ),
+          ],
+        ),
       ),
     );
   }

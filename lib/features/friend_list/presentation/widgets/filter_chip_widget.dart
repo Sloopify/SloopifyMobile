@@ -4,7 +4,12 @@ class FilterChipWidget extends StatelessWidget {
   final String label;
   final Color color;
 
-  const FilterChipWidget({required this.label, required this.color, super.key});
+  const FilterChipWidget({
+    required this.label,
+    required this.color,
+    super.key,
+    required void Function() onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
