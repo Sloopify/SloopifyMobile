@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sloopify_mobile/features/friend_list/domain/entities/friend.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/widgets/friend_choices.dart';
 
 class FriendItem extends StatelessWidget {
-  const FriendItem({super.key});
+  const FriendItem({super.key, required Friend friend});
 
   @override
   Widget build(BuildContext context) {

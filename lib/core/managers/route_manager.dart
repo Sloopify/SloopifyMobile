@@ -115,10 +115,10 @@ class AppRouter {
             return MyFriendsPage();
           },
         );
-      case FriendshipRequestPage.routeName:
+      case FriendListPage.routeName:
         return MaterialPageRoute(
           builder: (context) {
-            return FriendshipRequestPage();
+            return FriendListPage();
           },
         );
       case MyRequestsPage.routeName:
@@ -362,11 +362,11 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                if(arg["fromStory"]==false)
-                BlocProvider.value(
-                  value: arg["create_post_cubit"] as CreatePostCubit,
-                ),
-                if(arg['fromStory']==true)
+                if (arg["fromStory"] == false)
+                  BlocProvider.value(
+                    value: arg["create_post_cubit"] as CreatePostCubit,
+                  ),
+                if (arg['fromStory'] == true)
                   BlocProvider.value(
                     value: arg["story_editor_cubit"] as StoryEditorCubit,
                   ),
@@ -374,8 +374,7 @@ class AppRouter {
                   value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
-              child: MentionFriends(fromStory: arg["fromStory"]??false,
-              ),
+              child: MentionFriends(fromStory: arg["fromStory"] ?? false),
             );
           },
         );
@@ -555,10 +554,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
                 BlocProvider(create: (context) => locator<TextEditingCubit>()),
                 BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
                 BlocProvider(
@@ -577,10 +586,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
               ],
               child: CameraCaptureScreen(),
             );
@@ -592,10 +611,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
                 BlocProvider(create: (context) => locator<TextEditingCubit>()),
                 BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
                 BlocProvider(
@@ -612,11 +641,25 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
-                BlocProvider(create: (context) => locator<TextEditingCubit>()..setFromTextEditor()),
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
+                BlocProvider(
+                  create:
+                      (context) =>
+                          locator<TextEditingCubit>()..setFromTextEditor(),
+                ),
                 BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
                 BlocProvider(
                   create: (context) => locator<CalculateTempCubit>(),
