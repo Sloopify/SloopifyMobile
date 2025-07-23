@@ -1,14 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/group/group_icon_picker_event.dart';
-import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/group/group_icon_picker_state.dart';
+import 'group_icon_picker_event.dart';
+import 'group_icon_picker_state.dart';
 
 class GroupIconBloc extends Bloc<GroupIconEvent, GroupIconState> {
   final ImagePicker _picker = ImagePicker();
 
-  GroupIconBloc() : super(const GroupIconState()) {
+  GroupIconBloc() : super(GroupIconState.initial()) {
     on<PickFromGallery>(_onPickFromGallery);
     on<CaptureFromCamera>(_onCaptureFromCamera);
     on<CropImage>(_onCropImage);
@@ -42,7 +41,6 @@ class GroupIconBloc extends Bloc<GroupIconEvent, GroupIconState> {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: event.imagePath,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-
       uiSettings: [
         AndroidUiSettings(toolbarTitle: 'Crop Image'),
         IOSUiSettings(title: 'Crop Image'),

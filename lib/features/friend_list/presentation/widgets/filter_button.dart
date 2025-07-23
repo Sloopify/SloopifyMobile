@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/friendship_request.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/myRequests.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/youMayKnowScreen.dart';
 
@@ -16,7 +17,7 @@ class FilterButton extends StatelessWidget {
             case 'friendship requests':
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => MyRequestsPage()),
+                MaterialPageRoute(builder: (_) => FriendListPage()),
               );
               break;
             case 'my requests':

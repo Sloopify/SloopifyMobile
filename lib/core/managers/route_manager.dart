@@ -213,10 +213,10 @@ class AppRouter {
             return MyFriendsPage();
           },
         );
-      case FriendshipRequestPage.routeName:
+      case FriendListPage.routeName:
         return MaterialPageRoute(
           builder: (context) {
-            return FriendshipRequestPage();
+            return FriendListPage(token: '');
           },
         );
       case InboxScreen.routeName:
@@ -228,7 +228,7 @@ class AppRouter {
       case MyRequestsPage.routeName:
         return MaterialPageRoute(
           builder: (context) {
-            return MyRequestsPage();
+            return MyRequestsPage(token: '');
           },
         );
       case VerifyAccountScreen.routeName:

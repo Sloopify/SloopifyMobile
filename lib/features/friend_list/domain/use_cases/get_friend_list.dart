@@ -7,6 +7,6 @@ class GetFriendList {
   GetFriendList(this.repository);
 
   Future<List<Friend>> call() {
-    return repository.getFriendList();
+    return repository.getFriendList(1, 4, "");
   }
 }
