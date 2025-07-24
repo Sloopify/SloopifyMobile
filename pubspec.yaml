@@ -22,55 +22,54 @@ dependencies:
   dartz: ^0.10.1
   equatable: ^2.0.7
   easy_localization: ^3.0.7+1
-  internet_connection_checker: ^3.0.1
-  smooth_page_indicator: ^1.2.1
-  flutter_svg: ^2.1.0
-  flutter_screenutil: ^5.9.3
-  shared_preferences: ^2.5.3
-  yaml: ^3.1.3
-  get_it: ^8.0.3
   easy_splash_screen: ^1.0.4
-  regexpattern: ^2.6.0
-  flutter_bloc: ^9.1.1
-  pin_code_fields: ^8.0.1
-  fluttertoast: ^8.2.12
-  flutter_holo_date_picker: ^2.0.0
-  cached_network_image: ^3.4.1
-  shimmer: ^3.0.0
-  image_picker: ^1.1.2
-  lottie:
-  flutter_inner_shadow: 0.0.1
-  readmore: ^3.0.0
-  share_plus: ^11.0.0
-  flutter_polls: ^0.1.6
-  super_tooltip: ^2.0.9
-  photo_manager: ^3.0.0
-  permission_handler: ^12.0.0+1
-  flutter_quill: ^9.6.0
-  delta_to_html: ^0.2.2
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-  path_provider: ^2.0.15
-  google_maps_flutter: ^2.12.2
-  geolocator: ^14.0.0
-  logger: ^2.5.0
-  hive_generator: ^2.0.1
-  build_runner: ^2.4.15
-  video_player: ^2.9.5
-  country_code_picker: ^3.3.0
-  device_info_plus:
-  pull_to_refresh: ^2.0.0
+  equatable: ^2.0.7
   firebase_core: ^3.13.1
   firebase_messaging: ^15.2.6
-  google_sign_in: ^6.3.0
-  image_cropper: ^9.1.0
-  image: ^3.0.2
-  video_thumbnail: ^0.5.6
-  http: ^1.4.0
-  photofilters: ^3.0.1
-  path: ^1.9.1
-  google_fonts: ^6.2.1
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
   flutter_colorpicker: ^1.1.0
+  flutter_holo_date_picker: ^2.0.0
+  flutter_inner_shadow: 0.0.1
+  flutter_polls: ^0.1.6
+  flutter_quill: ^9.6.0
+  flutter_screenutil: ^5.9.3
+  flutter_svg: ^2.1.0
+  fluttertoast: ^8.2.12
+  geolocator: ^14.0.0
+  get_it: ^8.0.3
+  gif_view: ^1.0.3
+  giphy_get: ^3.6.1
+  google_fonts: ^6.2.1
+  google_maps_flutter: ^2.12.2
+  google_sign_in: ^6.3.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  hive_generator: ^2.0.1
+  http: ^1.4.0
+  icons_launcher: null
+  image: ^3.0.2
+  image_cropper: ^9.1.0
+  image_picker: ^1.1.2
+  internet_connection_checker: ^3.0.1
+  just_audio: ^0.10.4
+  logger: ^2.5.0
+  lottie: null
+  path: ^1.9.1
+  path_provider: ^2.0.15
+  permission_handler: ^12.0.0+1
+  photo_manager: ^3.0.0
+  photofilters: ^3.0.1
+  pin_code_fields: ^8.0.1
+  pull_to_refresh: ^2.0.0
+  readmore: ^3.0.0
+  regexpattern: ^2.6.0
+  share_plus: ^11.0.0
+  shared_preferences: ^2.5.3
+  shimmer: ^3.0.0
+  smooth_page_indicator: ^1.2.1
+  super_tooltip: ^2.0.9
   uuid: ^4.4.2
   camera: ^0.11.1
   giphy_get: ^3.6.1
@@ -85,10 +84,22 @@ dependencies:
   comment_tree:
    path: lib/core/external_packages/comment_tree-master
 
+  camera: ^0.11.1
+  giphy_get: ^3.6.1
+  gif_view: ^1.0.3
+  just_audio: ^0.10.4
+  icons_launcher:
+
+  comment_tree:
+   path: lib/core/external_packages/comment_tree-master
+
 
 dev_dependencies:
+  build: ^3.0.0
+  build_runner: ^2.6.0
   flutter_test:
     sdk: flutter
+  mockito: ^5.5.0
 icons_launcher:
   image_path: "assets/images/sloopify_logo2.png"
   platforms:
@@ -97,16 +108,9 @@ icons_launcher:
     ios:
       enable: true
 
-
-
-
-
-
-
 flutter:
   uses-material-design: true
   generate: true
-
 
   assets:
     - assets/
@@ -130,99 +134,94 @@ flutter:
 
   # example:
   fonts:
-     - family: Poppins
-       fonts:
-         - asset: assets/fonts/Poppins-Medium.ttf
-         - asset: assets/fonts/Poppins-Regular.ttf
-         - asset: assets/fonts/Poppins-Bold.ttf
-           weight: 500
-         - asset: assets/fonts/Poppins-Black.ttf
-     - family: Kavoon
-       fonts:
-         - asset: assets/fonts/Kavoon-Regular.ttf
-     - family: Beiruti
-       fonts:
-         - asset: assets/fonts/beiruti/Beiruti-Black.ttf
-         - asset: assets/fonts/beiruti/Beiruti-Bold.ttf
-         - asset: assets/fonts/beiruti/Beiruti-ExtraBold.ttf
-         - asset: assets/fonts/beiruti/Beiruti-ExtraLight.ttf
-         - asset: assets/fonts/beiruti/Beiruti-Light.ttf
-         - asset: assets/fonts/beiruti/Beiruti-Medium.ttf
-         - asset: assets/fonts/beiruti/Beiruti-Regular.ttf
-         - asset: assets/fonts/beiruti/Beiruti-SemiBold.ttf
-     - family: Kanit
-       fonts:
-         - asset: assets/fonts/Kanit-Black.ttf
-         - asset: assets/fonts/Kanit-Regular.ttf
-         - asset: assets/fonts/Kanit-Medium.ttf
-         - asset: assets/fonts/Kanit-Bold.ttf
-         - asset: assets/fonts/Kanit-Light.ttf
-     - family: Cairo
-       fonts:
-         - asset: assets/fonts/cairo/Cairo-Black.ttf
-         - asset: assets/fonts/cairo/Cairo-Bold.ttf
-         - asset: assets/fonts/cairo/Cairo-ExtraBold.ttf
-         - asset: assets/fonts/cairo/Cairo-ExtraLight.ttf
-         - asset: assets/fonts/cairo/Cairo-Light.ttf
-         - asset: assets/fonts/cairo/Cairo-Medium.ttf
-         - asset: assets/fonts/cairo/Cairo-Regular.ttf
-         - asset: assets/fonts/cairo/Cairo-Medium.ttf
-         - asset: assets/fonts/cairo/Cairo-SemiBold.ttf
-     - family: GochiHand
-       fonts:
-         - asset: assets/fonts/gochi_hand/GochiHand-Regular.ttf
-     - family: Lalezar
-       fonts:
-         - asset: assets/fonts/lalezar/Lalezar-Regular.ttf
-     - family: Marhey
-       fonts:
-         - asset: assets/fonts/marhey/Marhey-Bold.ttf
-         - asset: assets/fonts/marhey/Marhey-Light.ttf
-         - asset: assets/fonts/marhey/Marhey-Medium.ttf
-         - asset: assets/fonts/marhey/Marhey-Regular.ttf
-         - asset: assets/fonts/marhey/Marhey-SemiBold.ttf
-     - family: Oi
-       fonts:
-         - asset: assets/fonts/oi/Oi-Regular.ttf
-     - family: Oxanium
-       fonts:
-         - asset: assets/fonts/oxanium/Oxanium-Bold.ttf
-         - asset: assets/fonts/oxanium/Oxanium-ExtraBold.ttf
-         - asset: assets/fonts/oxanium/Oxanium-ExtraLight.ttf
-         - asset: assets/fonts/oxanium/Oxanium-Light.ttf
-         - asset: assets/fonts/oxanium/Oxanium-Medium.ttf
-         - asset: assets/fonts/oxanium/Oxanium-Regular.ttf
-         - asset: assets/fonts/oxanium/Oxanium-SemiBold.ttf
-     - family: PinyonScript
-       fonts:
-         - asset: assets/fonts/pinyon_script/PinyonScript-Regular.ttf
-     - family: Plaster
-       fonts:
-         - asset: assets/fonts/plaster/Plaster-Regular.ttf
-     - family: Playball
-       fonts:
-         - asset: assets/fonts/playball/Playball-Regular.ttf
-     - family: PoltawskiNowy
-       fonts:
-         - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-Bold.ttf
-         - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-BoldItalic.ttf
-         - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-Italic.ttf
-         - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-Medium.ttf
-         - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-MediumItalic.ttf
-         - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-Regular.ttf
-         - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-SemiBold.ttf
-         - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-SemiBoldItalic.ttf
-     - family: Roboto
-       fonts:
-         - asset: assets/fonts/roboto/Roboto-Bold.ttf
-         - asset: assets/fonts/roboto/Roboto-Italic.ttf
-         - asset: assets/fonts/roboto/Roboto-Medium.ttf
-         - asset: assets/fonts/roboto/Roboto-Regular.ttf
-         - asset: assets/fonts/roboto/Roboto_SemiCondensed-Medium.ttf
-
-
-
-  #
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Medium.ttf
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-Black.ttf
+    - family: Kavoon
+      fonts:
+        - asset: assets/fonts/Kavoon-Regular.ttf
+    - family: Beiruti
+      fonts:
+        - asset: assets/fonts/beiruti/Beiruti-Black.ttf
+        - asset: assets/fonts/beiruti/Beiruti-Bold.ttf
+        - asset: assets/fonts/beiruti/Beiruti-ExtraBold.ttf
+        - asset: assets/fonts/beiruti/Beiruti-ExtraLight.ttf
+        - asset: assets/fonts/beiruti/Beiruti-Light.ttf
+        - asset: assets/fonts/beiruti/Beiruti-Medium.ttf
+        - asset: assets/fonts/beiruti/Beiruti-Regular.ttf
+        - asset: assets/fonts/beiruti/Beiruti-SemiBold.ttf
+    - family: Kanit
+      fonts:
+        - asset: assets/fonts/Kanit-Black.ttf
+        - asset: assets/fonts/Kanit-Regular.ttf
+        - asset: assets/fonts/Kanit-Medium.ttf
+        - asset: assets/fonts/Kanit-Bold.ttf
+        - asset: assets/fonts/Kanit-Light.ttf
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/cairo/Cairo-Black.ttf
+        - asset: assets/fonts/cairo/Cairo-Bold.ttf
+        - asset: assets/fonts/cairo/Cairo-ExtraBold.ttf
+        - asset: assets/fonts/cairo/Cairo-ExtraLight.ttf
+        - asset: assets/fonts/cairo/Cairo-Light.ttf
+        - asset: assets/fonts/cairo/Cairo-Medium.ttf
+        - asset: assets/fonts/cairo/Cairo-Regular.ttf
+        - asset: assets/fonts/cairo/Cairo-Medium.ttf
+        - asset: assets/fonts/cairo/Cairo-SemiBold.ttf
+    - family: GochiHand
+      fonts:
+        - asset: assets/fonts/gochi_hand/GochiHand-Regular.ttf
+    - family: Lalezar
+      fonts:
+        - asset: assets/fonts/lalezar/Lalezar-Regular.ttf
+    - family: Marhey
+      fonts:
+        - asset: assets/fonts/marhey/Marhey-Bold.ttf
+        - asset: assets/fonts/marhey/Marhey-Light.ttf
+        - asset: assets/fonts/marhey/Marhey-Medium.ttf
+        - asset: assets/fonts/marhey/Marhey-Regular.ttf
+        - asset: assets/fonts/marhey/Marhey-SemiBold.ttf
+    - family: Oi
+      fonts:
+        - asset: assets/fonts/oi/Oi-Regular.ttf
+    - family: Oxanium
+      fonts:
+        - asset: assets/fonts/oxanium/Oxanium-Bold.ttf
+        - asset: assets/fonts/oxanium/Oxanium-ExtraBold.ttf
+        - asset: assets/fonts/oxanium/Oxanium-ExtraLight.ttf
+        - asset: assets/fonts/oxanium/Oxanium-Light.ttf
+        - asset: assets/fonts/oxanium/Oxanium-Medium.ttf
+        - asset: assets/fonts/oxanium/Oxanium-Regular.ttf
+        - asset: assets/fonts/oxanium/Oxanium-SemiBold.ttf
+    - family: PinyonScript
+      fonts:
+        - asset: assets/fonts/pinyon_script/PinyonScript-Regular.ttf
+    - family: Plaster
+      fonts:
+        - asset: assets/fonts/plaster/Plaster-Regular.ttf
+    - family: Playball
+      fonts:
+        - asset: assets/fonts/playball/Playball-Regular.ttf
+    - family: PoltawskiNowy
+      fonts:
+        - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-Bold.ttf
+        - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-BoldItalic.ttf
+        - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-Italic.ttf
+        - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-Medium.ttf
+        - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-MediumItalic.ttf
+        - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-Regular.ttf
+        - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-SemiBold.ttf
+        - asset: assets/fonts/Poltawski_Nowy/PoltawskiNowy-SemiBoldItalic.ttf
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/roboto/Roboto-Bold.ttf
+        - asset: assets/fonts/roboto/Roboto-Italic.ttf
+        - asset: assets/fonts/roboto/Roboto-Medium.ttf
+        - asset: assets/fonts/roboto/Roboto-Regular.ttf
+        - asset: assets/fonts/roboto/Roboto_SemiCondensed-Medium.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-
