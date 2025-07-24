@@ -13,7 +13,11 @@ import 'package:sloopify_mobile/features/create_story/presentation/screens/story
 import '../../../../create_posts/presentation/screens/post_audience_screen.dart';
 import '../../../domain/entities/positioned_element_entity.dart';
 import '../../../domain/entities/text_properties_story.dart';
-enum StoryType{text,media}
+
+enum StoryType { text, media }
+
+enum CreateStoryStatus { init, loading, success, error, offline }
+
 class StoryEditorState extends Equatable {
   final StoryType storyType;
   final List<AssetEntity> selectedMedia;
@@ -32,26 +36,33 @@ class StoryEditorState extends Equatable {
   final MediaStory selectedEditedMedia;
   final GradientBackground? gradientBackground;
   final List<PositionedTextElement>? textElements;
+  final CreateStoryStatus createStoryStatus;
+  final String errorMessage;
+  final PositionedTextElement? positionedTextElement;
+
   const StoryEditorState({
-    this.selectedMedia=const [],
+    this.errorMessage = '',
+    this.createStoryStatus = CreateStoryStatus.init,
+    this.selectedMedia = const [],
     this.content = "",
     this.textProperties,
     this.backgroundColors = const [],
     this.positionedElements = const [],
-    this.isVideoMuted =false,
+    this.isVideoMuted = false,
     this.privacy = StoryAudience.public,
     this.specificFriends = const [],
     this.friendExcept = const [],
     this.gifUrl,
     this.mediaFiles,
-    this.drawingElements=const [],
+    this.drawingElements = const [],
     this.currentElement,
-    this.storyType=StoryType.text,
-    this.selectedEditedMedia=const MediaStory(),
+    this.storyType = StoryType.text,
+    this.selectedEditedMedia = const MediaStory(),
     this.gradientBackground,
-    this.textElements
-
+    this.textElements,
+    this.positionedTextElement
   });
+
   StoryEditorState copyWith({
     List<AssetEntity>? selectedMedia,
     String? content,
@@ -64,21 +75,26 @@ class StoryEditorState extends Equatable {
     List<int>? friendExcept,
     String? gifUrl,
     List<MediaStory>? mediaFiles,
-    List<DrawingElement> ?drawingElements,
-    bool ?isToolBarVisible,
-    Color?drawingColor,
+    List<DrawingElement>? drawingElements,
+    bool? isToolBarVisible,
+    Color? drawingColor,
     double? drawingWidth,
     DrawingElement? currentLine,
     PositionedElement? currentOne,
-    StoryType ?storyType,
+    StoryType? storyType,
     MediaStory? selectedEditedMedia,
     GradientBackground? gradiant,
     List<PositionedTextElement>? textElements,
-
+    CreateStoryStatus? createStoryStatus,
+    String? errorMessage,
+    PositionedTextElement? textElement
   }) {
     return StoryEditorState(
-      gradientBackground: gradiant??this.gradientBackground,
-      selectedEditedMedia: selectedEditedMedia??this.selectedEditedMedia,
+      positionedTextElement: textElement??this.positionedTextElement,
+      errorMessage: errorMessage??this.errorMessage,
+      createStoryStatus: createStoryStatus ?? this.createStoryStatus,
+      gradientBackground: gradiant ?? this.gradientBackground,
+      selectedEditedMedia: selectedEditedMedia ?? this.selectedEditedMedia,
       selectedMedia: selectedMedia ?? this.selectedMedia,
       content: content ?? this.content,
       textProperties: textProperties ?? this.textProperties,
@@ -89,14 +105,14 @@ class StoryEditorState extends Equatable {
       specificFriends: specificFriends ?? this.specificFriends,
       friendExcept: friendExcept ?? this.friendExcept,
       gifUrl: gifUrl ?? this.gifUrl,
-      mediaFiles: mediaFiles??this.mediaFiles,
-      drawingElements: drawingElements??this.drawingElements,
-      currentElement: currentOne??currentElement,
-      storyType: storyType??this.storyType,
-      textElements: textElements??this.textElements
-
+      mediaFiles: mediaFiles ?? this.mediaFiles,
+      drawingElements: drawingElements ?? this.drawingElements,
+      currentElement: currentOne ?? currentElement,
+      storyType: storyType ?? this.storyType,
+      textElements: textElements ?? this.textElements,
     );
   }
+
   @override
   List<Object?> get props => [
     selectedMedia,
@@ -113,7 +129,7 @@ class StoryEditorState extends Equatable {
     drawingElements,
     currentElement,
     gradientBackground,
-    textElements
-
+    textElements,
+    createStoryStatus,
   ];
 }

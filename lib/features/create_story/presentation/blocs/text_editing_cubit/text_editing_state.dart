@@ -6,7 +6,7 @@ import 'package:sloopify_mobile/features/create_story/domain/entities/text_prope
 
 class TextEditingState extends Equatable {
   final TextPropertiesForStory textPropertiesForStory;
-  final PositionedTextElement positionedTextElement;
+   PositionedTextElement positionedTextElement;
   final List<PositionedTextElement> allTextAlignment;
   final bool isEditingExistingText;
   final bool fromTextStory;
@@ -23,16 +23,7 @@ class TextEditingState extends Equatable {
     return TextEditingState(
       fromTextStory: false,
       isEditingExistingText: false,
-      positionedTextElement: PositionedTextElement(
-        textPropertiesForStory: TextPropertiesForStory.empty(),
-        offset: Offset(0, 0),
-        id: '',
-        scale: 1,
-        rotation: 0.0,
-        positionedElementStoryTheme: null,
-        size: Size.zero,
-        text: "",
-      ),
+      positionedTextElement: PositionedTextElement.empty(),
       textPropertiesForStory: TextPropertiesForStory.empty(),
       allTextAlignment: []
     );
@@ -65,7 +56,15 @@ class TextEditingState extends Equatable {
         positionedElementStoryTheme: null,
         rotation: rotation ?? positionedTextElement.rotation,
         offset: offset ?? positionedTextElement.offset,
-        textProperty: textPropertiesForStory,
+        textProperty: textPropertiesForStory.copyWith(
+            color: color ?? textPropertiesForStory.color,
+            fontSize: fontSize ?? textPropertiesForStory.fontSize,
+            underline: underline ?? textPropertiesForStory.underline,
+            italic: italic ?? textPropertiesForStory.italic,
+            fontType: fontType ?? textPropertiesForStory.fontType,
+            bold: bold ?? textPropertiesForStory.bold,
+            alignment: alignment??textPropertiesForStory.alignment
+        ),
       ),
       textPropertiesForStory: textPropertiesForStory.copyWith(
         color: color ?? textPropertiesForStory.color,

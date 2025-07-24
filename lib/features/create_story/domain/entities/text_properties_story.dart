@@ -67,8 +67,8 @@ class TextPropertiesForStory extends Equatable {
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> data = {};
-    if (color != null && color != "null") {
-      data["color"] = color;
+    if (color != null) {
+      data["color"] = '${(color!.value & 0x00FFFFFF).toRadixString(16).padLeft(6, '0')}';
     }
     if (fontType != null) {
       data["font_type"] = fontType;

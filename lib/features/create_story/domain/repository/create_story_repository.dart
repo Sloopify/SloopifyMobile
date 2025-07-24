@@ -7,6 +7,7 @@ import '../../../create_posts/domain/entities/feeling_result_entity.dart';
 import '../../../create_posts/domain/entities/friends_result_entity.dart';
 import '../../../create_posts/domain/entities/place_entity.dart';
 import '../../../create_posts/domain/entities/user_place_result_entity.dart';
+import '../entities/story_entity.dart';
 
 abstract class CreateStoryRepo {
   Future<Either<Failure, FriendsResultEntity>> getFriendsList({
@@ -61,5 +62,9 @@ abstract class CreateStoryRepo {
     required int page,
     required int perPage,
     required String search,
+  });
+
+  Future<Either<Failure, Unit>> createMyStory({
+    required StoryEntity storyEntity,
   });
 }

@@ -1,16 +1,20 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:sloopify_mobile/core/utils/location_service.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/media_story.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
+import 'package:sloopify_mobile/features/create_story/domain/use_cases/create_my_story_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_state.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_audience/choose_story_audience.dart';
 
+import '../../../../../core/errors/failures.dart';
 import '../../../../../core/ui/widgets/text_editor_widget.dart';
 import '../../../../../core/utils/helper/postioned_element_story_theme.dart';
 import '../../../../create_posts/domain/entities/media_entity.dart';
@@ -21,8 +25,24 @@ import '../../../domain/entities/story_entity.dart';
 import '../../../domain/entities/text_properties_story.dart';
 
 class StoryEditorCubit extends Cubit<StoryEditorState> {
-  StoryEditorCubit() : super(const StoryEditorState());
+  final CreateMyStoryUseCase createMyStoryUseCase;
+
+  StoryEditorCubit({required this.createMyStoryUseCase})
+    : super(const StoryEditorState());
   final Uuid _uuid = const Uuid();
+
+  createStory() async {
+    emit(state.copyWith(createStoryStatus: CreateStoryStatus.loading));
+    final res = await createMyStoryUseCase.call(storyEntity: toStoryEntity());
+    res.fold(
+      (l) {
+        _mapFailureCreateStoryToState(emit, l, state);
+      },
+      (r) {
+        emit(state.copyWith(createStoryStatus: CreateStoryStatus.success));
+      },
+    );
+  }
 
   void toggleSelection(AssetEntity asset) {
     final updated = List<AssetEntity>.from(state.selectedMedia);
@@ -114,7 +134,9 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   addTextElement({required List<PositionedTextElement> newElement}) {
     emit(state.copyWith(textElements: newElement));
   }
-
+  updateOneTextElement({required PositionedTextElement newElement}) {
+    emit(state.copyWith(textElement: newElement));
+  }
   void setBackGroundGradiant(GradientBackground gradiant) {
     emit(
       state.copyWith(
@@ -150,7 +172,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       countryName: countryName,
       cityName: cityName,
       scale: scale,
-      id: _uuid.v4(),
+      id: Uuid().v4(),
       offset: offset,
       positionedElementStoryTheme: theme,
       size: size,
@@ -177,12 +199,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   }
 
   void addClockElement({
-     Offset? offset,
+    Offset? offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
     double? scale,
-
   }) {
     final newElement = ClockElement(
       scale: scale,
@@ -241,6 +262,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void addAudioElement({
     required int audioId,
+    required String audioUrl,
     Offset? offset,
     required String audioName,
     required String audioImage,
@@ -250,6 +272,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     double? scale,
   }) {
     final newElement = AudioElement(
+      audioUrl: audioUrl,
       audioImage: audioImage,
       audioName: audioName,
       scale: scale,
@@ -356,10 +379,10 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
 
   void updateSelectedPositioned(PositionedElement element) {
     List<PositionedElement> elements = List.from(state.positionedElements);
-    int index= elements.indexWhere((e)=>e.id==element.id);
+    int index = elements.indexWhere((e) => e.id == element.id);
     emit(state.copyWith(currentOne: element));
-    if(index!=-1){
-      elements[index]=element;
+    if (index != -1) {
+      elements[index] = element;
       emit(state.copyWith(positionedElements: elements));
     }
   }
@@ -370,10 +393,10 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       positionedElementStoryTheme: theme,
     );
     emit(state.copyWith(currentOne: newElement));
-    int index= elements.indexWhere((e)=>e.id==newElement?.id);
-    if(index!=-1){
-      elements[index]=newElement!;
-      emit(state.copyWith(positionedElements:elements));
+    int index = elements.indexWhere((e) => e.id == newElement?.id);
+    if (index != -1) {
+      elements[index] = newElement!;
+      emit(state.copyWith(positionedElements: elements));
     }
   }
 
@@ -381,73 +404,8 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     emit(StoryEditorState());
   }
 
-  // void updatePositionedElement(
-  //   String id,
-  //   Offset? newOffset,
-  //   Size? newSize,
-  //   double? newRotation,
-  //   double? scale,
-  // ) {
-  //   final updatedElements =
-  //       state.positionedElements.map((element) {
-  //         if (element.id == id) {
-  //           if (element is PositionedElementWithLocationId) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is PositionedMentionElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is ClockElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is FeelingElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is TemperatureElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is AudioElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is PollElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           } else if (element is StickerElement) {
-  //             return element.copyWith(
-  //               offset: newOffset,
-  //               size: newSize,
-  //               rotation: newRotation,
-  //             );
-  //           }
-  //         }
-  //         return element;
-  //       }).toList();
-  //   emit(state.copyWith(positionedElements: updatedElements));
-  // }
-
   void removePositionedElement(String id) {
-    final List<PositionedElement> current=state.positionedElements;
+    final List<PositionedElement> current = state.positionedElements;
     current.removeWhere((element) => element.id == id);
     emit(state.copyWith(positionedElements: current));
   }
@@ -461,7 +419,8 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     TemperatureElement? temperatureElement;
     AudioElement? audioElement;
     PollElement? pollElement;
-    String? gifUrl;
+    StickerElement? stickerElement;
+    print('sssssssssssss${state.positionedElements}');
     for (var element in state.positionedElements) {
       if (element is PositionedElementWithLocationId) {
         locationElement = element;
@@ -478,11 +437,12 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       } else if (element is PollElement) {
         pollElement = element;
       } else if (element is StickerElement) {
-        gifUrl = element.gifUrl; // Assuming only one sticker/gif for now based
+        stickerElement = element; // Assuming only one sticker/gif for now based
       }
     }
+
     return StoryEntity(
-      content: state.content,
+      isVideoMuted: state.isVideoMuted,
       backgroundColor: state.backgroundColors,
       privacy: state.privacy,
       specificFriends:
@@ -495,6 +455,10 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       temperatureElement: temperatureElement,
       audioElement: audioElement,
       pollElement: pollElement,
+      stickerElement: stickerElement,
+      positionedTextElements: state.textElements,
+      mediaFiles: state.mediaFiles,
+      lines: state.drawingElements,
     );
   }
 
@@ -544,5 +508,25 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     }
 
     return [formatColor(gradient.startColor), formatColor(gradient.endColor)];
+  }
+
+  _mapFailureCreateStoryToState(emit, Failure f, StoryEditorState state) {
+    switch (f) {
+      case OfflineFailure():
+        emit(
+          state.copyWith(
+            createStoryStatus: CreateStoryStatus.offline,
+            errorMessage: 'no_internet_connection'.tr(),
+          ),
+        );
+
+      case NetworkErrorFailure f:
+        emit(
+          state.copyWith(
+            createStoryStatus: CreateStoryStatus.error,
+            errorMessage: f.message,
+          ),
+        );
+    }
   }
 }

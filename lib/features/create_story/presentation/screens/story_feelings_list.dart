@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/managers/app_gaps.dart';
@@ -26,12 +27,12 @@ class StoryFeelingsList extends StatefulWidget {
 }
 
 class _StoryFeelingsListState extends State<StoryFeelingsList> {
-
   @override
   void initState() {
     context.read<FeelingsActivitiesCubit>().getFeelings();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +46,10 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
         builder: (context, state) {
           print(state.selectedFeelingIcon);
           return Padding(
-            padding:  EdgeInsets.symmetric(horizontal: AppPadding.p20,vertical: AppPadding.p10),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppPadding.p20,
+              vertical: AppPadding.p10,
+            ),
             child: Column(
               children: [
                 Row(
@@ -55,9 +59,9 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
                         hintText: "Serach for a friend",
                         withTitle: false,
                         onChanged: (value) {
-                          context.read<FeelingsActivitiesCubit>().setFeelingName(
-                            value,
-                          );
+                          context
+                              .read<FeelingsActivitiesCubit>()
+                              .setFeelingName(value);
                         },
                       ),
                     ),
@@ -100,7 +104,8 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
                       ),
                     ),
                   ),
-                ] else if (state.getFeelingStatus == GetFeelingStatus.error) ...[
+                ] else if (state.getFeelingStatus ==
+                    GetFeelingStatus.error) ...[
                   Center(
                     child: Text(
                       state.errorMessage,
@@ -159,12 +164,18 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
                       child: CustomElevatedButton(
                         label: "Done",
                         onPressed: () {
-                          context.read<StoryEditorCubit>().addFeelingElement(
-                            feelingIcon: state.selectedFeelingIcon,
-                            feelingId: 0,
-                            feelingName: state.selectedFeeling,
-                          );
-
+                          if (context
+                              .read<StoryEditorCubit>()
+                              .state
+                              .positionedElements
+                              .any((e) => e is FeelingElement)) {
+                          } else {
+                            context.read<StoryEditorCubit>().addFeelingElement(
+                              feelingIcon: state.selectedFeelingIcon,
+                              feelingId: state.selectedFeelingId,
+                              feelingName: state.selectedFeeling,
+                            );
+                          }
                           Navigator.of(context).pop();
                         },
                         width: MediaQuery.of(context).size.width * 0.7,
@@ -201,8 +212,15 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
                 feeling.name) {
               context.read<FeelingsActivitiesCubit>().selectFeelings("");
             } else {
-              context.read<FeelingsActivitiesCubit>().selectFeelings(feeling.name);
-              context.read<FeelingsActivitiesCubit>().selectFeelingsIcon(feeling.mobileIcon);
+              context.read<FeelingsActivitiesCubit>().selectFeelings(
+                feeling.name,
+              );
+              context.read<FeelingsActivitiesCubit>().selectFeelingsIcon(
+                feeling.mobileIcon,
+              );
+              context.read<FeelingsActivitiesCubit>().selectFeelingId(
+                feeling.id,
+              );
             }
           },
           child: Container(
@@ -218,7 +236,7 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
             ),
             child: Row(
               children: [
-              SvgPicture.network(feeling.mobileIcon),
+                SvgPicture.network(feeling.mobileIcon),
                 Gaps.hGap1,
                 Text(
                   feeling.name,

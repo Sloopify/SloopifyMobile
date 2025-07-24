@@ -28,6 +28,7 @@ class FeelingsActivitiesState extends Equatable {
   final bool hasCategoriesReachedEnd;
   final bool hasActivitiesReachedEnd;
   final bool fromStory;
+  final int selectedFeelingId;
 
   const FeelingsActivitiesState({
     this.selectedFeeling='',
@@ -50,7 +51,8 @@ class FeelingsActivitiesState extends Equatable {
     this.hasActivitiesReachedEnd = false,
     this.hasCategoriesReachedEnd = false,
     this.hasFeelingsReachedEnd = false,
-    this.fromStory=false
+    this.fromStory=false,
+    this.selectedFeelingId=0
   });
 
   @override
@@ -76,7 +78,8 @@ class FeelingsActivitiesState extends Equatable {
     hasFeelingsReachedEnd,
     hasCategoriesReachedEnd,
     hasActivitiesReachedEnd,
-    fromStory
+    fromStory,
+    selectedFeelingId
   ];
 
   FeelingsActivitiesState copyWith({
@@ -100,9 +103,11 @@ class FeelingsActivitiesState extends Equatable {
     bool? hasCategoriesReachedEnd,
     bool? hasActivitiesReachedEnd,
     String ? selectedFeelingIcon,
-    bool? fromStory
+    int ? selectedFeelingIId,
+    bool? fromStory,
   }) {
     return FeelingsActivitiesState(
+      selectedFeelingId: selectedFeelingId??this.selectedFeelingId,
       selectedFeelingIcon: selectedFeelingIcon??this.selectedFeelingIcon,
       fromStory: fromStory??this.fromStory,
       selectedCategoryName: selectedCategoryName ?? this.selectedCategoryName,

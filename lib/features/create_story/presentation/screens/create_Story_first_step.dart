@@ -18,6 +18,7 @@ import 'package:sloopify_mobile/features/create_story/presentation/screens/text_
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/managers/app_gaps.dart';
 import '../../../create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
+import '../widgets/test.dart';
 import 'camera_capture.dart';
 
 class CreateStoryFirstStep extends StatelessWidget {
@@ -37,14 +38,15 @@ class CreateStoryFirstStep extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: AppPadding.p10),
             child: InkWell(
               onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  StoryAudienceScreen.routeName,
-                  arguments: {
-                    "story_editor_cubit": context.read<StoryEditorCubit>(),
-                    "post_friends_cubit": context.read<PostFriendsCubit>(),
-                  },
-                );
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ReliableTextTransform()));
+                // Navigator.pushNamed(
+                //   context,
+                //   StoryAudienceScreen.routeName,
+                //   arguments: {
+                //     "story_editor_cubit": context.read<StoryEditorCubit>(),
+                //     "post_friends_cubit": context.read<PostFriendsCubit>(),
+                //   },
+                // );
               },
               child: SvgPicture.asset(AssetsManager.storyAudience),
             ),

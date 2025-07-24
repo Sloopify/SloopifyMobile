@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:logger/logger.dart';
 import 'package:sloopify_mobile/features/create_story/data/models/audio_result_model.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/audio_result_enitity.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/story_entity.dart';
 
 import '../../../../core/api_service/api_urls.dart';
 import '../../../../core/api_service/base_api_service.dart';
@@ -52,6 +54,7 @@ abstract class CreateStoryDataProvider {
   Future<Unit> deleteUserPlace({required int placeId});
   Future<AudioResultModel> getStoryAudios({required int page,required int perPage});
   Future<AudioResultModel> searchStoryAudio({required int page,required int perPage,required String search});
+  Future<Unit> createMyStory({required StoryEntity storyEntity});
 
 
 }
@@ -219,6 +222,21 @@ class CreateStoryDataProviderImpl extends CreateStoryDataProvider {
     );
     if (res["success"] == true) {
       return AudioResultModel.fromJson(res["data"]);
+    } else {
+      throw NetworkErrorFailure(message: res['message']);
+    }
+  }
+
+  @override
+  Future<Unit> createMyStory({required StoryEntity storyEntity}) async {
+    final res = await client.multipartRequest(
+      url: ApiUrls.createMyStory,
+      isContainsMedia: storyEntity.mediaFiles!=null && storyEntity.mediaFiles!.isNotEmpty==true,
+      jsonBody:await storyEntity.toJson(),
+    );
+    print(await storyEntity.toJson());
+    if (res["success"] == true) {
+      return unit;
     } else {
       throw NetworkErrorFailure(message: res['message']);
     }

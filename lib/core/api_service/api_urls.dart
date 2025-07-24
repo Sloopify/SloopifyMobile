@@ -55,6 +55,7 @@ static const String changePassword="auth/forgot-password/reset-password";
   static const String deleteUserLocation="stories/update-user-place";
   static const String getStoryAudios="stories/get-story-audio";
   static const String searchStoryAudio="stories/search-story-audio";
+  static const String createMyStory="stories/create-story";
 
 
 

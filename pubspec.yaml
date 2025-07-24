@@ -77,6 +77,8 @@ dependencies:
   gif_view: ^1.0.3
   just_audio: ^0.10.4
   icons_launcher:
+  matrix_gesture_detector_pro: ^1.0.0
+
 
   comment_tree:
    path: lib/core/external_packages/comment_tree-master

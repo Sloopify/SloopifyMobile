@@ -8,8 +8,7 @@ import 'all_positioned_element.dart';
 import 'media_story.dart';
 
 class StoryEntity extends Equatable {
-  final String content;
-  final PositionedTextElement? positionedTextElement;
+  final List<PositionedTextElement>? positionedTextElements;
   final List<String>? backgroundColor;
   final StoryAudience privacy;
   final List<int>? specificFriends;
@@ -21,13 +20,14 @@ class StoryEntity extends Equatable {
   final TemperatureElement? temperatureElement;
   final AudioElement? audioElement;
   final PollElement? pollElement;
-  final StickerElement ? stickerElement;
+  final StickerElement? stickerElement;
   final List<MediaStory>? mediaFiles;
   final List<DrawingElement>? lines;
+  final bool? isVideoMuted;
+  final PositionedTextElement? positionedTextElement;
 
   const StoryEntity({
-    required this.content,
-    this.positionedTextElement,
+    this.positionedTextElements,
     this.backgroundColor,
     required this.privacy,
     this.specificFriends,
@@ -41,13 +41,14 @@ class StoryEntity extends Equatable {
     this.pollElement,
     this.mediaFiles,
     this.stickerElement,
-    this.lines
+    this.lines,
+    this.isVideoMuted,
+    this.positionedTextElement
   });
 
   factory StoryEntity.fromEmpty() {
     return const StoryEntity(
-      content: "",
-      positionedTextElement: null,
+      positionedTextElements: [],
       backgroundColor: null,
       privacy: StoryAudience.public,
       specificFriends: null,
@@ -61,76 +62,126 @@ class StoryEntity extends Equatable {
       pollElement: null,
       stickerElement: null,
       lines: [],
-      mediaFiles: []
+      mediaFiles: [],
+      isVideoMuted: null,
+      positionedTextElement: null
     );
   }
 
   @override
   // TODO: implement props
-  List<Object?> get props => [
-    pollElement,
-    audioElement,
-    temperatureElement,
-    feelingElement,
-    clockElement,
-    mentionsElements,
-    locationElement,
-    friendExcept,
-    specificFriends,
-    privacy,
-    backgroundColor,
-    stickerElement,
-    positionedTextElement,
-    content,
-    mediaFiles,
-    lines
-  ];
+  List<Object?> get props =>
+      [
+        pollElement,
+        audioElement,
+        temperatureElement,
+        feelingElement,
+        clockElement,
+        mentionsElements,
+        locationElement,
+        friendExcept,
+        specificFriends,
+        privacy,
+        backgroundColor,
+        stickerElement,
+        positionedTextElements,
+        mediaFiles,
+        lines,
+        isVideoMuted,
+        positionedTextElement
+      ];
 
   Future<Map<String, dynamic>> toJson() async {
-    final Map<String, dynamic> data = {
-      'content': content,
-      'privacy': privacy.getValueForApi(),
-    };
-    if (positionedTextElement != null) {
-      data['text_element'] = positionedTextElement!.toJson();
+    final Map<String, dynamic> data = {'privacy': privacy.getValueForApi()};
+    if (isVideoMuted != null &&
+        mediaFiles != null &&
+        mediaFiles!.length == 1 &&
+        mediaFiles!.first.isVideoFile == true) {
+      data.putIfAbsent('isVideoMuted', () => boolToInt(isVideoMuted));
     }
-    if (backgroundColor != null && backgroundColor!.isNotEmpty) {
+    if (positionedTextElements != null && positionedTextElements!.isNotEmpty) {
+      if (mediaFiles == null || mediaFiles!.isEmpty) {
+        data['text_elements'] =
+            positionedTextElements!.map((e) => e.toJson()).toList();
+      } else {
+        List<PositionedTextElement> positionedTextElement =
+        positionedTextElements!;
+        for (int i = 0; i < positionedTextElement.length; i++) {
+          data["text_elements[$i]"] = positionedTextElement[i];
+        }
+      }
+    }
+    if(positionedTextElement!=null){
+      data["text_element"]= positionedTextElement!.toJson();
+    }
+    if (backgroundColor != null &&
+        backgroundColor!.isNotEmpty &&
+        (mediaFiles == null || mediaFiles!.isEmpty)) {
       data['background_color'] = backgroundColor;
     }
     if (specificFriends != null && specificFriends!.isNotEmpty) {
-      data['specific_friends'] = specificFriends;
+      if (mediaFiles == null || mediaFiles!.isEmpty) {
+        data['specific_friends'] = specificFriends;
+      } else {
+        List<int> specificFriendsList = specificFriends!;
+        for (int i = 0; i < specificFriendsList.length; i++) {
+          data["specific_friends[$i]"] = specificFriendsList[i];
+        }
+      }
     }
     if (friendExcept != null && friendExcept!.isNotEmpty) {
-      data['friend_except'] = friendExcept;
+      if (mediaFiles == null || mediaFiles!.isEmpty) {
+        data['friend_except'] = friendExcept;
+      } else {
+        List<int> friendsExceptList = friendExcept!;
+        for (int i = 0; i < friendsExceptList.length; i++) {
+          data["friend_except[$i]"] = friendsExceptList[i];
+        }
+      }
     }
-    if (locationElement != null) {
+    if ( locationElement!=null) {
       data['location_element'] = locationElement!.toJson();
     }
     if (mentionsElements != null && mentionsElements!.isNotEmpty) {
-      data['mentions_elements'] = mentionsElements!.map((e) =>
-          e.toJson()).toList();
+      if (mediaFiles == null || mediaFiles!.isEmpty) {
+        data['mentions_elements'] =
+            mentionsElements!.map((e) => e.toJson()).toList();
+      } else {
+        List<PositionedElement> mentions = mentionsElements!;
+        for (int i = 0; i < mentions.length; i++) {
+          data["mentions_elements[$i]"] = mentions[i];
+        }
+      }
     }
-    if (clockElement != null) {
+    if (clockElement != null ) {
       data['clock_element'] = clockElement!.toJson();
     }
-    if (feelingElement != null) {
-      data['feeling_element'] = feelingElement!.toJson();
-    }
-    if (temperatureElement != null) {
-      data['temperature_element'] = temperatureElement!.toJson();
-    }
-    if (audioElement != null) {
-      data['audio_element'] = audioElement!.toJson();
-    }
-    if (pollElement != null) {
-      data['poll_element'] = pollElement!.toJson();
-    }
-    if (stickerElement != null) {
-      data['gif_element'] = stickerElement!.toJson();
-    }
-    if (lines != null) {
-      data['drawing_elements'] = lines!.map((e)=>e.toJson()).toList();
-    }
+      if (feelingElement != null) {
+        data['feeling_element'] = feelingElement!.toJson();
+      }
+      if (temperatureElement != null) {
+        data['temperature_element'] = temperatureElement!.toJson();
+      }
+      if (audioElement != null) {
+        data['audio_element'] = audioElement!.toJson();
+      }
+      if (pollElement != null) {
+        data['poll_element'] = pollElement!.toJson();
+      }
+      if (stickerElement != null) {
+        data['gif_element'] = stickerElement!.toJson();
+      }
+      if (lines != null) {
+        if (mediaFiles == null || mediaFiles!.isEmpty) {
+          data['drawing_elements'] = lines!.map((e) => e.toJson()).toList();
+        } else {
+          List<DrawingElement> drawings = lines!;
+          for (int i = 0; i < drawings.length; i++) {
+            data["drawing_elements[$i]"] = drawings[i];
+          }
+        }
+      }
+
     if (mediaFiles != null) {
       // Wait for all media files to be converted to JSON
       final mediaList = await Future.wait(mediaFiles!.map((e) => e.toJson()));
@@ -139,3 +190,6 @@ class StoryEntity extends Equatable {
     return data;
   }
 }
+
+
+int boolToInt(bool? value) => (value ?? false) ? 1 : 0;

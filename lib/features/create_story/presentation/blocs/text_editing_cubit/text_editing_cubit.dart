@@ -49,20 +49,17 @@ class TextEditingCubit extends Cubit<TextEditingState> {
     emit(state.copyWith(allTextAlignment: newList));
   }
 
-  void updateTextElement(PositionedTextElement element,String text){
+  void updateTextElement(PositionedTextElement element){
     final updatedList = List<PositionedTextElement>.from(
       state.allTextAlignment,
     );
-    final current = state.positionedTextElement.copyWith(text: text);
 
     final index = state.allTextAlignment.indexWhere(
           (e) => e.id == element.id,
     );
-    print('nnnnnnnnnnn${state.positionedTextElement.text}');
-    print(index);
     if (index != -1) {
-      updatedList[index]=current;
-      state.allTextAlignment[index]=current;
+      updatedList[index]=element;
+      state.allTextAlignment[index]=element;
       emit(state.copyWith(allTextAlignment: updatedList));
     }
   }
@@ -80,6 +77,7 @@ class TextEditingCubit extends Cubit<TextEditingState> {
   }
 
   void updateSelectedPositionedText(PositionedTextElement element) {
+    state.positionedTextElement=element;
     final updatedList = List<PositionedTextElement>.from(
       state.allTextAlignment,
     );
@@ -87,10 +85,12 @@ class TextEditingCubit extends Cubit<TextEditingState> {
           (e) => e.id == element.id,
     );
     if(index!=-1){
+      emit(state.copyWith(newOne: element));
       state.allTextAlignment[index] = element;
       updatedList[index]=element;
+      state.allTextAlignment[index]=element;
     }
-    emit(state.copyWith(allTextAlignment: updatedList));
+    emit(state.copyWith(allTextAlignment: updatedList,));
   }
   void setEditingExistingText(bool editing) {
     emit(state.copyWith(isEditingPositionedText: editing));
@@ -105,6 +105,9 @@ class TextEditingCubit extends Cubit<TextEditingState> {
 
   void clearAll(){
     emit(TextEditingState.fromEmpty());
+  }
+  void updateTextContent(String newText) {
+     emit(state.copyWith(text: newText));
   }
 
 }

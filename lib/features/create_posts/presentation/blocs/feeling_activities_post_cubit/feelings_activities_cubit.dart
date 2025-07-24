@@ -90,6 +90,14 @@ class FeelingsActivitiesCubit extends Cubit<FeelingsActivitiesState> {
       ),
     );
   }
+  selectFeelingId(int value) {
+    emit(
+      state.copyWith(
+          getFeelingStatus: GetFeelingStatus.init,
+          selectedFeelingIId: value
+      ),
+    );
+  }
   selectCategoryName(String value) {
     emit(
       state.copyWith(

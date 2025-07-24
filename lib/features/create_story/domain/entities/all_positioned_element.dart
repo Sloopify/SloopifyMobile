@@ -51,7 +51,7 @@ class PositionedElementWithLocationId extends PositionedElement {
       locationId: locationId ?? this.locationId,
       offset: offset ?? this.offset,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
     );
@@ -99,7 +99,7 @@ class PositionedMentionElement extends PositionedElement {
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
     );
@@ -146,11 +146,25 @@ class PositionedTextElement extends PositionedElement {
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
     );
   }
+
+  factory PositionedTextElement.empty(){
+    return PositionedTextElement(
+        textPropertiesForStory: TextPropertiesForStory.empty(),
+        offset: Offset.zero,
+        id: '',
+        rotation: 0.0,
+        positionedElementStoryTheme: null,
+        size: Size.zero,
+        scale: 1.0,
+        text: "");
+  }
+
+
 }
 
 class FeelingElement extends PositionedElement {
@@ -187,17 +201,17 @@ class FeelingElement extends PositionedElement {
     Size? size,
     double? scale,
     String? feelingName,
-    String? feelingIcon
+    String? feelingIcon,
   }) {
     return FeelingElement(
       feelingName: feelingName ?? this.feelingName,
       feelingId: feelingId ?? this.feelingId,
       rotation: rotation ?? this.rotation,
       offset: offset ?? this.offset,
-      feelingIcon: feelingIcon??this.feelingIcon,
+      feelingIcon: feelingIcon ?? this.feelingIcon,
       id: id,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
     );
@@ -249,7 +263,7 @@ class TemperatureElement extends PositionedElement {
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
     );
@@ -274,22 +288,30 @@ class AudioElement extends PositionedElement {
   final int audioId;
   final String audioName;
   final String audioImage;
+  final String audioUrl;
 
   AudioElement({
     required this.audioId,
     required this.audioName,
     required this.audioImage,
-     super.offset,
+    required this.audioUrl,
+    super.offset,
     required super.id,
-     super.rotation,
-     super.positionedElementStoryTheme,
-     super.size,
-     super.scale,
+    super.rotation,
+    super.positionedElementStoryTheme,
+    super.size,
+    super.scale,
   });
 
   @override
   Map<String, dynamic> toJson() {
-    return {'audio_id': audioId, ...super.toJson()};
+    return {
+      'audio_id': audioId,
+      "audio_name": audioName,
+      "audio_image": audioImage,
+      "audio_url": audioUrl,
+      ...super.toJson(),
+    };
   }
 
   AudioElement copyWith({
@@ -300,21 +322,22 @@ class AudioElement extends PositionedElement {
     Size? size,
     int? audioId,
     double? scale,
-    String ?audioName,
+    String? audioName,
     String? audioImage,
-
+    String? audioUrl
   }) {
     return AudioElement(
+      audioUrl: audioUrl ?? this.audioUrl,
       audioId: audioId ?? this.audioId,
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       id: id,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
-      audioImage: audioImage??this.audioImage,
-      audioName: audioName??this.audioName
+      audioImage: audioImage ?? this.audioImage,
+      audioName: audioName ?? this.audioName,
     );
   }
 }
@@ -356,7 +379,7 @@ class PollElement extends PositionedElement {
       rotation: rotation ?? this.rotation,
       id: id,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
     );
@@ -395,7 +418,7 @@ class StickerElement extends PositionedElement {
       rotation: rotation ?? this.rotation,
       id: id,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
     );
@@ -417,7 +440,7 @@ class ClockElement extends PositionedElement {
 
   @override
   Map<String, dynamic> toJson() {
-    return {"clock": '${dateTime.hour}: ${dateTime.minute}', "clockTheme": ""};
+    return { ...super.toJson(), "clock": '${dateTime.hour}:${dateTime.minute}'};
   }
 
   ClockElement copyWith({
@@ -435,7 +458,7 @@ class ClockElement extends PositionedElement {
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       positionedElementStoryTheme:
-          positionedElementStoryTheme ?? this.positionedElementStoryTheme,
+      positionedElementStoryTheme ?? this.positionedElementStoryTheme,
       size: size ?? this.size,
       scale: scale ?? this.scale,
     );

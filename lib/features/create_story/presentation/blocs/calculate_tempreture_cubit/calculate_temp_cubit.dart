@@ -52,6 +52,7 @@ class CalculateTempCubit extends Cubit<CalculateTempState> {
         final iconCode = data['weather'][0]['icon'];
         print('iccccon${iconCode}');
         final isDay = iconCode.contains('d');
+        emit(state.copyWith(isDay: isDay));
         print('dddddddddddddddddd${isDay}');
         final weatherCode = data['weather'][0]['id'];
         print('weather code ${weatherCode}');

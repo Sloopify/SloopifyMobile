@@ -7,6 +7,7 @@ import 'package:sloopify_mobile/features/create_posts/domain/entities/place_enti
 import 'package:sloopify_mobile/features/create_posts/domain/entities/user_place_result_entity.dart';
 import 'package:sloopify_mobile/features/create_story/data/create_stoty_provider/create_story_data_provider.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/audio_result_enitity.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/story_entity.dart';
 import 'package:sloopify_mobile/features/create_story/domain/repository/create_story_repository.dart';
 
 import '../../../../core/api_service/base_repo.dart';
@@ -119,6 +120,16 @@ class CreateStoryRepoImpl extends CreateStoryRepo{
     final data = await BaseRepo.repoRequest(
       request: () async {
         return await createStoryDataProvider.searchStoryAudio(perPage: perPage,search: search,page: page);
+      },
+    );
+    return data.fold((f) => Left(f), (data) => Right(data));
+  }
+
+  @override
+  Future<Either<Failure, Unit>> createMyStory({required StoryEntity storyEntity}) async {
+    final data = await BaseRepo.repoRequest(
+      request: () async {
+        return await createStoryDataProvider.createMyStory(storyEntity:storyEntity);
       },
     );
     return data.fold((f) => Left(f), (data) => Right(data));

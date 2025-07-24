@@ -47,7 +47,7 @@ class _TextEditingToolbarState extends State<TextEditingToolbar> {
               left: 16,
               top:
                   MediaQuery.of(context).padding.top +
-                  100, // Adjust top to be below top toolbar
+                  50, // Adjust top to be below top toolbar
               bottom:
                   MediaQuery.of(context).padding.bottom +
                   120, // Adjust bottom to be above bottom toolbar

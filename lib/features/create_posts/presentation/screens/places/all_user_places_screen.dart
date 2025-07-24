@@ -7,6 +7,7 @@ import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/core/ui/widgets/custom_footer.dart';
 import 'package:sloopify_mobile/features/create_posts/domain/entities/place_entity.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 
 import '../../../../../core/managers/app_dimentions.dart';
@@ -161,13 +162,23 @@ class AllUserPlacesScreen extends StatelessWidget {
                                   state.selectedLocationId,
                                 );
                               } else {
-                                context
+                                if (context
                                     .read<StoryEditorCubit>()
-                                    .addLocationElement(
-                                      id: state.selectedLocationId,
-                                      cityName: state.selectedCityName,
-                                      countryName: state.selectedCountryName,
-                                    );
+                                    .state
+                                    .positionedElements
+                                    .any(
+                                      (e) =>
+                                          e is PositionedElementWithLocationId,
+                                    )) {
+                                } else {
+                                  context
+                                      .read<StoryEditorCubit>()
+                                      .addLocationElement(
+                                        id: state.selectedLocationId,
+                                        cityName: state.selectedCityName,
+                                        countryName: state.selectedCountryName,
+                                      );
+                                }
                               }
                             },
                             backgroundColor: ColorManager.primaryColor,

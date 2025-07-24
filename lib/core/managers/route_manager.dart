@@ -616,7 +616,7 @@ class AppRouter {
                 BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
                 BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
                 BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
-                BlocProvider(create: (context) => locator<TextEditingCubit>()..setFromTextEditor()),
+                BlocProvider(create: (context) => locator<TextEditingCubit>()),
                 BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
                 BlocProvider(
                   create: (context) => locator<CalculateTempCubit>(),

@@ -12,6 +12,7 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/feeling
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_friends_cubit/post_freinds_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/screens/mention_friends.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/widgets/feelings_list_widget.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/calculate_tempreture_cubit/calculate_temp_state.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/play_audio_cubit/play_audio_cubit.dart';
@@ -24,6 +25,7 @@ import '../../../../core/managers/app_gaps.dart' show Gaps;
 import '../../../create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import '../../../create_posts/presentation/screens/places/all_user_places_screen.dart';
 import '../screens/story_audios.dart';
+import 'gif_element.dart';
 
 class StoryElementsSheet extends StatefulWidget {
   const StoryElementsSheet({super.key});
@@ -129,7 +131,14 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                     text: 'Clock',
                     asset: AssetsManager.storyClock,
                     onTap: () {
-                      context.read<StoryEditorCubit>().addClockElement();
+                      if (context
+                          .read<StoryEditorCubit>()
+                          .state
+                          .positionedElements
+                          .any((e) => e is ClockElement)) {
+                      } else {
+                        context.read<StoryEditorCubit>().addClockElement();
+                      }
                       Navigator.of(context).pop();
                     },
                   ),
@@ -142,11 +151,18 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                           text:
                               '${state.weatherIcon} ${state.temperatureElement!.value.toStringAsFixed(1)}',
                           onTap: () {
-                            context
+                            if (context
                                 .read<StoryEditorCubit>()
-                                .addTemperatureElement(
-                                  state.temperatureElement!,
-                                );
+                                .state
+                                .positionedElements
+                                .any((e) => e is TemperatureElement)) {
+                            } else {
+                              context
+                                  .read<StoryEditorCubit>()
+                                  .addTemperatureElement(
+                                    state.temperatureElement!,
+                                  );
+                            }
                             Navigator.of(context).pop();
                           },
                         );
@@ -233,8 +249,7 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if(asset!=null)
-            SvgPicture.asset(asset),
+            if (asset != null) SvgPicture.asset(asset),
             Gaps.hGap1,
             Text(
               text,
@@ -259,7 +274,12 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
     if (gif != null) {
       final gifUrl = gif.images?.original?.url;
       if (gifUrl != null) {
-        context.read<StoryEditorCubit>().addStickerElement(gifUrl: gifUrl);
+        if (context.read<StoryEditorCubit>().state.positionedElements.any(
+          (e) => e is GifElement,
+        )) {
+        } else {
+          context.read<StoryEditorCubit>().addStickerElement(gifUrl: gifUrl);
+        }
       }
     }
   }

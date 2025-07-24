@@ -33,29 +33,21 @@ class PositionedElementItem extends StatefulWidget {
 }
 
 class _PositionedElementItemState extends State<PositionedElementItem> {
-  late Offset _offset;
-  late double _scale;
-  late double _rotation;
-
-  late Offset _initialOffset;
-  late Offset _startFocalPoint;
-  late double _initialScale;
-  late double _initialRotation;
+  Offset _position = Offset(100, 100);
+  double _scale = 1.0;
+  double _rotation = 0.0;
+  Offset? _startFocalPoint;
+  Offset? _startPosition;
+  double? _startScale;
+  double? _startRotation;
   late   PositionedElementStoryTheme _initStoryTheme ;
-@override
-  void didChangeDependencies() {
-  _offset = widget.positionedElement.offset ?? const Offset(100, 100);
-  _scale = widget.positionedElement.scale ?? 1.0;
-  _rotation = widget.positionedElement.rotation ?? 0.0;
 
-  super.didChangeDependencies();
-  }
   @override
   void initState() {
     super.initState();
     _initStoryTheme = widget.positionedElement.positionedElementStoryTheme ??
         PositionedElementStoryTheme.white;
-    _offset = widget.positionedElement.offset ?? const Offset(100, 100);
+    _position = widget.positionedElement.offset ?? const Offset(100, 100);
     _scale = widget.positionedElement.scale ?? 1.0;
     _rotation = widget.positionedElement.rotation ?? 0.0;
   }
@@ -65,7 +57,6 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
   void _updateParent() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Size? originalSize = widget.widgetKey.currentContext?.size;
-      print('ooooooooo${originalSize}');
       Size scaledSize = Size.zero;
       if (originalSize != null) {
         Size scaledSize = Size(
@@ -76,7 +67,7 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
       }
 
       final updatedElement = widget.positionedElement.copyWith(
-        offset: _offset,
+        offset: _position,
         rotation: _rotation,
         size: scaledSize,
         scale: _scale,
@@ -87,50 +78,49 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
   }
 
   void _onScaleStart(ScaleStartDetails details) {
-    _initialScale = _scale;
-    _initialRotation = _rotation;
     _startFocalPoint = details.focalPoint;
-    _initialOffset = _offset;
+    _startPosition = _position;
+    _startScale = _scale;
+    _startRotation = _rotation;
+    setState(() {});
   }
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
     // If new finger added or removed, update base references
     setState(() {
-      _scale = (_initialScale * details.scale).clamp(0.5, 5.0);
-      _rotation = _initialRotation + details.rotation;
-      final delta = details.focalPoint - _startFocalPoint;
-      _offset = _initialOffset + delta;
+      _position = _startPosition! + (details.focalPoint - _startFocalPoint!);
+
+      // Scale with constraints
+      _scale = (_startScale! * details.scale);
+
+      // Rotation
+      _rotation = _startRotation! + details.rotation;
     });
     _updateParent();
-    print(_pointerCount);
   }
 
   @override
   Widget build(BuildContext context) {
-    print(_initStoryTheme);
     return Positioned(
-      left: _offset.dx,
-      top: _offset.dy,
+      left: _position.dx,
+      top: _position.dy,
       child: GestureDetector(
         onScaleStart: _onScaleStart,
         onScaleUpdate: _onScaleUpdate,
-        onScaleEnd: (_) {
-          _updateParent();
-        },
-        child: Transform.translate(
-          offset: Offset.zero,
-          child: Transform.rotate(
-            angle: _rotation,
-            child: Transform.scale(
-              scale: _scale,
-              child:
-                  widget.positionedElement is StickerElement
-                      ? GifView.network(
-                        (widget.positionedElement as StickerElement).gifUrl,
-                        height: 200,
-                        width: 200,
-                      )
-                      : MainPositionedWidget(
+        child: Transform.rotate(
+          angle: _rotation,
+          child: Transform.scale(
+            scale: _scale,
+            child:
+                widget.positionedElement is StickerElement
+                    ? GifView.network(
+                      (widget.positionedElement as StickerElement).gifUrl,
+                      height: 200,
+                      width: 200,
+                    )
+                    : Padding(
+                      padding: const EdgeInsets.all(50),
+                      child: MainPositionedWidget(
                         theme: _initStoryTheme,
                         onChangedTheme: () {
                           toggleElementTheme();
@@ -145,7 +135,7 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
                         key: widget.widgetKey,
                         child: _buildMainPostionedItem(context),
                       ),
-            ),
+                    ),
           ),
         ),
       ),
@@ -253,7 +243,7 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
           SvgPicture.asset(AssetsManager.storyClock, color: svgColor),
           Gaps.hGap1,
           Text(
-            DateFormat('h:mm:a')
+            DateFormat('h:mm a')
                 .format((widget.positionedElement as ClockElement).dateTime)
                 .toLowerCase(),
             style: elementTextStyle,

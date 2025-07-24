@@ -12,7 +12,6 @@ class MediaStory extends Equatable {
   final double? rotateAngle;
   final double? scale;
   final Offset? offset;
-  final bool? isVideoMuted;
 
   const MediaStory({
     this.offset,
@@ -22,7 +21,6 @@ class MediaStory extends Equatable {
     this.isVideoFile = false,
     this.rotateAngle,
     this.order,
-    this.isVideoMuted,
   });
 
   factory MediaStory.empty() {
@@ -50,7 +48,6 @@ class MediaStory extends Equatable {
       scale: scale ?? this.scale,
       offset: offset ?? this.offset,
       id: id,
-      isVideoMuted: isVideoMuted ?? this.isVideoMuted,
       file: file ?? this.file,
       rotateAngle: rotateAngle ?? this.rotateAngle,
       isVideoFile: isVideoFile ?? this.isVideoFile,
@@ -73,8 +70,6 @@ class MediaStory extends Equatable {
   toJson() async {
     Map<String, dynamic> data = <String, dynamic>{};
     if (order != null) data.putIfAbsent('order', () => order);
-    if (isVideoMuted != null && isVideoFile)
-      data.putIfAbsent('isVideoMuted', () => boolToInt(isVideoMuted));
     if (rotateAngle != null)
       data.putIfAbsent('rotate_angle', () => rotateAngle);
     if (scale != null) data.putIfAbsent('scale', () => scale);

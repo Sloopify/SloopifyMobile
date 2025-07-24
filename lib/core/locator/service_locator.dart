@@ -47,6 +47,7 @@ import 'package:sloopify_mobile/features/create_posts/presentation/blocs/post_fr
 import 'package:sloopify_mobile/features/create_story/data/create_stoty_provider/create_story_data_provider.dart';
 import 'package:sloopify_mobile/features/create_story/data/repository/create_story_repo.dart';
 import 'package:sloopify_mobile/features/create_story/domain/repository/create_story_repository.dart';
+import 'package:sloopify_mobile/features/create_story/domain/use_cases/create_my_story_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/create_place_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_all_user_places_use_case.dart';
 import 'package:sloopify_mobile/features/create_story/domain/use_cases/get_story_audios_use_case.dart';
@@ -189,6 +190,7 @@ Future<void> setupLocator() async {
   );
   locator.registerFactory(
         () => StoryEditorCubit(
+          createMyStoryUseCase: locator()
     ),
   );
   locator.registerFactory(
@@ -331,7 +333,9 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton(
     () => SearchStoryAudioUseCase(createStoryRepo: locator()),
   );
-
+  locator.registerLazySingleton(
+        () => CreateMyStoryUseCase(createStoryRepo: locator()),
+  );
   ///
   ///Repositories
   ////////

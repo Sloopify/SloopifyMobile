@@ -38,7 +38,7 @@ import '../widgets/postitioned_element_item.dart';
 import '../widgets/story_privacy_fab.dart';
 import '../widgets/text_input_overlay.dart';
 
-enum EditingMode { normal, draw, text, sticker }
+enum EditingMode { normal, draw, text, sticker,dragging }
 
 class StoryEditorScreen extends StatefulWidget {
   const StoryEditorScreen({Key? key}) : super(key: key);
@@ -270,6 +270,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                                     state.allTextAlignment.map((e) => e.text),
                                   );
                                   return EditableTextElement(
+                                    onScale: (){},
                                     onTap: () {
                                       context
                                           .read<TextEditingCubit>()
@@ -278,13 +279,6 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                                     },
                                     widgetKey: _textKeys[e.id]!,
                                     textElement: e,
-                                    onElementChanged: (updatedElement) {
-                                      context
-                                          .read<TextEditingCubit>()
-                                          .updateSelectedPositionedText(
-                                            updatedElement,
-                                          );
-                                    },
                                   );
                                 },
                               );
@@ -553,6 +547,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                                   state.allTextAlignment.map((e) => e.text),
                                 );
                                 return EditableTextElement(
+                                  onScale: (){},
                                   onTap: () {
                                     context
                                         .read<TextEditingCubit>()
@@ -561,13 +556,6 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
                                   },
                                   widgetKey: _textKeys[e.id]!,
                                   textElement: e,
-                                  onElementChanged: (updatedElement) {
-                                    context
-                                        .read<TextEditingCubit>()
-                                        .updateSelectedPositionedText(
-                                          updatedElement,
-                                        );
-                                  },
                                 );
                               },
                             );
