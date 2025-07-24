@@ -26,6 +26,7 @@ import 'package:sloopify_mobile/features/create_story/presentation/widgets/post_
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/story_elements_sheet.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/story_painter.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/stroke_width_drawer.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/widgets/text_editing_tool_bar.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/ui/widgets/custom_sheet.dart';
@@ -38,7 +39,7 @@ import '../widgets/postitioned_element_item.dart';
 import '../widgets/story_privacy_fab.dart';
 import '../widgets/text_input_overlay.dart';
 
-enum EditingMode { normal, draw, text, sticker,dragging }
+enum EditingMode { normal, draw, text, sticker, dragging }
 
 class StoryEditorScreen extends StatefulWidget {
   const StoryEditorScreen({Key? key}) : super(key: key);
@@ -80,6 +81,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
     _textFocusNode = FocusNode();
     //context.read<CalculateTempCubit>().getCurrentTemperature();
     _initializeAnimations();
+    print(
+      context.read<StoryEditorCubit>().state.mediaFiles!.map((e) => e.offset),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeVideoMedia(context);
     });
@@ -120,15 +124,13 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
   }
 
   void _toggleToolbar() {
-    setState(() {
-      _isToolbarVisible = !_isToolbarVisible;
-    });
-    if (_isToolbarVisible) {
+    if (_currentMode == EditingMode.normal) {
       _toolbarAnimationController.forward();
     } else {
       _toolbarAnimationController.reverse();
     }
   }
+
 
   void _changeEditingMode(EditingMode mode) {
     setState(() {
@@ -136,7 +138,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
     });
   }
 
-  void _applyCenteredGridLayout() {
+  void _applyCenteredGridLayout(BuildContext context) {
     final mediaFiles = context.read<StoryEditorCubit>().state.mediaFiles ?? [];
     if (mediaFiles.isEmpty) return;
 
@@ -169,6 +171,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
       final updatedMedia = mediaFiles[i].copyWith(offset: Offset(dx, dy));
       updatedMediaFiles.add(updatedMedia);
     }
+    print(updatedMediaFiles.map((e) => e.offset));
 
     context.read<StoryEditorCubit>().setFinalListOfMediaFiles(
       updatedMediaFiles,
@@ -177,516 +180,895 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton:
-          _currentMode == EditingMode.normal
-              ? Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.p10,
-                  vertical: AppPadding.p10,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [StoryPrivacyFab(), PostStoryBtn()],
-                ),
-              )
-              : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      backgroundColor: Colors.black,
-      body: BlocBuilder<DrawingStoryCubit, DrawingState>(
-        builder: (context, state) {
-          return BlocBuilder<StoryEditorCubit, StoryEditorState>(
-            builder: (context, storyState) {
-              final mediaFiles = storyState.mediaFiles ?? [];
-              print(mediaFiles.map((e) => e.offset));
-              if (mediaFiles.length > 1 && mediaFiles.isNotEmpty) {
-                // Apply dynamic layout when media files change
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mediaFiles.isNotEmpty && mediaFiles.length > 1) {
-                    // Check if layout needs to be applied (items without positions)
-                    final needsLayout = mediaFiles.any(
-                      (item) =>
-                          item.offset == null ||
-                          item.scale == null ||
-                          item.offset == Offset.zero,
-                    );
-                    if (needsLayout) {
-                      _applyCenteredGridLayout();
-                    }
-                  }
-                });
-                return GestureDetector(
-                  onPanStart:
-                      _currentMode == EditingMode.draw
-                          ? (details) {
-                            context.read<DrawingStoryCubit>().changeCurrentLine(
-                              [details.localPosition],
-                            );
-                          }
-                          : null,
-                  onPanUpdate:
-                      _currentMode == EditingMode.draw
-                          ? (details) {
-                            context.read<DrawingStoryCubit>().addNewLine(
-                              details.localPosition,
-                            );
-                          }
-                          : null,
-                  onPanEnd:
-                      _currentMode == EditingMode.draw
-                          ? (details) {
-                            context
-                                .read<DrawingStoryCubit>()
-                                .addDrawingElement();
-                            context
-                                .read<DrawingStoryCubit>()
-                                .emptyCurrentPoints();
-                          }
-                          : null,
-                  child: Stack(
-                    fit: StackFit.passthrough,
-                    children: [
-                      ...storyState.mediaFiles!.asMap().entries.map((entry) {
-                        return InteractiveMediaItem(media: entry.value);
-                      }),
-                      if (context
-                          .read<TextEditingCubit>()
-                          .state
-                          .allTextAlignment
-                          .isNotEmpty)
-                        ...context
-                            .read<TextEditingCubit>()
-                            .state
-                            .allTextAlignment
-                            .map((e) {
-                              _textKeys.putIfAbsent(e.id, () => GlobalKey());
-                              return BlocBuilder<
-                                TextEditingCubit,
-                                TextEditingState
-                              >(
-                                builder: (context, state) {
-                                  print(
-                                    state.allTextAlignment.map((e) => e.text),
-                                  );
-                                  return EditableTextElement(
-                                    onScale: (){},
-                                    onTap: () {
-                                      context
-                                          .read<TextEditingCubit>()
-                                          .setEditingExistingText(true);
-                                      _changeEditingMode(EditingMode.text);
-                                    },
-                                    widgetKey: _textKeys[e.id]!,
-                                    textElement: e,
-                                  );
-                                },
-                              );
-                            }),
-                      if (context
-                          .read<StoryEditorCubit>()
-                          .state
-                          .positionedElements
-                          .isNotEmpty)
-                        ...context
-                            .read<StoryEditorCubit>()
-                            .state
-                            .positionedElements
-                            .map((e) {
-                              _elementsKey.putIfAbsent(e.id, () => GlobalKey());
-                              return BlocBuilder<
-                                StoryEditorCubit,
-                                StoryEditorState
-                              >(
-                                builder: (context, state) {
-                                  return PositionedElementItem(
-                                    widgetKey: _elementsKey[e.id]!,
-                                    positionedElement: e,
-                                  );
-                                },
-                              );
-                            }),
-                      // Top Toolbar
-                      Positioned(
-                        top: MediaQuery.of(context).padding.top,
-                        left: 0,
-                        right: 0,
-                        child: EditingTopToolBar(
-                          editingMode: _currentMode,
-                          onDone: () {
-                            context.read<StoryEditorCubit>().addTextElement(
-                              newElement:
-                                  context
-                                      .read<TextEditingCubit>()
-                                      .state
-                                      .allTextAlignment,
-                            );
-                            _changeEditingMode(EditingMode.normal);
-                            _toggleToolbar();
-                          },
-                          onBack: () {
-                            if (_currentMode == EditingMode.draw) {
-                              context.read<DrawingStoryCubit>().clearDrawing();
-                              _changeEditingMode(EditingMode.normal);
-                              _toggleToolbar();
-                            } else {
-                              CustomSheet.show(
-                                child: MultiBlocProvider(
-                                  providers: [
-                                    BlocProvider.value(
-                                      value: context.read<StoryEditorCubit>(),
-                                    ),
-                                    BlocProvider.value(
-                                      value: context.read<TextEditingCubit>(),
-                                    ),
-                                    BlocProvider.value(
-                                      value: context.read<DrawingStoryCubit>(),
-                                    ),
-                                  ],
-                                  child: ConfirmDiscardOrKeepEditingStory(),
-                                ),
-                                context: context,
-                                barrierColor: ColorManager.black.withOpacity(
-                                  0.2,
-                                ),
-                              );
-                            }
-                          },
-                          undoDrawing:
-                              context.read<DrawingStoryCubit>().undoDrawing,
-                        ),
-                      ),
-                      // Bottom Toolbar
-                      AnimatedBuilder(
-                        animation: _toolbarAnimation,
-                        builder: (context, child) {
-                          return Positioned(
-                            top: MediaQuery.of(context).padding.top + 100,
-                            left: 15,
-                            child: Transform.translate(
-                              offset: Offset(
-                                0,
-                                100 * (1 - _toolbarAnimation.value),
-                              ),
-                              child: Opacity(
-                                opacity: _toolbarAnimation.value,
-                                child: _buildSideLeftDrawingToolBar(context),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      if (_currentMode == EditingMode.draw)
-                        Positioned(
-                          top: MediaQuery.of(context).padding.top + 100,
-                          right: 0,
-                          child: StrokeWidthDrawer(
-                            onChanged:
-                                context
-                                    .read<DrawingStoryCubit>()
-                                    .changeStrokeWidth,
-                            currentStrokeWidth: state.strokeWidth,
-                          ),
-                        ),
-                      // Mode-specific Toolbars
-                      if (_currentMode == EditingMode.draw)
-                        DrawingColorPallete(),
-                      // Text Editing Overlay (TextField and Text Toolbar)
-                      if (_currentMode == EditingMode.text)
-                        TextInputOverlay(
-                          focusNode: _textFocusNode,
-                          onTextSubmitted: () {
-                            _changeEditingMode(EditingMode.normal);
-                            _toggleToolbar();
-                          },
-                        ),
-                      //_buildPostStoryBtn(),
-                    ],
-                  ),
-                );
-              } else if (mediaFiles.isNotEmpty && mediaFiles.length == 1) {
-                return Stack(
-                  fit: StackFit.passthrough,
-                  children: [
-                    Positioned.fill(
-                      child: GestureDetector(
-                        onScaleUpdate:
-                            _currentMode != EditingMode.draw
-                                ? (details) {
-                                  if (_currentMode != EditingMode.draw) {
-                                    setState(() {
-                                      // Update scale
-                                      _currentScale =
-                                          _initialScale * details.scale;
-
-                                      // Update rotation
-                                      _currentRotation =
-                                          _initialRotation + details.rotation;
-
-                                      _currentOffset += details.focalPointDelta;
-                                    });
-                                  }
+    return BlocBuilder<StoryEditorCubit, StoryEditorState>(
+      builder: (context, state) {
+        if (_currentMode ==EditingMode.normal &&state.mediaFiles!.any(
+              (element) =>
+          element.offset == null ||
+              element.offset == Offset.zero ||
+              element.scale == null ||
+              element.rotateAngle == null,
+        )) {
+          _applyCenteredGridLayout(context);
+        }
+        return Scaffold(
+          floatingActionButton:
+              _currentMode == EditingMode.normal
+                  ? Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppPadding.p10,
+                      vertical: AppPadding.p10,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [StoryPrivacyFab(), PostStoryBtn()],
+                    ),
+                  )
+                  : null,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          backgroundColor: Colors.black,
+          body:
+              state.mediaFiles!.length > 1
+                  ? SafeArea(
+                    child:
+                        _currentMode == EditingMode.dragging
+                            ? BlocBuilder<StoryEditorCubit, StoryEditorState>(
+                              builder: (context, state) {
+                                if (state.mediaFiles!.any(
+                                  (element) =>
+                                      element.offset == null ||
+                                      element.offset == Offset.zero ||
+                                      element.scale == null ||
+                                      element.rotateAngle == null,
+                                )) {
+                                  _applyCenteredGridLayout(context);
                                 }
-                                : null,
-                        onScaleStart:
-                            _currentMode != EditingMode.draw
-                                ? (details) {
-                                  if (_currentMode != EditingMode.draw) {
-                                    _initialScale = _currentScale;
-                                    _initialRotation = _currentRotation;
-                                    _initialOffset = _currentOffset;
-                                    context
-                                        .read<StoryEditorCubit>()
-                                        .onUpdateAttributeOneMedia(
-                                          _currentScale,
-                                          _currentOffset,
-                                          _currentRotation,
-                                        );
-                                  }
-                                }
-                                : null,
-                        onPanStart:
-                            _currentMode == EditingMode.draw &&
-                                    context
+                                return Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: GestureDetector(
+                                        onTap:
+                                            () => _changeEditingMode(
+                                              EditingMode.normal,
+                                            ),
+                                      ),
+                                    ),
+                                    ...state.mediaFiles!.asMap().entries.map((
+                                      entry,
+                                    ) {
+                                      return InteractiveMediaItem(
+                                        media: entry.value,
+                                        onScale:
+                                            () => _changeEditingMode(
+                                              EditingMode.dragging,
+                                            ),
+                                      );
+                                    }),
+                                    if (context
                                         .read<TextEditingCubit>()
                                         .state
                                         .allTextAlignment
-                                        .isEmpty
-                                ? (details) {
-                                  context
-                                      .read<DrawingStoryCubit>()
-                                      .changeCurrentLine([
-                                        details.localPosition,
-                                      ]);
-                                }
-                                : null,
-                        onPanUpdate:
-                            _currentMode == EditingMode.draw
-                                ? (details) {
-                                  context.read<DrawingStoryCubit>().addNewLine(
-                                    details.localPosition,
-                                  );
-                                }
-                                : null,
-                        onPanEnd:
-                            _currentMode == EditingMode.draw
-                                ? (details) {
-                                  context
-                                      .read<DrawingStoryCubit>()
-                                      .addDrawingElement();
-                                  context
-                                      .read<StoryEditorCubit>()
-                                      .addDrawingElement(state.lines);
-                                  context
-                                      .read<DrawingStoryCubit>()
-                                      .emptyCurrentPoints();
-                                }
-                                : null,
-                        child: Stack(
-                          children: [
-                            Container(
-                              color: Colors.black,
-                              child: Center(
-                                child: Transform.translate(
-                                  offset: _currentOffset,
-                                  // Apply translation first
-                                  child: Transform.rotate(
-                                    angle: _currentRotation,
-                                    // Combine initial and gesture rotation
-                                    child: Transform.scale(
-                                      scale: _currentScale,
-                                      // Apply scale
-                                      child:
-                                          mediaFiles.first.isVideoFile
-                                              ? _buildVideoPlayer()
-                                              : _buildImageDisplay(
-                                                mediaFiles.first.file!,
-                                              ),
+                                        .isNotEmpty)
+                                      ...context
+                                          .read<TextEditingCubit>()
+                                          .state
+                                          .allTextAlignment
+                                          .map((e) {
+                                            _textKeys.putIfAbsent(
+                                              e.id,
+                                              () => GlobalKey(),
+                                            );
+                                            return BlocBuilder<
+                                              TextEditingCubit,
+                                              TextEditingState
+                                            >(
+                                              builder: (context, state) {
+                                                print(
+                                                  state.allTextAlignment.map(
+                                                    (e) => e.text,
+                                                  ),
+                                                );
+                                                return EditableTextElement(
+                                                  onScale: () =>_changeEditingMode(EditingMode.dragging),
+                                                  onTap: () {
+                                                    context
+                                                        .read<
+                                                          TextEditingCubit
+                                                        >()
+                                                        .setEditingExistingText(
+                                                          true,
+                                                        );
+                                                    _changeEditingMode(
+                                                      EditingMode.text,
+                                                    );
+                                                  },
+                                                  widgetKey: _textKeys[e.id]!,
+                                                  textElement: e,
+                                                );
+                                              },
+                                            );
+                                          }),
+                                    if (state.positionedElements.isNotEmpty)
+                                      ...state.positionedElements.map((e) {
+                                        _elementsKey.putIfAbsent(
+                                          e.id,
+                                          () => GlobalKey(),
+                                        );
+                                        return BlocBuilder<
+                                          StoryEditorCubit,
+                                          StoryEditorState
+                                        >(
+                                          builder: (context, state) {
+                                            return PositionedElementItem(
+                                              widgetKey: _elementsKey[e.id]!,
+                                              positionedElement: e,
+                                            );
+                                          },
+                                        );
+                                      }),
+                                  ],
+                                );
+                              },
+                            )
+                            : _currentMode == EditingMode.draw
+                            ? Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: GestureDetector(
+                                    onPanStart: (details) {
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .changeCurrentLine([
+                                            details.localPosition,
+                                          ]);
+                                    },
+
+                                    onPanUpdate: (details) {
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .addNewLine(details.localPosition);
+                                    },
+                                    onPanEnd: (details) {
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .addDrawingElement();
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .emptyCurrentPoints();
+                                    },
+                                    child: Container(
+                                      color: ColorManager.black,
+                                      child: BlocBuilder<
+                                        DrawingStoryCubit,
+                                        DrawingState
+                                      >(
+                                        builder: (context, state) {
+                                          return CustomPaint(
+                                            painter: StoryPainter(
+                                              drawingPaths:
+                                                  state.lines +
+                                                  [
+                                                    if (state
+                                                        .currentPoints
+                                                        .isNotEmpty)
+                                                      DrawingElement(
+                                                        points:
+                                                            state.currentPoints,
+                                                        color: state.lineColor,
+                                                        strokeWidth:
+                                                            state.strokeWidth,
+                                                      ),
+                                                  ],
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: CustomPaint(
-                                painter: StoryPainter(
-                                  drawingPaths:
-                                      state.lines +
-                                      [
-                                        if (state.currentPoints.isNotEmpty)
-                                          DrawingElement(
-                                            points: state.currentPoints,
-                                            color: state.lineColor,
-                                            strokeWidth: state.strokeWidth,
-                                          ),
-                                      ],
+                                ...state.mediaFiles!.asMap().entries.map((
+                                  entry,
+                                ) {
+                                  return InteractiveMediaItem(
+                                    media: entry.value,
+                                    onScale:
+                                        () => {},
+                                  );
+                                }),
+                                if (context
+                                    .read<TextEditingCubit>()
+                                    .state
+                                    .allTextAlignment
+                                    .isNotEmpty)
+                                  ...context
+                                      .read<TextEditingCubit>()
+                                      .state
+                                      .allTextAlignment
+                                      .map((e) {
+                                        _textKeys.putIfAbsent(
+                                          e.id,
+                                          () => GlobalKey(),
+                                        );
+                                        return BlocBuilder<
+                                          TextEditingCubit,
+                                          TextEditingState
+                                        >(
+                                          builder: (context, state) {
+                                            print(
+                                              state.allTextAlignment.map(
+                                                (e) => e.text,
+                                              ),
+                                            );
+                                            return EditableTextElement(
+                                              onScale: () =>_changeEditingMode(EditingMode.dragging),
+                                              onTap: () {
+                                                context
+                                                    .read<TextEditingCubit>()
+                                                    .setEditingExistingText(
+                                                      true,
+                                                    );
+                                                _changeEditingMode(
+                                                  EditingMode.text,
+                                                );
+                                              },
+                                              widgetKey: _textKeys[e.id]!,
+                                              textElement: e,
+                                            );
+                                          },
+                                        );
+                                      }),
+                                if (state.positionedElements.isNotEmpty)
+                                  ...state.positionedElements.map((e) {
+                                    _elementsKey.putIfAbsent(
+                                      e.id,
+                                      () => GlobalKey(),
+                                    );
+                                    return BlocBuilder<
+                                      StoryEditorCubit,
+                                      StoryEditorState
+                                    >(
+                                      builder: (context, state) {
+                                        return PositionedElementItem(
+                                          widgetKey: _elementsKey[e.id]!,
+                                          positionedElement: e,
+                                        );
+                                      },
+                                    );
+                                  }),
+                                Positioned(
+                                  top: MediaQuery.of(context).padding.top + 100,
+                                  right: 0,
+                                  child: BlocBuilder<
+                                    DrawingStoryCubit,
+                                    DrawingState
+                                  >(
+                                    builder: (context, state) {
+                                      return StrokeWidthDrawer(
+                                        onChanged:
+                                            context
+                                                .read<DrawingStoryCubit>()
+                                                .changeStrokeWidth,
+                                        currentStrokeWidth: state.strokeWidth,
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (context
-                        .read<TextEditingCubit>()
-                        .state
-                        .allTextAlignment
-                        .isNotEmpty)
-                      ...context
-                          .read<TextEditingCubit>()
-                          .state
-                          .allTextAlignment
-                          .map((e) {
-                            _textKeys.putIfAbsent(e.id, () => GlobalKey());
-                            return BlocBuilder<
-                              TextEditingCubit,
-                              TextEditingState
-                            >(
-                              builder: (context, state) {
-                                print(
-                                  state.allTextAlignment.map((e) => e.text),
-                                );
-                                return EditableTextElement(
-                                  onScale: (){},
-                                  onTap: () {
-                                    context
-                                        .read<TextEditingCubit>()
-                                        .setEditingExistingText(true);
-                                    _changeEditingMode(EditingMode.text);
+                                DrawingColorPallete(),
+                              ],
+                            )
+                            : _currentMode == EditingMode.text
+                            ? Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: GestureDetector(
+                                    onTap:
+                                        () => _changeEditingMode(
+                                          EditingMode.normal,
+                                        ),
+                                    child: Container(color: ColorManager.black),
+                                  ),
+                                ),
+                                ...state.mediaFiles!.asMap().entries.map((
+                                  entry,
+                                ) {
+                                  return InteractiveMediaItem(
+                                    media: entry.value,
+                                    onScale:
+                                        () =>{},
+                                  );
+                                }),
+                                if (context
+                                    .read<TextEditingCubit>()
+                                    .state
+                                    .allTextAlignment
+                                    .isNotEmpty)
+                                  ...context
+                                      .read<TextEditingCubit>()
+                                      .state
+                                      .allTextAlignment
+                                      .map((e) {
+                                        _textKeys.putIfAbsent(
+                                          e.id,
+                                          () => GlobalKey(),
+                                        );
+                                        return BlocBuilder<
+                                          TextEditingCubit,
+                                          TextEditingState
+                                        >(
+                                          builder: (context, state) {
+                                            print(
+                                              state.allTextAlignment.map(
+                                                (e) => e.text,
+                                              ),
+                                            );
+                                            return EditableTextElement(
+                                              onScale: () =>_changeEditingMode(EditingMode.dragging),
+                                              onTap: () {
+                                                context
+                                                    .read<TextEditingCubit>()
+                                                    .setEditingExistingText(
+                                                      true,
+                                                    );
+                                                _changeEditingMode(
+                                                  EditingMode.text,
+                                                );
+                                              },
+                                              widgetKey: _textKeys[e.id]!,
+                                              textElement: e,
+                                            );
+                                          },
+                                        );
+                                      }),
+                                if (state.positionedElements.isNotEmpty)
+                                  ...state.positionedElements.map((e) {
+                                    _elementsKey.putIfAbsent(
+                                      e.id,
+                                      () => GlobalKey(),
+                                    );
+                                    return BlocBuilder<
+                                      StoryEditorCubit,
+                                      StoryEditorState
+                                    >(
+                                      builder: (context, state) {
+                                        return PositionedElementItem(
+                                          widgetKey: _elementsKey[e.id]!,
+                                          positionedElement: e,
+                                        );
+                                      },
+                                    );
+                                  }),
+                                TextInputOverlay(
+                                  focusNode: _textFocusNode,
+                                  onTextSubmitted: () {
+                                    _changeEditingMode(EditingMode.normal);
+                                    _toggleToolbar();
                                   },
-                                  widgetKey: _textKeys[e.id]!,
-                                  textElement: e,
-                                );
-                              },
-                            );
-                          }),
-                    if (context
-                        .read<StoryEditorCubit>()
-                        .state
-                        .positionedElements
-                        .isNotEmpty)
-                      ...context
-                          .read<StoryEditorCubit>()
-                          .state
-                          .positionedElements
-                          .map((e) {
-                            _elementsKey.putIfAbsent(e.id, () => GlobalKey());
-                            return BlocBuilder<
-                              StoryEditorCubit,
-                              StoryEditorState
-                            >(
+                                ),
+                              ],
+                            )
+                            : _currentMode == EditingMode.normal
+                            ? BlocBuilder<StoryEditorCubit, StoryEditorState>(
                               builder: (context, state) {
-                                return Draggable<PositionedElement>(
-                                  data: e,
-                                  feedback: PositionedElementItem(
-                                    widgetKey: _elementsKey[e.id]!,
-                                    positionedElement: e,
-                                  ),
-                                  child: PositionedElementItem(
-                                    widgetKey: _elementsKey[e.id]!,
-                                    positionedElement: e,
-                                  ),
+                                return Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: Container(
+                                        color: ColorManager.black,
+                                        child: BlocBuilder<
+                                          DrawingStoryCubit,
+                                          DrawingState
+                                        >(
+                                          builder: (context, state) {
+                                            return CustomPaint(
+                                              painter: StoryPainter(
+                                                drawingPaths:
+                                                    state.lines +
+                                                    [
+                                                      if (state
+                                                          .currentPoints
+                                                          .isNotEmpty)
+                                                        DrawingElement(
+                                                          points:
+                                                              state
+                                                                  .currentPoints,
+                                                          color:
+                                                              state.lineColor,
+                                                          strokeWidth:
+                                                              state.strokeWidth,
+                                                        ),
+                                                    ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    ...state.mediaFiles!.asMap().entries.map((
+                                      entry,
+                                    ) {
+                                      return InteractiveMediaItem(
+                                        media: entry.value,
+                                        onScale:
+                                            () => _changeEditingMode(
+                                              EditingMode.dragging,
+                                            ),
+                                      );
+                                    }),
+                                    if (context
+                                        .read<TextEditingCubit>()
+                                        .state
+                                        .allTextAlignment
+                                        .isNotEmpty)
+                                      ...context
+                                          .read<TextEditingCubit>()
+                                          .state
+                                          .allTextAlignment
+                                          .map((e) {
+                                            _textKeys.putIfAbsent(
+                                              e.id,
+                                              () => GlobalKey(),
+                                            );
+                                            return BlocBuilder<
+                                              TextEditingCubit,
+                                              TextEditingState
+                                            >(
+                                              builder: (context, state) {
+                                                print(
+                                                  state.allTextAlignment.map(
+                                                    (e) => e.text,
+                                                  ),
+                                                );
+                                                return EditableTextElement(
+                                                  onScale: () =>_changeEditingMode(EditingMode.dragging),
+                                                  onTap: () {
+                                                    context
+                                                        .read<
+                                                          TextEditingCubit
+                                                        >()
+                                                        .setEditingExistingText(
+                                                          true,
+                                                        );
+                                                    _changeEditingMode(
+                                                      EditingMode.text,
+                                                    );
+                                                  },
+                                                  widgetKey: _textKeys[e.id]!,
+                                                  textElement: e,
+                                                );
+                                              },
+                                            );
+                                          }),
+                                    if (state.positionedElements.isNotEmpty)
+                                      ...state.positionedElements.map((e) {
+                                        _elementsKey.putIfAbsent(
+                                          e.id,
+                                          () => GlobalKey(),
+                                        );
+                                        return BlocBuilder<
+                                          StoryEditorCubit,
+                                          StoryEditorState
+                                        >(
+                                          builder: (context, state) {
+                                            return PositionedElementItem(
+                                              widgetKey: _elementsKey[e.id]!,
+                                              positionedElement: e,
+                                            );
+                                          },
+                                        );
+                                      }),
+                                    AnimatedBuilder(
+                                      animation: _toolbarAnimation,
+                                      builder: (context, child) {
+                                        return Positioned(
+                                          top:
+                                              MediaQuery.of(
+                                                context,
+                                              ).padding.top +
+                                              100,
+                                          left: 15,
+                                          child: Transform.translate(
+                                            offset: Offset(
+                                              0,
+                                              100 *
+                                                  (1 - _toolbarAnimation.value),
+                                            ),
+                                            child: Opacity(
+                                              opacity: _toolbarAnimation.value,
+                                              child:
+                                                  _buildSideLeftDrawingToolBar(
+                                                    context,
+                                                  ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ), // Top Toolbar
+                                    Positioned(
+                                      top: MediaQuery.of(context).padding.top,
+                                      left: 0,
+                                      right: 0,
+                                      child: EditingTopToolBar(
+                                        editingMode: _currentMode,
+                                        onDone: () {
+                                          context
+                                              .read<StoryEditorCubit>()
+                                              .addTextElement(
+                                                newElement:
+                                                    context
+                                                        .read<
+                                                          TextEditingCubit
+                                                        >()
+                                                        .state
+                                                        .allTextAlignment,
+                                              );
+                                          _changeEditingMode(
+                                            EditingMode.normal,
+                                          );
+                                          _toggleToolbar();
+                                        },
+                                        onBack: () {
+                                          CustomSheet.show(
+                                            child: MultiBlocProvider(
+                                              providers: [
+                                                BlocProvider.value(
+                                                  value:
+                                                      context
+                                                          .read<
+                                                            StoryEditorCubit
+                                                          >(),
+                                                ),
+                                                BlocProvider.value(
+                                                  value:
+                                                      context
+                                                          .read<
+                                                            TextEditingCubit
+                                                          >(),
+                                                ),
+                                                BlocProvider.value(
+                                                  value:
+                                                      context
+                                                          .read<
+                                                            DrawingStoryCubit
+                                                          >(),
+                                                ),
+                                              ],
+                                              child:
+                                                  ConfirmDiscardOrKeepEditingStory(),
+                                            ),
+                                            context: context,
+                                            barrierColor: ColorManager.black
+                                                .withOpacity(0.2),
+                                          );
+                                        },
+                                        undoDrawing:
+                                            context
+                                                .read<DrawingStoryCubit>()
+                                                .undoDrawing,
+                                      ),
+                                    ),
+                                  ],
                                 );
                               },
-                            );
-                          }),
-                    // Top Toolbar
-                    Positioned(
-                      top: MediaQuery.of(context).padding.top,
-                      left: 0,
-                      right: 0,
-                      child: EditingTopToolBar(
-                        editingMode: _currentMode,
-                        onDone: () {
-                          _changeEditingMode(EditingMode.normal);
-                          _toggleToolbar();
-                        },
-                        onBack: () {
-                          if (_currentMode == EditingMode.draw) {
-                            context.read<DrawingStoryCubit>().clearDrawing();
-                            _changeEditingMode(EditingMode.normal);
-                            _toggleToolbar();
-                          } else if (_currentMode == EditingMode.normal) {
-                            _toggleToolbar();
-                            CustomSheet.show(
-                              child: MultiBlocProvider(
-                                providers: [
-                                  BlocProvider.value(
-                                    value: context.read<StoryEditorCubit>(),
+                            )
+                            : SizedBox.shrink(),
+                  )
+                  : SafeArea(
+                    child: Stack(
+                      fit: StackFit.passthrough,
+                      children: [
+                        Positioned.fill(
+                          child: GestureDetector(
+                            onScaleUpdate:
+                                _currentMode != EditingMode.draw
+                                    ? (details) {
+                                      if (_currentMode != EditingMode.draw) {
+                                        setState(() {
+                                          // Update scale
+                                          _currentScale =
+                                              _initialScale * details.scale;
+
+                                          // Update rotation
+                                          _currentRotation =
+                                              _initialRotation +
+                                              details.rotation;
+
+                                          _currentOffset +=
+                                              details.focalPointDelta;
+                                        });
+                                      }
+                                    }
+                                    : null,
+                            onScaleStart:
+                                _currentMode != EditingMode.draw
+                                    ? (details) {
+                                      if (_currentMode != EditingMode.draw) {
+                                        _initialScale = _currentScale;
+                                        _initialRotation = _currentRotation;
+                                        _initialOffset = _currentOffset;
+                                        context
+                                            .read<StoryEditorCubit>()
+                                            .onUpdateAttributeOneMedia(
+                                              _currentScale,
+                                              _currentOffset,
+                                              _currentRotation,
+                                            );
+                                      }
+                                    }
+                                    : null,
+                            onPanStart:
+                                _currentMode == EditingMode.draw &&
+                                        context
+                                            .read<TextEditingCubit>()
+                                            .state
+                                            .allTextAlignment
+                                            .isEmpty
+                                    ? (details) {
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .changeCurrentLine([
+                                            details.localPosition,
+                                          ]);
+                                    }
+                                    : null,
+                            onPanUpdate:
+                                _currentMode == EditingMode.draw
+                                    ? (details) {
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .addNewLine(details.localPosition);
+                                    }
+                                    : null,
+                            onPanEnd:
+                                _currentMode == EditingMode.draw
+                                    ? (details) {
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .addDrawingElement();
+                                      context
+                                          .read<StoryEditorCubit>()
+                                          .addDrawingElement(
+                                            context
+                                                .read<DrawingStoryCubit>()
+                                                .state
+                                                .lines,
+                                          );
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .emptyCurrentPoints();
+                                    }
+                                    : null,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  color: Colors.black,
+                                  child: Center(
+                                    child: Transform.translate(
+                                      offset: _currentOffset,
+                                      // Apply translation first
+                                      child: Transform.rotate(
+                                        angle: _currentRotation,
+                                        // Combine initial and gesture rotation
+                                        child: Transform.scale(
+                                          scale: _currentScale,
+                                          // Apply scale
+                                          child:
+                                              state
+                                                      .mediaFiles!
+                                                      .first
+                                                      .isVideoFile
+                                                  ? _buildVideoPlayer()
+                                                  : _buildImageDisplay(
+                                                    state
+                                                        .mediaFiles!
+                                                        .first
+                                                        .file!,
+                                                  ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  BlocProvider.value(
-                                    value: context.read<TextEditingCubit>(),
+                                ),
+                                Positioned.fill(
+                                  child: BlocBuilder<
+                                    DrawingStoryCubit,
+                                    DrawingState
+                                  >(
+                                    builder: (context, state) {
+                                      return CustomPaint(
+                                        painter: StoryPainter(
+                                          drawingPaths:
+                                              state.lines +
+                                              [
+                                                if (state
+                                                    .currentPoints
+                                                    .isNotEmpty)
+                                                  DrawingElement(
+                                                    points: state.currentPoints,
+                                                    color: state.lineColor,
+                                                    strokeWidth:
+                                                        state.strokeWidth,
+                                                  ),
+                                              ],
+                                        ),
+                                      );
+                                    },
                                   ),
-                                  BlocProvider.value(
-                                    value: context.read<DrawingStoryCubit>(),
-                                  ),
-                                ],
-                                child: ConfirmDiscardOrKeepEditingStory(),
-                              ),
-                              context: context,
-                              barrierColor: ColorManager.black.withOpacity(0.2),
-                            );
-                          } else if (_currentMode == EditingMode.text) {
-                            _changeEditingMode(EditingMode.normal);
-                            _toggleToolbar();
-                          }
-                        },
-                        undoDrawing:
-                            context.read<DrawingStoryCubit>().undoDrawing,
-                      ),
-                    ),
-                    // Bottom Toolbar
-                    AnimatedBuilder(
-                      animation: _toolbarAnimation,
-                      builder: (context, child) {
-                        return Positioned(
-                          top: MediaQuery.of(context).padding.top + 100,
-                          left: 15,
-                          child: Transform.translate(
-                            offset: Offset(
-                              0,
-                              100 * (1 - _toolbarAnimation.value),
-                            ),
-                            child: Opacity(
-                              opacity: _toolbarAnimation.value,
-                              child: _buildSideLeftDrawingToolBar(context),
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                    ),
-                    if (_currentMode == EditingMode.draw)
-                      Positioned(
-                        top: MediaQuery.of(context).padding.top + 100,
-                        right: 0,
-                        child: StrokeWidthDrawer(
-                          onChanged:
-                              context
-                                  .read<DrawingStoryCubit>()
-                                  .changeStrokeWidth,
-                          currentStrokeWidth: state.strokeWidth,
                         ),
-                      ),
-                    // Mode-specific Toolbars
-                    if (_currentMode == EditingMode.draw) DrawingColorPallete(),
-                    // Text Editing Overlay (TextField and Text Toolbar)
-                    if (_currentMode == EditingMode.text)
-                      TextInputOverlay(
-                        focusNode: _textFocusNode,
-                        onTextSubmitted: () {
-                          _changeEditingMode(EditingMode.normal);
-                          _toggleToolbar();
-                        },
-                      ),
-                  ],
-                );
-              } else {
-                return Container();
-              }
-            },
-          );
-        },
-      ),
+                        if (context
+                            .read<TextEditingCubit>()
+                            .state
+                            .allTextAlignment
+                            .isNotEmpty)
+                          ...context
+                              .read<TextEditingCubit>()
+                              .state
+                              .allTextAlignment
+                              .map((e) {
+                                _textKeys.putIfAbsent(e.id, () => GlobalKey());
+                                return BlocBuilder<
+                                  TextEditingCubit,
+                                  TextEditingState
+                                >(
+                                  builder: (context, state) {
+                                    print(
+                                      state.allTextAlignment.map((e) => e.text),
+                                    );
+                                    return EditableTextElement(
+                                      onScale: () =>{},
+                                      onTap: () {
+                                        context
+                                            .read<TextEditingCubit>()
+                                            .setEditingExistingText(true);
+                                        _changeEditingMode(EditingMode.text);
+                                      },
+                                      widgetKey: _textKeys[e.id]!,
+                                      textElement: e,
+                                    );
+                                  },
+                                );
+                              }),
+                        if (context
+                            .read<StoryEditorCubit>()
+                            .state
+                            .positionedElements
+                            .isNotEmpty)
+                          ...context
+                              .read<StoryEditorCubit>()
+                              .state
+                              .positionedElements
+                              .map((e) {
+                                _elementsKey.putIfAbsent(
+                                  e.id,
+                                  () => GlobalKey(),
+                                );
+                                return BlocBuilder<
+                                  StoryEditorCubit,
+                                  StoryEditorState
+                                >(
+                                  builder: (context, state) {
+                                    return Draggable<PositionedElement>(
+                                      data: e,
+                                      feedback: PositionedElementItem(
+                                        widgetKey: _elementsKey[e.id]!,
+                                        positionedElement: e,
+                                      ),
+                                      child: PositionedElementItem(
+                                        widgetKey: _elementsKey[e.id]!,
+                                        positionedElement: e,
+                                      ),
+                                    );
+                                  },
+                                );
+                              }),
+                        // Top Toolbar
+                        Positioned(
+                          top: MediaQuery.of(context).padding.top,
+                          left: 0,
+                          right: 0,
+                          child: EditingTopToolBar(
+                            editingMode: _currentMode,
+                            onDone: () {
+                              _changeEditingMode(EditingMode.normal);
+                              _toggleToolbar();
+                            },
+                            onBack: () {
+                              if (_currentMode == EditingMode.draw) {
+                                context
+                                    .read<DrawingStoryCubit>()
+                                    .clearDrawing();
+                                _changeEditingMode(EditingMode.normal);
+                                _toggleToolbar();
+                              } else if (_currentMode == EditingMode.normal) {
+                                _toggleToolbar();
+                                CustomSheet.show(
+                                  child: MultiBlocProvider(
+                                    providers: [
+                                      BlocProvider.value(
+                                        value: context.read<StoryEditorCubit>(),
+                                      ),
+                                      BlocProvider.value(
+                                        value: context.read<TextEditingCubit>(),
+                                      ),
+                                      BlocProvider.value(
+                                        value:
+                                            context.read<DrawingStoryCubit>(),
+                                      ),
+                                    ],
+                                    child: ConfirmDiscardOrKeepEditingStory(),
+                                  ),
+                                  context: context,
+                                  barrierColor: ColorManager.black.withOpacity(
+                                    0.2,
+                                  ),
+                                );
+                              } else if (_currentMode == EditingMode.text) {
+                                _changeEditingMode(EditingMode.normal);
+                                _toggleToolbar();
+                              }
+                            },
+                            undoDrawing:
+                                context.read<DrawingStoryCubit>().undoDrawing,
+                          ),
+                        ),
+                        // Bottom Toolbar
+                        AnimatedBuilder(
+                          animation: _toolbarAnimation,
+                          builder: (context, child) {
+                            return Positioned(
+                              top: MediaQuery.of(context).padding.top + 100,
+                              left: 15,
+                              child: Transform.translate(
+                                offset: Offset(
+                                  0,
+                                  100 * (1 - _toolbarAnimation.value),
+                                ),
+                                child: Opacity(
+                                  opacity: _toolbarAnimation.value,
+                                  child: _buildSideLeftDrawingToolBar(context),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        if (_currentMode == EditingMode.draw)
+                          Positioned(
+                            top: MediaQuery.of(context).padding.top + 100,
+                            right: 0,
+                            child: BlocBuilder<DrawingStoryCubit, DrawingState>(
+                              builder: (context, state) {
+                                return StrokeWidthDrawer(
+                                  onChanged:
+                                      context
+                                          .read<DrawingStoryCubit>()
+                                          .changeStrokeWidth,
+                                  currentStrokeWidth: state.strokeWidth,
+                                );
+                              },
+                            ),
+                          ),
+                        // Mode-specific Toolbars
+                        if (_currentMode == EditingMode.draw)
+                          DrawingColorPallete(),
+                        // Text Editing Overlay (TextField and Text Toolbar)
+                        if (_currentMode == EditingMode.text)
+                          TextInputOverlay(
+                            focusNode: _textFocusNode,
+                            onTextSubmitted: () {
+                              _changeEditingMode(EditingMode.normal);
+                              _toggleToolbar();
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+        );
+      },
     );
   }
 
@@ -723,20 +1105,17 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        if (context.read<StoryEditorCubit>().state.mediaFiles != null &&
-            context.read<StoryEditorCubit>().state.mediaFiles!.length == 1)
-          IconButton(
-            onPressed: () {
-              _changeEditingMode(EditingMode.draw);
-              _toggleToolbar();
-            },
-            icon: Icon(Icons.brush, color: ColorManager.white, size: 24),
-          ),
+        IconButton(
+          onPressed: () {
+            _changeEditingMode(EditingMode.draw);
+            _toggleToolbar();
+          },
+          icon: Icon(Icons.brush, color: ColorManager.white, size: 24),
+        ),
         Gaps.vGap2,
         InkWell(
           onTap: () {
             //    _toggleToolbar();
-            _changeEditingMode(EditingMode.sticker);
             CustomSheet.show(
               child: MultiBlocProvider(
                 providers: [
@@ -756,12 +1135,17 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
           child: SvgPicture.asset(AssetsManager.sticker),
         ),
         Gaps.vGap4,
-        InkWell(
-          onTap: () {
-            _changeEditingMode(EditingMode.text);
-            _toggleToolbar();
+        BlocBuilder<TextEditingCubit, TextEditingState>(
+          builder: (context, state) {
+            return InkWell(
+              onTap: () {
+                _changeEditingMode(EditingMode.text);
+                _toggleToolbar();
+                context.read<TextEditingCubit>().setEditingExistingText(false);
+              },
+              child: SvgPicture.asset(AssetsManager.textAa),
+            );
           },
-          child: SvgPicture.asset(AssetsManager.textAa),
         ),
         Gaps.vGap4,
 
@@ -783,15 +1167,17 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
       ],
     );
   }
-  Widget _removeElementWidget(){
+
+  Widget _removeElementWidget() {
     return Align(
       alignment: Alignment.bottomCenter,
       child: DragTarget<PositionedElement>(
         onWillAcceptWithDetails: (_) => true,
         onAcceptWithDetails: (element) {
-          Future.delayed(Duration(milliseconds: 300),(){
-            context.read<StoryEditorCubit>().removePositionedElement((element as PositionedElement).id);
-
+          Future.delayed(Duration(milliseconds: 300), () {
+            context.read<StoryEditorCubit>().removePositionedElement(
+              (element as PositionedElement).id,
+            );
           });
           // Optionally: trigger an animation before removal
         },
@@ -806,7 +1192,11 @@ class _StoryEditorScreenState extends State<StoryEditorScreen>
               color: isActive ? Colors.redAccent : Colors.black54,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.delete, color: Colors.white, size: isActive ? 36 : 28),
+            child: Icon(
+              Icons.delete,
+              color: Colors.white,
+              size: isActive ? 36 : 28,
+            ),
           );
         },
       ),

@@ -174,6 +174,11 @@ class AllUserPlacesScreen extends StatelessWidget {
                                   context
                                       .read<StoryEditorCubit>()
                                       .addLocationElement(
+                                        offset: Offset(
+                                          MediaQuery.of(context).size.width / 2,
+                                          MediaQuery.of(context).size.height /
+                                              2,
+                                        ),
                                         id: state.selectedLocationId,
                                         cityName: state.selectedCityName,
                                         countryName: state.selectedCountryName,

@@ -137,7 +137,14 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                           .positionedElements
                           .any((e) => e is ClockElement)) {
                       } else {
-                        context.read<StoryEditorCubit>().addClockElement();
+                        context.read<StoryEditorCubit>().addClockElement(
+                          rotation: 0.0,
+                          scale: 1.0,
+                          offset: Offset(
+                            MediaQuery.of(context).size.width / 2,
+                            MediaQuery.of(context).size.height / 2,
+                          ),
+                        );
                       }
                       Navigator.of(context).pop();
                     },
@@ -278,7 +285,12 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
           (e) => e is GifElement,
         )) {
         } else {
-          context.read<StoryEditorCubit>().addStickerElement(gifUrl: gifUrl);
+          context.read<StoryEditorCubit>().addStickerElement(
+            gifUrl: gifUrl,
+            offset: Offset(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height/2),
+            scale: 1.0,
+            rotation: 0.0,
+          );
         }
       }
     }

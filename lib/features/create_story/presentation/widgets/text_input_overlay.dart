@@ -28,9 +28,17 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
 
   @override
   void initState() {
-    _textEditingController = TextEditingController(
-      text: context.read<TextEditingCubit>().state.positionedTextElement.text,
-    );
+    _textEditingController =
+        context.read<TextEditingCubit>().state.isEditingExistingText
+            ? TextEditingController(
+              text:
+                  context
+                      .read<TextEditingCubit>()
+                      .state
+                      .positionedTextElement
+                      .text,
+            )
+            : TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(widget.focusNode);
@@ -188,6 +196,9 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
                           context.read<StoryEditorCubit>().updateOneTextElement(
                             newElement: updatedText,
                           );
+                        }else{
+                          context.read<StoryEditorCubit>().updateTextElement(updatedText);
+
                         }
                       } else {
                         context.read<TextEditingCubit>().addTextAlignment(
@@ -197,6 +208,8 @@ class _TextInputOverlayState extends State<TextInputOverlay> {
                           context.read<StoryEditorCubit>().updateOneTextElement(
                             newElement: newText,
                           );
+                        }else{
+                          context.read<StoryEditorCubit>().addTextElement(newElement: state.allTextAlignment);
                         }
                       }
                       widget.onTextSubmitted(); // hide overlay

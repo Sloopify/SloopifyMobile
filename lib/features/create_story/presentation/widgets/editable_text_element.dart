@@ -78,7 +78,6 @@ class _EditableTextElementState extends State<EditableTextElement> {
         onTap: widget.onTap,
         onScaleStart: _onScaleStart,
         onScaleUpdate: _onScaleUpdate,
-
         child: Transform.rotate(
           angle: _rotation,
           child: Transform.scale(

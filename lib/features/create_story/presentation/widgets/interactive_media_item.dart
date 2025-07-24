@@ -6,15 +6,16 @@ import 'package:sloopify_mobile/features/create_story/domain/entities/media_stor
 
 import '../blocs/story_editor_cubit/story_editor_cubit.dart';
 
-
 class InteractiveMediaItem extends StatefulWidget {
   final MediaStory media;
   final Size size;
+  final Function() onScale;
 
   const InteractiveMediaItem({
     Key? key,
     required this.media,
     this.size = const Size(180, 180),
+    required this.onScale
   }) : super(key: key);
 
   @override
@@ -30,82 +31,80 @@ class InteractiveMediaItemState extends State<InteractiveMediaItem> {
   late Offset _startFocalPoint;
   late double _initialScale;
   late double _initialRotation;
+
   @override
   void initState() {
     super.initState();
     _offset = widget.media.offset ?? const Offset(0, 0);
     _scale = widget.media.scale ?? 1.0;
     _rotation = widget.media.rotateAngle ?? 0.0;
-
-  }
-  @override
-  void didUpdateWidget(covariant InteractiveMediaItem oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _offset = widget.media.offset ?? _offset;
-    _scale = widget.media.scale ?? _scale;
-    _rotation = widget.media.rotateAngle ?? _rotation;
   }
 
 
   @override
   Widget build(BuildContext context) {
-    return   Positioned(
+    return Positioned(
       left: _offset.dx,
       top: _offset.dy,
       child: GestureDetector(
         onScaleStart: (details) {
-            _startFocalPoint = details.focalPoint;
-            _initialOffset = _offset;
-            _initialScale = _scale;
-            _initialRotation = _rotation;
+          _startFocalPoint = details.focalPoint;
+          _initialOffset = _offset;
+          _initialScale = _scale;
+          _initialRotation = _rotation;
 
         },
         onScaleUpdate: (details) {
           setState(() {
-            _scale = (_initialScale * details.scale).clamp(0.3, 4.0);
+            _scale = (_initialScale * details.scale);
             _rotation = _initialRotation + details.rotation;
             // Update the position based on finger movement
             final delta = details.focalPoint - _startFocalPoint;
             _offset = _initialOffset + delta;
           });
+          final updatedMedia = widget.media.copyWith(
+            offset: _offset,
+            scale: _scale,
+            rotateAngle: _rotation,
+          );
+          context.read<StoryEditorCubit>().updateSingleMedia(updatedMedia);
+          widget.onScale();
         },
         onScaleEnd: (_) {
-            // Persist updated media state
-            final updatedMedia = widget.media.copyWith(
-              offset: _offset,
-              scale: _scale,
-              rotateAngle: _rotation,
-            );
-            context.read<StoryEditorCubit>().updateSingleMedia(updatedMedia);
-
+          // Persist updated media state
+          final updatedMedia = widget.media.copyWith(
+            offset: _offset,
+            scale: _scale,
+            rotateAngle: _rotation,
+          );
+          context.read<StoryEditorCubit>().updateSingleMedia(updatedMedia);
         },
-        child: Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()
-            ..translate(widget.size.width / 2, widget.size.height / 2)
-            ..rotateZ(_rotation)
-            ..scale(_scale)
-            ..translate(-widget.size.width / 2, -widget.size.height / 2),
-          child: SizedBox(
-            width: widget.size.width,
-            height: widget.size.height,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: widget.media.isVideoFile
-                  ? _buildVideoPlayer()
-                  : _buildImageDisplay(widget.media.file!),
+        child: Transform.scale(
+          scale: _scale,
+          child: Transform.rotate(
+            angle: _rotation,
+            child: SizedBox(
+              width: widget.size.width,
+              height: widget.size.height,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child:
+                    widget.media.isVideoFile
+                        ? _buildVideoPlayer()
+                        : _buildImageDisplay(widget.media.file!),
+              ),
             ),
           ),
         ),
       ),
     );
   }
-  }
+}
 
-  Widget _buildVideoPlayer() {
-    return const Placeholder(); // Replace with real video logic
-  }
+Widget _buildVideoPlayer() {
+  return const Placeholder(); // Replace with real video logic
+}
 
-  Widget _buildImageDisplay(File file) {
-    return Image.file(file, fit: BoxFit.contain);
-  }
+Widget _buildImageDisplay(File file) {
+  return Image.file(file, fit: BoxFit.contain);
+}

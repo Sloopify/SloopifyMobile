@@ -171,6 +171,9 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
                               .any((e) => e is FeelingElement)) {
                           } else {
                             context.read<StoryEditorCubit>().addFeelingElement(
+                              offset: Offset(MediaQuery.of(context).size.width/2, MediaQuery.of(context).size.height/2),
+                              scale: 1.0,
+                              rotation: 0.0,
                               feelingIcon: state.selectedFeelingIcon,
                               feelingId: state.selectedFeelingId,
                               feelingName: state.selectedFeeling,

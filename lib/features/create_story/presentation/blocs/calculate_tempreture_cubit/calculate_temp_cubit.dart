@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:http/http.dart' as http;
@@ -71,6 +72,9 @@ class CalculateTempCubit extends Cubit<CalculateTempState> {
           id: Uuid().v4(),
           weatherCode: state.weatherIcon,
           isDay: state.isDay,
+          offset: Offset(500, 500),
+          rotation: 0.0,
+           scale: 1.0
         );
         emit(state.copyWith(element: temperatureElement));
 

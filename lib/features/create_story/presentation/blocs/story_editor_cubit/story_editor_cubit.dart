@@ -134,6 +134,20 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   addTextElement({required List<PositionedTextElement> newElement}) {
     emit(state.copyWith(textElements: newElement));
   }
+  void updateTextElement(PositionedTextElement element){
+    final updatedList = List<PositionedTextElement>.from(
+      state.textElements??[],
+    );
+
+    final index = updatedList.indexWhere(
+          (e) => e.id == element.id,
+    );
+    if (index != -1) {
+      updatedList[index]=element;
+      state.textElements![index]=element;
+      emit(state.copyWith(textElements: updatedList));
+    }
+  }
   updateOneTextElement({required PositionedTextElement newElement}) {
     emit(state.copyWith(textElement: newElement));
   }
@@ -187,11 +201,12 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     );
   }
 
-  void addMentionElement({required int friendId, required String friendName}) {
+  void addMentionElement({required int friendId, required String friendName,required Offset offset}) {
     final newElement = PositionedMentionElement(
       id: Uuid().v4(),
       friendId: friendId,
-      friendName: friendName,
+      friendName: friendName,rotation: 0.0,
+      scale: 1.0,offset: offset
     );
     List<PositionedElement> newList = List.from(state.positionedElements);
     newList.add(newElement);

@@ -129,6 +129,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         )) {
         } else {
           context.read<StoryEditorCubit>().addAudioElement(
+            rotation: 0.0,
+            scale: 1.0,
+            offset: Offset(MediaQuery.of(context).size.width/2, MediaQuery.of(context).size.height/2),
             audioUrl: widget.voice,
             audioId: widget.audioId,
             audioImage: widget.audioImage,
