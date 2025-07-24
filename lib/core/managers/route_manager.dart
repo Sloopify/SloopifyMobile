@@ -12,6 +12,20 @@ import 'package:sloopify_mobile/features/auth/presentation/screens/login_with_ot
 import 'package:sloopify_mobile/features/auth/presentation/screens/otp_code_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/verify_account_screen.dart';
 import 'package:sloopify_mobile/features/auth/presentation/screens/write_otp_code_screen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/friend_chat/friend_chat_state.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/channel/ChannelDetailScreen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/channel/channel_page.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/group_members/group_detail_screen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/group_screen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/video_call_screen.dart';
+
+import 'package:sloopify_mobile/features/chat_media/presentation/screen/chat_media_page.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/chat_Notification_Settings.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/chat_background_screen.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/chat_theme_screen.dart';
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/color_picker_screen.dart';
+
+import 'package:sloopify_mobile/features/friend_chat_profile/presentation/widgets/choose_from_gallery.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/create_post_cubit/create_post_cubit.dart';
 import 'package:sloopify_mobile/features/create_posts/presentation/blocs/crop_image_cubit/crop_image_cubit.dart';
@@ -115,10 +129,22 @@ class AppRouter {
             return MyFriendsPage();
           },
         );
-      case FriendshipRequestPage.routeName:
+      case FriendListPage.routeName:
         return MaterialPageRoute(
           builder: (context) {
-            return FriendshipRequestPage();
+            return FriendListPage();
+          },
+        );
+      case InboxScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return InboxScreen();
+          },
+        );
+      case FriendListPage.routeName:
+        return MaterialPageRoute(
+          builder: (context) {
+            return FriendListPage();
           },
         );
       case MyRequestsPage.routeName:
@@ -295,7 +321,7 @@ class AppRouter {
                   value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
-              child: FriendsList(),
+              child: FriendsList(friends: [], selected: [], onToggle: (u) {}),
             );
           },
         );
@@ -362,20 +388,22 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                if(arg["fromStory"]==false)
-                BlocProvider.value(
-                  value: arg["create_post_cubit"] as CreatePostCubit,
-                ),
-                if(arg['fromStory']==true)
+                if (arg["fromStory"] == false)
+                  BlocProvider.value(
+                    value: arg["create_post_cubit"] as CreatePostCubit,
+                  ),
+                if (arg['fromStory'] == true)
                   BlocProvider.value(
                     value: arg["story_editor_cubit"] as StoryEditorCubit,
                   ),
                 BlocProvider.value(
+                  value: arg["create_post_cubit"] as CreatePostCubit,
+                ),
+                BlocProvider.value(
                   value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
-              child: MentionFriends(fromStory: arg["fromStory"]??false,
-              ),
+              child: MentionFriends(fromStory: arg["fromStory"] ?? false),
             );
           },
         );
@@ -555,10 +583,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
                 BlocProvider(create: (context) => locator<TextEditingCubit>()),
                 BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
                 BlocProvider(
@@ -577,10 +615,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
               ],
               child: CameraCaptureScreen(),
             );
@@ -592,10 +640,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
                 BlocProvider(create: (context) => locator<TextEditingCubit>()),
                 BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
                 BlocProvider(
@@ -612,10 +670,20 @@ class AppRouter {
           builder: (context) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: arg["story_editor_cubit"] as StoryEditorCubit),
-                BlocProvider.value(value: arg["post_friends_cubit"] as PostFriendsCubit),
-                BlocProvider.value(value: arg["add_location_cubit"] as AddLocationCubit),
-                BlocProvider.value(value: arg["feelings_activities_cubit"] as FeelingsActivitiesCubit),
+                BlocProvider.value(
+                  value: arg["story_editor_cubit"] as StoryEditorCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["post_friends_cubit"] as PostFriendsCubit,
+                ),
+                BlocProvider.value(
+                  value: arg["add_location_cubit"] as AddLocationCubit,
+                ),
+                BlocProvider.value(
+                  value:
+                      arg["feelings_activities_cubit"]
+                          as FeelingsActivitiesCubit,
+                ),
                 BlocProvider(create: (context) => locator<TextEditingCubit>()),
                 BlocProvider(create: (context) => locator<DrawingStoryCubit>()),
                 BlocProvider(

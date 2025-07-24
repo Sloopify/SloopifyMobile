@@ -1,19 +1,28 @@
 import '../../domain/entities/friend.dart';
 
-class FriendModel extends Friend {
+class FriendModel {
+  final String id;
+  final String name;
+  final String avatarUrl;
+  final bool isFriend;
+
   FriendModel({
-    required super.id,
-    required super.name,
-    required super.avatarUrl,
-    required super.isFriend,
+    required this.id,
+    required this.name,
+    required this.avatarUrl,
+    required this.isFriend,
   });
 
   factory FriendModel.fromJson(Map<String, dynamic> json) {
     return FriendModel(
-      id: json['id'],
+      id: json['id'].toString(),
       name: json['name'],
-      avatarUrl: json['avatarUrl'],
-      isFriend: json['isFriend'],
+      avatarUrl: json['avatar_url'] ?? '',
+      isFriend: json['is_friend'] ?? false,
     );
+  }
+
+  Friend toEntity() {
+    return Friend(id: id, name: name, avatarUrl: avatarUrl, isFriend: isFriend);
   }
 }
