@@ -140,7 +140,7 @@ class _MyFriendsPageState extends State<MyFriendsPage> {
                       itemCount: friends.length,
                       itemBuilder: (_, index) {
                         final friend = friends[index];
-                        return FriendItem(friend: friend); // Pass real friend
+                        return FriendItem(); // Pass real friend
                       },
                     );
                   }

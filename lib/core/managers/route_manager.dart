@@ -82,6 +82,7 @@ import '../../features/create_story/presentation/screens/story_editor_screen.dar
 import '../../features/create_story/presentation/screens/story_feelings_list.dart';
 import '../../features/create_story/presentation/screens/text_story_editor.dart';
 import '../../features/home/presentation/screens/home_navigation_screen.dart';
+import '../../features/inbox/presentation/screen/inbox_page.dart';
 import '../../features/start_up/presenation/screens/on_boarding_screen.dart';
 
 class AppRouter {
@@ -321,7 +322,7 @@ class AppRouter {
                   value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
-              child: FriendsList(friends: [], selected: [], onToggle: (u) {}),
+              child: FriendsList(),
             );
           },
         );
