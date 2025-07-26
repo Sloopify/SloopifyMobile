@@ -17,6 +17,7 @@ import 'package:sloopify_mobile/features/create_story/presentation/screens/text_
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/managers/app_gaps.dart';
+import '../../../../core/ui/widgets/text_editor_widget.dart';
 import '../../../create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
 import '../widgets/test.dart';
 import 'camera_capture.dart';
@@ -38,15 +39,14 @@ class CreateStoryFirstStep extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: AppPadding.p10),
             child: InkWell(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ReliableTextTransform()));
-                // Navigator.pushNamed(
-                //   context,
-                //   StoryAudienceScreen.routeName,
-                //   arguments: {
-                //     "story_editor_cubit": context.read<StoryEditorCubit>(),
-                //     "post_friends_cubit": context.read<PostFriendsCubit>(),
-                //   },
-                // );
+                Navigator.pushNamed(
+                  context,
+                  StoryAudienceScreen.routeName,
+                  arguments: {
+                    "story_editor_cubit": context.read<StoryEditorCubit>(),
+                    "post_friends_cubit": context.read<PostFriendsCubit>(),
+                  },
+                );
               },
               child: SvgPicture.asset(AssetsManager.storyAudience),
             ),
@@ -76,7 +76,13 @@ class CreateStoryFirstStep extends StatelessWidget {
                           TextStoryEditor.routeName,
                           arguments: {
                             "story_editor_cubit":
-                                context.read<StoryEditorCubit>(),
+                                context.read<StoryEditorCubit>()
+                                  ..setBackGroundGradiant(
+                                    GradientBackground(
+                                      ColorManager.pink,
+                                      ColorManager.blueGradiant,
+                                    ),
+                                  ),
                             "post_friends_cubit":
                                 context.read<PostFriendsCubit>(),
                             "add_location_cubit":

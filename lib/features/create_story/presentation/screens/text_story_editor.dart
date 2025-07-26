@@ -169,6 +169,10 @@ class _TextStoryEditorState extends State<TextStoryEditor>
                             BlocBuilder<TextEditingCubit, TextEditingState>(
                               builder: (context, state) {
                                 return EditableTextElement(
+                                  onDelete: (){
+                                    context.read<TextEditingCubit>().removeOnlyOneTextElement(state.positionedTextElement.id);
+                                    context.read<StoryEditorCubit>().removeTextElement(state.positionedTextElement.id);
+                                  },
                                   onScale:
                                       () => _changeEditingMode(
                                         EditingMode.dragging,
@@ -205,6 +209,14 @@ class _TextStoryEditorState extends State<TextStoryEditor>
                                   >(
                                     builder: (context, state) {
                                       return PositionedElementItem(
+                                        onScale: ()=>_changeEditingMode(EditingMode.dragging),
+                                        onDelete: () {
+                                          context
+                                              .read<StoryEditorCubit>()
+                                              .removePositionedElement(
+                                            e.id,
+                                          );
+                                        },
                                         widgetKey: _elementsKey[e.id]!,
                                         positionedElement: e,
                                       );
@@ -259,6 +271,7 @@ class _TextStoryEditorState extends State<TextStoryEditor>
                   : _currentMode == EditingMode.normal
                   ? BlocBuilder<StoryEditorCubit, StoryEditorState>(
                     builder: (context, state) {
+                      print(state.positionedElements);
                       return Stack(
                         children: [
                           Positioned.fill(
@@ -314,7 +327,12 @@ class _TextStoryEditorState extends State<TextStoryEditor>
                               PositionedTextElement.empty())
                             BlocBuilder<TextEditingCubit, TextEditingState>(
                               builder: (context, state) {
+                                print(state.positionedTextElement.text);
                                 return EditableTextElement(
+                                  onDelete: (){
+                                    context.read<TextEditingCubit>().removeOnlyOneTextElement(state.positionedTextElement.id);
+                                    context.read<StoryEditorCubit>().removeTextElement(state.positionedTextElement.id);
+                                  },
                                   onScale:
                                       () => _changeEditingMode(
                                         EditingMode.dragging,
@@ -346,6 +364,14 @@ class _TextStoryEditorState extends State<TextStoryEditor>
                                     () => GlobalKey(),
                                   );
                                   return PositionedElementItem(
+                                    onScale: ()=>_changeEditingMode(EditingMode.dragging),
+                                    onDelete: () {
+                                      context
+                                          .read<StoryEditorCubit>()
+                                          .removePositionedElement(
+                                        e.id,
+                                      );
+                                    },
                                     widgetKey: _elementsKey[e.id]!,
                                     positionedElement: e,
                                   );
@@ -536,6 +562,11 @@ class _TextStoryEditorState extends State<TextStoryEditor>
                             BlocBuilder<TextEditingCubit, TextEditingState>(
                               builder: (context, state) {
                                 return EditableTextElement(
+                                  onDelete: (){
+                                    context.read<TextEditingCubit>().removeOnlyOneTextElement(state.positionedTextElement.id);
+                                    context.read<StoryEditorCubit>().removeTextElement(state.positionedTextElement.id);
+
+                                  },
                                   onScale: () => {},
                                   onTap: () {
                                     context
@@ -564,6 +595,14 @@ class _TextStoryEditorState extends State<TextStoryEditor>
                                     () => GlobalKey(),
                                   );
                                   return PositionedElementItem(
+                                    onScale: ()=>_changeEditingMode(EditingMode.dragging),
+                                    onDelete: () {
+                                      context
+                                          .read<StoryEditorCubit>()
+                                          .removePositionedElement(
+                                        e.id,
+                                      );
+                                    },
                                     widgetKey: _elementsKey[e.id]!,
                                     positionedElement: e,
                                   );

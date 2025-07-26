@@ -12,6 +12,7 @@ class BackgroundColorsSheet extends StatelessWidget {
   BackgroundColorsSheet({super.key});
 
   final List<GradientBackground> gradients = [
+    GradientBackground(ColorManager.pink, ColorManager.blueGradiant),
     GradientBackground(Colors.white, Colors.white),
     GradientBackground(
       ColorManager.primaryColor.withOpacity(0.2),

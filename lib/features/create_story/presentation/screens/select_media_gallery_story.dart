@@ -16,6 +16,7 @@ import 'dart:typed_data';
 
 import '../../../../core/managers/app_dimentions.dart';
 import '../../../../core/ui/widgets/custom_elevated_button.dart';
+import '../../../../core/utils/helper/snackbar.dart';
 import '../blocs/calculate_tempreture_cubit/calculate_temp_cubit.dart';
 import '../blocs/drawing_story/drawing_story_cubit.dart';
 import '../blocs/text_editing_cubit/text_editing_cubit.dart';
@@ -268,57 +269,59 @@ class _SelectMediaGalleryStoryState extends State<SelectMediaGalleryStory> {
                         .state
                         .selectedMedia
                         .isNotEmpty)
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          width: double.infinity,
-                          height: 60,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppPadding.p50,
-                            vertical: AppPadding.p8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: ColorManager.white,
-                            boxShadow: [
-                              BoxShadow(
-                                offset: Offset(0, 4),
-                                spreadRadius: 0,
-                                blurRadius: 6,
-                                color: ColorManager.black.withOpacity(0.25),
-                              ),
-                            ],
-                          ),
-                          child: CustomElevatedButton(
-                            label: "Done",
-                            onPressed: () async {
-                              final previousMediaList =
-                                  context
-                                      .read<StoryEditorCubit>()
-                                      .state
-                                      .mediaFiles;
-                              final updatedMediaList = context
-                                  .read<StoryEditorCubit>()
-                                  .convertToOrderedMediaEntities(
+                      SafeArea(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            width: double.infinity,
+                            height: 60,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppPadding.p50,
+                              vertical: AppPadding.p8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: ColorManager.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  offset: Offset(0, 4),
+                                  spreadRadius: 0,
+                                  blurRadius: 6,
+                                  color: ColorManager.black.withOpacity(0.25),
+                                ),
+                              ],
+                            ),
+                            child: CustomElevatedButton(
+                              label: "Done",
+                              onPressed: () async {
+                                final previousMediaList =
                                     context
                                         .read<StoryEditorCubit>()
                                         .state
-                                        .selectedMedia,
-                                    previousMediaList ?? [],
-                                  );
-                              context
-                                  .read<StoryEditorCubit>()
-                                  .setFinalListOfMediaFiles(
-                                    await updatedMediaList,
-                                  );
-                              Navigator.of(context).pushNamed(StoryEditorScreen.routeName,arguments: {
-                                "story_editor_cubit":context.read<StoryEditorCubit>(),
-                                "post_friends_cubit":context.read<PostFriendsCubit>(),
-                                "add_location_cubit":context.read<AddLocationCubit>(),
-                                "feelings_activities_cubit":context.read<FeelingsActivitiesCubit>(),
-                              });
-                            },
-                            backgroundColor: ColorManager.primaryColor,
-                            width: MediaQuery.of(context).size.width * 0.5,
+                                        .mediaFiles;
+                                final updatedMediaList = context
+                                    .read<StoryEditorCubit>()
+                                    .convertToOrderedMediaEntities(
+                                      context
+                                          .read<StoryEditorCubit>()
+                                          .state
+                                          .selectedMedia,
+                                      previousMediaList ?? [],
+                                    );
+                                context
+                                    .read<StoryEditorCubit>()
+                                    .setFinalListOfMediaFiles(
+                                      await updatedMediaList,
+                                    );
+                                Navigator.of(context).pushNamed(StoryEditorScreen.routeName,arguments: {
+                                  "story_editor_cubit":context.read<StoryEditorCubit>(),
+                                  "post_friends_cubit":context.read<PostFriendsCubit>(),
+                                  "add_location_cubit":context.read<AddLocationCubit>(),
+                                  "feelings_activities_cubit":context.read<FeelingsActivitiesCubit>(),
+                                });
+                              },
+                              backgroundColor: ColorManager.primaryColor,
+                              width: MediaQuery.of(context).size.width * 0.5,
+                            ),
                           ),
                         ),
                       ),

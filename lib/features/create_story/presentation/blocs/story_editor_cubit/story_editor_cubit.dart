@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:sloopify_mobile/core/utils/helper/snackbar.dart';
 import 'package:sloopify_mobile/core/utils/location_service.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/media_story.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
@@ -21,6 +23,7 @@ import '../../../../create_posts/domain/entities/media_entity.dart';
 import '../../../domain/entities/all_positioned_element.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../domain/entities/poll_entity_option.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../../domain/entities/text_properties_story.dart';
 
@@ -49,9 +52,12 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     if (updated.contains(asset)) {
       updated.remove(asset);
     } else {
-      updated.add(asset);
+      if (updated.length <= 8) {
+        updated.add(asset);
+      }
     }
     emit(state.copyWith(selectedMedia: updated));
+
   }
 
   selectOneMedia(AssetEntity asset) async {
@@ -106,7 +112,12 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   void setStoryAudience(StoryAudience privacy) {
     emit(state.copyWith(privacy: privacy));
   }
-
+  void setListOfFriendsExcept(List<int> friends) {
+    emit(state.copyWith(friendExcept: friends));
+  }
+  void setListOfSpecificFriends(List<int> friends) {
+    emit(state.copyWith(specificFriends: friends));
+  }
   void updateTextProperties({
     Color? color,
     String? fontType,
@@ -267,10 +278,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
   }
 
   Future<void> addTemperatureElement(TemperatureElement newElement) async {
+    final List<PositionedElement> updatedList= List.from(state.positionedElements);
+    updatedList.add(newElement);
     emit(
       state.copyWith(
-        positionedElements: List.from(state.positionedElements)
-          ..add(newElement),
+        positionedElements: updatedList,
       ),
     );
   }
@@ -305,21 +317,30 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       ),
     );
   }
+  updatePollElement(Poll poll){
+    print('poll ${poll}');
+    final pollCreated = state.positionedElements.where((e)=>e is PollElement).first;
+   final newPoll= (pollCreated as PollElement).copyWith(poll: poll);
+    List<PositionedElement> elements = List.from(state.positionedElements);
+    int index = elements.indexWhere((e) => e.id == newPoll.id);
+    if (index != -1) {
+      elements[index] = newPoll;
+      state.positionedElements[index]=newPoll;
+      emit(state.copyWith(positionedElements: elements));
+    }
+  }
 
   void addPollElement({
-    required String question,
-    required List<String> options,
-    required Offset offset,
+     Offset ? offset,
     PositionedElementStoryTheme? theme,
     Size? size,
     double? rotation,
     double? scale,
   }) {
     final newElement = PollElement(
+      poll: Poll.fromEmpty(),
       scale: scale,
       id: Uuid().v4(),
-      question: question,
-      options: options,
       offset: offset,
       positionedElementStoryTheme: theme,
       size: size,
@@ -332,6 +353,7 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
       ),
     );
   }
+
 
   void addStickerElement({
     required String gifUrl,
@@ -424,7 +446,11 @@ class StoryEditorCubit extends Cubit<StoryEditorState> {
     current.removeWhere((element) => element.id == id);
     emit(state.copyWith(positionedElements: current));
   }
-
+  void removeTextElement(String id) {
+    final List<PositionedTextElement> current = state.textElements??[];
+    current.removeWhere((element) => element.id == id);
+    emit(state.copyWith(textElements: current));
+  }
   // Method to convert current state to StoryEntity for backend submission
   StoryEntity toStoryEntity() {
     PositionedElementWithLocationId? locationElement;

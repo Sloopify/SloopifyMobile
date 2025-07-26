@@ -30,6 +30,11 @@ static const Color blueWithGradiant=Color(0xff433E7B);
 static const Color textGray3=Color(0xff727171);
 static const Color offWhite=Color(0xffEDEFF1);
 static const Color lightRed=Color(0xffFECDD3);
+static const Color lightPurple=Color(0xff8CA8CF);
+static const Color lightGrayTextField= Color(0xffEFEFEF);
+static const Color lightBlueGray= Color(0xff64748B);
+static const Color pink= Color(0xffFF00A0);
+static const Color blueGradiant= Color(0xff333399);
 
 
   static final gradient = const LinearGradient(

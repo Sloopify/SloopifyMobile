@@ -107,7 +107,7 @@ class StoryEntity extends Equatable {
         List<PositionedTextElement> positionedTextElement =
         positionedTextElements!;
         for (int i = 0; i < positionedTextElement.length; i++) {
-          data["text_elements[$i]"] = positionedTextElement[i];
+          data["text_elements[$i]"] = positionedTextElement[i].toJson();
         }
       }
     }
@@ -149,7 +149,7 @@ class StoryEntity extends Equatable {
       } else {
         List<PositionedElement> mentions = mentionsElements!;
         for (int i = 0; i < mentions.length; i++) {
-          data["mentions_elements[$i]"] = mentions[i];
+          data["mentions_elements[$i]"] = mentions[i].toJson();
         }
       }
     }
@@ -177,7 +177,7 @@ class StoryEntity extends Equatable {
         } else {
           List<DrawingElement> drawings = lines!;
           for (int i = 0; i < drawings.length; i++) {
-            data["drawing_elements[$i]"] = drawings[i];
+            data["drawing_elements[$i]"] = drawings[i].toJson();
           }
         }
       }

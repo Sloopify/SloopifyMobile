@@ -11,21 +11,27 @@ import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/utils/helper/postioned_element_story_theme.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/all_positioned_element.dart';
+import 'package:sloopify_mobile/features/create_story/domain/entities/poll_entity_option.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/gif_element.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/widgets/main_postitioned_widget.dart';
+import 'package:sloopify_mobile/features/create_story/presentation/widgets/poll_widget.dart';
 
 import '../../../../core/ui/widgets/general_image.dart';
 
 class PositionedElementItem extends StatefulWidget {
   final PositionedElement positionedElement;
   final GlobalKey widgetKey;
+  final VoidCallback onDelete;
+  final VoidCallback onScale;
 
   const PositionedElementItem({
     super.key,
     required this.positionedElement,
     required this.widgetKey,
+    required this.onDelete,
+    required this.onScale,
   });
 
   @override
@@ -40,19 +46,22 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
   Offset? _startPosition;
   double? _startScale;
   double? _startRotation;
-  late   PositionedElementStoryTheme _initStoryTheme ;
+  late PositionedElementStoryTheme _initStoryTheme;
+
+  // Delete tracking
+  bool _showTrash = false;
+  double _trashScale = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _initStoryTheme = widget.positionedElement.positionedElementStoryTheme ??
+    _initStoryTheme =
+        widget.positionedElement.positionedElementStoryTheme ??
         PositionedElementStoryTheme.white;
     _position = widget.positionedElement.offset ?? const Offset(100, 100);
     _scale = widget.positionedElement.scale ?? 1.0;
     _rotation = widget.positionedElement.rotation ?? 0.0;
   }
-
-  int _pointerCount = 0;
 
   void _updateParent() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -72,7 +81,11 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
         size: scaledSize,
         scale: _scale,
       );
-      context.read<StoryEditorCubit>().updateSelectedPositioned(updatedElement);
+      if (mounted) {
+        context.read<StoryEditorCubit>().updateSelectedPositioned(
+          updatedElement,
+        );
+      }
       print(updatedElement.size);
     });
   }
@@ -86,59 +99,115 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
   }
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final trashZoneHeight = screenHeight * 0.1;
+    final trashZoneTop = screenHeight - trashZoneHeight;
     // If new finger added or removed, update base references
     setState(() {
       _position = _startPosition! + (details.focalPoint - _startFocalPoint!);
-
-      // Scale with constraints
       _scale = (_startScale! * details.scale);
-
-      // Rotation
       _rotation = _startRotation! + details.rotation;
+      // Check if in trash zone
+      final inTrashZone = details.focalPoint.dy > trashZoneTop;
+      _showTrash = inTrashZone;
+
+      // Calculate trash icon scale
+      if (inTrashZone) {
+        final progress =
+            (details.focalPoint.dy - trashZoneTop) / trashZoneHeight;
+        _trashScale = progress.clamp(0.0, 1.0);
+      } else {
+        _trashScale = 0.0;
+      }
     });
+    widget.onScale();
     _updateParent();
+  }
+
+  void _animateDelete() async {
+    // Shrink animation
+    for (double s = _scale; s > 0.5; s -= 0.1) {
+      await Future.delayed(Duration(milliseconds: 30));
+      if (mounted) setState(() => _scale = s);
+    }
+
+    // Trigger delete
+    widget.onDelete();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: _position.dx,
-      top: _position.dy,
-      child: GestureDetector(
-        onScaleStart: _onScaleStart,
-        onScaleUpdate: _onScaleUpdate,
-        child: Transform.rotate(
-          angle: _rotation,
-          child: Transform.scale(
-            scale: _scale,
-            child:
-                widget.positionedElement is StickerElement
-                    ? GifView.network(
-                      (widget.positionedElement as StickerElement).gifUrl,
-                      height: 200,
-                      width: 200,
-                    )
-                    : Padding(
-                      padding: const EdgeInsets.all(50),
-                      child: MainPositionedWidget(
-                        theme: _initStoryTheme,
-                        onChangedTheme: () {
-                          toggleElementTheme();
-                          context
-                              .read<StoryEditorCubit>()
-                              .updateSelectedPositioned(
-                                widget.positionedElement.copyWith(
-                                  positionedElementStoryTheme: _initStoryTheme,
-                                ),
-                              );
-                        },
-                        key: widget.widgetKey,
-                        child: _buildMainPostionedItem(context),
-                      ),
-                    ),
+    return Stack(
+      children: [
+        // The trash zone (positioned at screen bottom)
+        Positioned(
+          bottom: 0,
+          left: MediaQuery.of(context).size.width * 0.2,
+          right: MediaQuery.of(context).size.width * 0.2,
+          child: ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(100)),
+            child: Center(
+              child: AnimatedScale(
+                scale: _trashScale,
+                duration: Duration(milliseconds: 200),
+                child: SvgPicture.asset(AssetsManager.deleteItem),
+              ),
+            ),
           ),
         ),
-      ),
+        Positioned(
+          left: _position.dx,
+          top: _position.dy,
+          child: GestureDetector(
+            onScaleStart: _onScaleStart,
+            onScaleUpdate: _onScaleUpdate,
+            onScaleEnd: (_) {
+              if (_showTrash) {
+                _animateDelete();
+              }
+              setState(() {
+                _showTrash = false;
+                _trashScale = 0.0;
+              });
+            },
+            child: Transform.rotate(
+              angle: _rotation,
+              child: Transform.scale(
+                scale: _scale,
+                child:
+                    widget.positionedElement is PollElement
+                        ? PollCreationWidget()
+                        : widget.positionedElement is StickerElement
+                        ? GifView.network(
+                          (widget.positionedElement as StickerElement).gifUrl,
+                          height: 200,
+                          width: 200,
+                        )
+                        : Container(
+                          padding: EdgeInsets.all(50),
+                          color: Colors.transparent,
+                          child: MainPositionedWidget(
+                            theme: _initStoryTheme,
+                            onChangedTheme: () {
+                              toggleElementTheme();
+                              context
+                                  .read<StoryEditorCubit>()
+                                  .updateSelectedPositioned(
+                                    widget.positionedElement.copyWith(
+                                      positionedElementStoryTheme:
+                                          _initStoryTheme,
+                                    ),
+                                  );
+                            },
+                            key: widget.widgetKey,
+                            child: _buildMainPostionedItem(context),
+                          ),
+                        ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -172,14 +241,15 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
         ],
       );
     } else if (widget.positionedElement is TemperatureElement) {
+      print((widget.positionedElement as TemperatureElement).weatherCode);
       return Row(
         children: [
           Text(
-            (widget.positionedElement as TemperatureElement).value
-                .toStringAsFixed(0),
+           '${ (widget.positionedElement as TemperatureElement).value
+               .toStringAsFixed(0)}°',
             style: elementTextStyle,
           ),
-          Text((widget.positionedElement as TemperatureElement).weatherCode),
+           Text(getWeatherSticker(  (widget.positionedElement as TemperatureElement))),
         ],
       );
     } else if (widget.positionedElement is FeelingElement) {
@@ -187,7 +257,9 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SvgPicture.network((widget.positionedElement as FeelingElement).feelingIcon),
+          SvgPicture.network(
+            (widget.positionedElement as FeelingElement).feelingIcon,
+          ),
           Gaps.hGap1,
           Text(
             (widget.positionedElement as FeelingElement).feelingName,
@@ -276,5 +348,41 @@ class _PositionedElementItemState extends State<PositionedElementItem> {
         _initStoryTheme = PositionedElementStoryTheme.white;
       });
     }
+  }
+  String getWeatherSticker(TemperatureElement temp) {
+    // Define weather condition category
+    final isRain = temp.weatherCode >= 200 && temp.weatherCode < 600;
+    final isSnow = temp.weatherCode >= 600 && temp.weatherCode < 700;
+    final isCloudy = temp.weatherCode > 800;
+    final isClear = temp.weatherCode == 800;
+
+    // 🌙 or ☀️ based on time
+    final timeEmoji = temp.isDay ? '☀️' : '🌙';
+
+    // 🌧️ if raining
+    if (isRain) {
+      if (temp.value >= 20 && temp.isDay) return '🌦️'; // sun + rain
+      if (temp.value >= 20 ) return '🌧️🌙'; // night rain
+      return temp.isDay ? '🌧️' : '🌧️🌙';
+    }
+
+    // ❄️ if snowing
+    if (isSnow) return '❄️$timeEmoji';
+
+    // ☁️ if cloudy
+    if (isCloudy) {
+      if (temp.value < 15) return '☁️❄️$timeEmoji'; // cold cloudy
+      return '☁️$timeEmoji';
+    }
+
+    // ☀️ or 🌙 for clear
+    if (isClear) {
+      if (temp.value >= 25 && temp.isDay) return '🔥☀️'; // hot sunny
+      if (temp.value <= 5 && temp.isDay) return '❄️☀️';
+      if (temp.value <= 5 && !temp.isDay) return '❄️🌙';
+      return timeEmoji;
+    }
+
+    return timeEmoji; // fallback
   }
 }

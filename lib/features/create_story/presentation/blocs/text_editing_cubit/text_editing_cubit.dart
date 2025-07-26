@@ -49,17 +49,15 @@ class TextEditingCubit extends Cubit<TextEditingState> {
     emit(state.copyWith(allTextAlignment: newList));
   }
 
-  void updateTextElement(PositionedTextElement element){
+  void updateTextElement(PositionedTextElement element) {
     final updatedList = List<PositionedTextElement>.from(
       state.allTextAlignment,
     );
 
-    final index = state.allTextAlignment.indexWhere(
-          (e) => e.id == element.id,
-    );
+    final index = state.allTextAlignment.indexWhere((e) => e.id == element.id);
     if (index != -1) {
-      updatedList[index]=element;
-      state.allTextAlignment[index]=element;
+      updatedList[index] = element;
+      state.allTextAlignment[index] = element;
       emit(state.copyWith(allTextAlignment: updatedList));
     }
   }
@@ -77,21 +75,20 @@ class TextEditingCubit extends Cubit<TextEditingState> {
   }
 
   void updateSelectedPositionedText(PositionedTextElement element) {
-    state.positionedTextElement=element;
+    state.positionedTextElement = element;
     final updatedList = List<PositionedTextElement>.from(
       state.allTextAlignment,
     );
-    final index = updatedList.indexWhere(
-          (e) => e.id == element.id,
-    );
-    if(index!=-1){
+    final index = updatedList.indexWhere((e) => e.id == element.id);
+    if (index != -1) {
       emit(state.copyWith(newOne: element));
       state.allTextAlignment[index] = element;
-      updatedList[index]=element;
-      state.allTextAlignment[index]=element;
+      updatedList[index] = element;
+      state.allTextAlignment[index] = element;
     }
-    emit(state.copyWith(allTextAlignment: updatedList,));
+    emit(state.copyWith(allTextAlignment: updatedList));
   }
+
   void setEditingExistingText(bool editing) {
     emit(state.copyWith(isEditingPositionedText: editing));
   }
@@ -99,15 +96,27 @@ class TextEditingCubit extends Cubit<TextEditingState> {
   void clearCurrentText() {
     emit(TextEditingState.fromEmpty());
   }
+
   void setFromTextEditor() {
     emit(state.copyWith(fromTextStory: true));
   }
 
-  void clearAll(){
+  void clearAll() {
     emit(TextEditingState.fromEmpty());
   }
+
   void updateTextContent(String newText) {
-     emit(state.copyWith(text: newText));
+    emit(state.copyWith(text: newText));
   }
 
+  void removeTextElement(String id) {
+    final List<PositionedTextElement> current = state.allTextAlignment;
+    current.removeWhere((element) => element.id == id);
+    emit(state.copyWith(allTextAlignment: current));
+  }
+
+  void removeOnlyOneTextElement(String id) {
+    state.positionedTextElement = PositionedTextElement.empty();
+    emit(state.copyWith(newOne: PositionedTextElement.empty()));
+  }
 }

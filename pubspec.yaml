@@ -78,6 +78,8 @@ dependencies:
   just_audio: ^0.10.4
   icons_launcher:
   matrix_gesture_detector_pro: ^1.0.0
+  dashed_rect: ^0.0.4
+
 
 
   comment_tree:

@@ -185,6 +185,9 @@ class AssetsManager{
   static const String storyAudio = '${baseCreateStoryIcons}story_music.svg';
   static const String muteVideo = '${baseCreateStoryIcons}mute_video.svg';
   static const String storyPrivacy = '${baseCreateStoryIcons}story_privacy.svg';
+  static const String deleteItem = '${baseCreateStoryIcons}delete_item.svg';
+  static const String deletePollOption = '${baseCreateStoryIcons}delete_poll_option.svg';
+  static const String addPollOption = '${baseCreateStoryIcons}add_poll_option.svg';
 
 
   //////////////////******************notification ******/////////////////

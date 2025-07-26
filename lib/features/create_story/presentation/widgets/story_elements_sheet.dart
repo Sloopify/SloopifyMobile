@@ -60,9 +60,10 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                         AllUserPlacesScreen.routeName,
                         arguments: {
                           "story_editor_cubit":
-                              context.read<StoryEditorCubit>(),
+                          context.read<StoryEditorCubit>(),
                           "add_location_cubit":
-                              context.read<AddLocationCubit>()..setFromStory(),
+                          context.read<AddLocationCubit>()
+                            ..setFromStory(),
                           "fromStory": true,
                         },
                       );
@@ -72,7 +73,19 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                     context: context,
                     text: 'Poll',
                     asset: AssetsManager.storyPoll,
-                    onTap: () {},
+                    onTap: () {
+                      context.read<StoryEditorCubit>().addPollElement(
+                        offset: Offset(MediaQuery
+                            .of(context)
+                            .size
+                            .width / 2, MediaQuery
+                            .of(context)
+                            .size
+                            .height / 2),
+                        scale: 1.0,
+                        rotation: 0.0,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -87,20 +100,20 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                     onTap: () {
                       Navigator.of(context)
                           .pushNamed(
-                            MentionFriends.routeName,
-                            arguments: {
-                              "post_friends_cubit":
-                                  context.read<PostFriendsCubit>()
-                                    ..setFromStory()
-                                    ..getFriendsList(),
-                              "story_editor_cubit":
-                                  context.read<StoryEditorCubit>(),
-                              "fromStory": true,
-                            },
-                          )
+                        MentionFriends.routeName,
+                        arguments: {
+                          "post_friends_cubit":
+                          context.read<PostFriendsCubit>()
+                            ..setFromStory()
+                            ..getFriendsList(),
+                          "story_editor_cubit":
+                          context.read<StoryEditorCubit>(),
+                          "fromStory": true,
+                        },
+                      )
                           .then((value) {
-                            Navigator.of(context).pop();
-                          });
+                        Navigator.of(context).pop();
+                      });
                       ;
                     },
                   ),
@@ -114,7 +127,7 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                         StoryAudios.routeName,
                         arguments: {
                           "story_editor_cubit":
-                              context.read<StoryEditorCubit>(),
+                          context.read<StoryEditorCubit>(),
                           "play_audio_cubit": locator<PlayAudioCubit>(),
                         },
                       );
@@ -135,14 +148,19 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                           .read<StoryEditorCubit>()
                           .state
                           .positionedElements
-                          .any((e) => e is ClockElement)) {
-                      } else {
+                          .any((e) => e is ClockElement)) {} else {
                         context.read<StoryEditorCubit>().addClockElement(
                           rotation: 0.0,
                           scale: 1.0,
                           offset: Offset(
-                            MediaQuery.of(context).size.width / 2,
-                            MediaQuery.of(context).size.height / 2,
+                            MediaQuery
+                                .of(context)
+                                .size
+                                .width / 2,
+                            MediaQuery
+                                .of(context)
+                                .size
+                                .height / 2,
                           ),
                         );
                       }
@@ -156,7 +174,8 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                           asset: null,
                           context: context,
                           text:
-                              '${state.weatherIcon} ${state.temperatureElement!.value.toStringAsFixed(1)}',
+                          '${state.weatherIcon} ${state.temperatureElement!
+                              .value.toStringAsFixed(1)}',
                           onTap: () {
                             if (context
                                 .read<StoryEditorCubit>()
@@ -174,7 +193,31 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                           },
                         );
                       } else
-                        return SizedBox.shrink();
+                        return Container(
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width * 0.35,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppPadding.p8,
+                            vertical: AppPadding.p10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: ColorManager.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: ColorManager.lightGray),
+                            boxShadow: [
+                              BoxShadow(
+                                offset: Offset(0, 4),
+                                blurRadius: 4,
+                                spreadRadius: 0,
+                                color: ColorManager.black.withOpacity(0.2),
+                              ),
+                            ],
+                          ),
+                          child: Text('loading weather...', style: AppTheme
+                              .headline4.copyWith(color: ColorManager.black,fontWeight: FontWeight.w500),),
+                        );
                     },
                   ),
                 ],
@@ -190,18 +233,18 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
                     onTap: () {
                       Navigator.of(context)
                           .pushNamed(
-                            StoryFeelingsList.routeName,
-                            arguments: {
-                              "story_editor_cubit":
-                                  context.read<StoryEditorCubit>(),
-                              "feelings_activities_cubit":
-                                  context.read<FeelingsActivitiesCubit>()
-                                    ..setFromStory(),
-                            },
-                          )
+                        StoryFeelingsList.routeName,
+                        arguments: {
+                          "story_editor_cubit":
+                          context.read<StoryEditorCubit>(),
+                          "feelings_activities_cubit":
+                          context.read<FeelingsActivitiesCubit>()
+                            ..setFromStory(),
+                        },
+                      )
                           .then((value) {
-                            Navigator.of(context).pop();
-                          });
+                        Navigator.of(context).pop();
+                      });
                     },
                   ),
                   _buildElementOption(
@@ -235,7 +278,10 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
         //Navigator.of(context).pop();
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.35,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width * 0.35,
         padding: EdgeInsets.symmetric(
           horizontal: AppPadding.p16,
           vertical: AppPadding.p10,
@@ -281,13 +327,22 @@ class _StoryElementsSheetState extends State<StoryElementsSheet> {
     if (gif != null) {
       final gifUrl = gif.images?.original?.url;
       if (gifUrl != null) {
-        if (context.read<StoryEditorCubit>().state.positionedElements.any(
-          (e) => e is GifElement,
-        )) {
-        } else {
+        if (context
+            .read<StoryEditorCubit>()
+            .state
+            .positionedElements
+            .any(
+              (e) => e is GifElement,
+        )) {} else {
           context.read<StoryEditorCubit>().addStickerElement(
             gifUrl: gifUrl,
-            offset: Offset(MediaQuery.of(context).size.width / 2, MediaQuery.of(context).size.height/2),
+            offset: Offset(MediaQuery
+                .of(context)
+                .size
+                .width / 2, MediaQuery
+                .of(context)
+                .size
+                .height / 2),
             scale: 1.0,
             rotation: 0.0,
           );

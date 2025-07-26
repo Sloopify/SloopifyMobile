@@ -13,24 +13,20 @@ class PostFriendsState extends Equatable {
   final int page;
   final bool hasReachedEnd;
   final bool fromStory;
-  final int selectedMentionFriendId;
-  final String selectedMentionName;
+  final List<MentionFriendStory> mentionFriendsStory;
 
   const PostFriendsState({
     this.getAllFriendStatus = GetAllFriendStatus.init,
     this.errorMessage = "",
     this.allFriends = const [],
     this.searchName = "",
-    this.selectedFriendsExcept=const [],
-    this.selectedSpecificFriends=const [],
-    this.page=0,
-    this.hasReachedEnd=true,
-    this.selectedMentionFriends=const [],
-     this.fromStory=false,
-    this.selectedMentionFriendId=0,
-    this.selectedMentionName=''
-
-
+    this.selectedFriendsExcept = const [],
+    this.selectedSpecificFriends = const [],
+    this.page = 0,
+    this.hasReachedEnd = true,
+    this.selectedMentionFriends = const [],
+    this.fromStory = false,
+    this.mentionFriendsStory = const [],
   });
 
   @override
@@ -46,9 +42,7 @@ class PostFriendsState extends Equatable {
     hasReachedEnd,
     page,
     fromStory,
-    selectedMentionFriendId,
-    selectedMentionName
-
+    mentionFriendsStory,
   ];
 
   PostFriendsState copyWith({
@@ -58,30 +52,50 @@ class PostFriendsState extends Equatable {
     List<int>? selectedFriends,
     String? searchName,
     bool? isSpecificFriends,
-    bool ?isFriendsExcept,
-     List<int>? selectedSpecificFriends,
-     List<int> ?selectedFriendsExcept,
+    bool? isFriendsExcept,
+    List<int>? selectedSpecificFriends,
+    List<int>? selectedFriendsExcept,
     List<int>? selectedMentionFriends,
     int? page,
-    bool ? hasReachedEnd,
+    bool? hasReachedEnd,
     bool? fromStory,
-   int? selectedMentionFriendId,
-    String? selectedMentionName
-
+    int? selectedMentionFriendId,
+    String? selectedMentionName,
+    List<MentionFriendStory>? mentionFriendStory,
   }) {
     return PostFriendsState(
-      page: page??this.page,
-      hasReachedEnd: hasReachedEnd??this.hasReachedEnd,
-      selectedMentionFriends: selectedMentionFriends??this.selectedMentionFriends,
+      page: page ?? this.page,
+      hasReachedEnd: hasReachedEnd ?? this.hasReachedEnd,
+      selectedMentionFriends:
+          selectedMentionFriends ?? this.selectedMentionFriends,
       errorMessage: errorMessage ?? this.errorMessage,
       getAllFriendStatus: getAllFriendStatus ?? this.getAllFriendStatus,
       allFriends: allFriends ?? this.allFriends,
       searchName: searchName ?? this.searchName,
-      selectedFriendsExcept: selectedFriendsExcept??this.selectedFriendsExcept,
-      selectedSpecificFriends: selectedSpecificFriends??this.selectedSpecificFriends,
-      fromStory: fromStory??this.fromStory,
-      selectedMentionFriendId: selectedMentionFriendId??this.selectedMentionFriendId,
-      selectedMentionName: selectedMentionName??this.selectedMentionName
+      selectedFriendsExcept:
+          selectedFriendsExcept ?? this.selectedFriendsExcept,
+      selectedSpecificFriends:
+          selectedSpecificFriends ?? this.selectedSpecificFriends,
+      fromStory: fromStory ?? this.fromStory,
+      mentionFriendsStory: mentionFriendStory ?? this.mentionFriendsStory,
+    );
+  }
+}
+
+class MentionFriendStory extends Equatable {
+  final int friendId;
+  final String friendName;
+
+  MentionFriendStory({required this.friendId, required this.friendName});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [friendId, friendName];
+
+  MentionFriendStory copyWith({int? friendId, String? friendName}) {
+    return MentionFriendStory(
+      friendId: friendId ?? this.friendId,
+      friendName: friendName ?? this.friendName,
     );
   }
 }

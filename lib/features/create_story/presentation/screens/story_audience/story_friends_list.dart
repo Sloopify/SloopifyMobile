@@ -91,89 +91,88 @@ class StoryFriendsList extends StatelessWidget {
                     ),
                     Gaps.vGap3,
                     if (context.read<StoryEditorCubit>().state.privacy ==
-                        StoryAudience.specificFriends)
-                  ...[
-                    Expanded(
-                      child: SmartRefresher(
-                        controller:
-                        context
-                            .read<PostFriendsCubit>()
-                            .refreshController,
-                        enablePullUp: true,
-                        enablePullDown: true,
-                        onRefresh:
-                            () =>
-                            context.read<PostFriendsCubit>().onRefresh(),
-                        onLoading:
-                            () =>
-                            context.read<PostFriendsCubit>().onLoadMore(),
-                        footer: customFooter,
-                        child: ListView.separated(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          itemCount: state.allFriends.length,
-                          itemBuilder: (context, index) {
-                            bool isSelcetd = state.selectedSpecificFriends
-                                .contains(state.allFriends[index].id);
-                            return SelectFriendItem(
-                              friendEntity: state.allFriends[index],
-                              onChanged: (value) {
-                                context
-                                    .read<PostFriendsCubit>()
-                                    .toggleSelectSpecificFriends(
-                                  state.allFriends[index].id,
-                                );
-                              },
-                              initValue: isSelcetd,
-                            );
-                          },
-                          separatorBuilder: (
-                              BuildContext context,
-                              int index,
-                              ) {
-                            return Gaps.vGap2;
-                          },
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 50,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      width: double.infinity,
-                      color: ColorManager.white,
-                      child: CustomElevatedButton(
-                        label: "Done",
-                        onPressed: () => Navigator.of(context).pop(),
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        borderSide: BorderSide(
-                          color: ColorManager.primaryColor.withOpacity(
-                            0.3,
-                          ),
-                        ),
-                        backgroundColor: ColorManager.primaryColor
-                            .withOpacity(0.3),
-                      ),
-                    ),
-
-                  ]else if (context.read<StoryEditorCubit>().state.privacy ==
-                        StoryAudience.friendsExcept)...[
+                        StoryAudience.specificFriends) ...[
                       Expanded(
                         child: SmartRefresher(
                           controller:
-                          context
-                              .read<PostFriendsCubit>()
-                              .refreshController,
+                              context
+                                  .read<PostFriendsCubit>()
+                                  .refreshController,
                           enablePullUp: true,
                           enablePullDown: true,
                           onRefresh:
                               () =>
-                              context
-                                  .read<PostFriendsCubit>()
-                                  .onRefresh(),
+                                  context.read<PostFriendsCubit>().onRefresh(),
                           onLoading:
                               () =>
+                                  context.read<PostFriendsCubit>().onLoadMore(),
+                          footer: customFooter,
+                          child: ListView.separated(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            itemCount: state.allFriends.length,
+                            itemBuilder: (context, index) {
+                              bool isSelcetd = state.selectedSpecificFriends
+                                  .contains(state.allFriends[index].id);
+                              return SelectFriendItem(
+                                friendEntity: state.allFriends[index],
+                                onChanged: (value) {
+                                  context
+                                      .read<PostFriendsCubit>()
+                                      .toggleSelectSpecificFriends(
+                                        state.allFriends[index].id,
+                                      );
+                                },
+                                initValue: isSelcetd,
+                              );
+                            },
+                            separatorBuilder: (
+                              BuildContext context,
+                              int index,
+                            ) {
+                              return Gaps.vGap2;
+                            },
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 50,
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        width: double.infinity,
+                        color: ColorManager.white,
+                        child: CustomElevatedButton(
+                          label: "Done",
+                          onPressed: () {
+                            context
+                                .read<StoryEditorCubit>()
+                                .setListOfSpecificFriends(
+                                  state.selectedSpecificFriends,
+                                );
+                            Navigator.of(context).pop();
+                          },
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          borderSide: BorderSide(
+                            color: ColorManager.primaryColor.withOpacity(0.3),
+                          ),
+                          backgroundColor: ColorManager.primaryColor
+                              .withOpacity(0.3),
+                        ),
+                      ),
+                    ] else if (context.read<StoryEditorCubit>().state.privacy ==
+                        StoryAudience.friendsExcept) ...[
+                      Expanded(
+                        child: SmartRefresher(
+                          controller:
                               context
                                   .read<PostFriendsCubit>()
-                                  .onLoadMore(),
+                                  .refreshController,
+                          enablePullUp: true,
+                          enablePullDown: true,
+                          onRefresh:
+                              () =>
+                                  context.read<PostFriendsCubit>().onRefresh(),
+                          onLoading:
+                              () =>
+                                  context.read<PostFriendsCubit>().onLoadMore(),
                           footer: customFooter,
                           child: ListView.separated(
                             padding: EdgeInsets.symmetric(horizontal: 10),
@@ -187,17 +186,17 @@ class StoryFriendsList extends StatelessWidget {
                                   context
                                       .read<PostFriendsCubit>()
                                       .toggleSelectFriendsExcept(
-                                    state.allFriends[index].id,
-                                  );
+                                        state.allFriends[index].id,
+                                      );
                                   print(state.selectedFriendsExcept);
                                 },
                                 initValue: isSelcetd,
                               );
                             },
                             separatorBuilder: (
-                                BuildContext context,
-                                int index,
-                                ) {
+                              BuildContext context,
+                              int index,
+                            ) {
                               return Gaps.vGap2;
                             },
                           ),
@@ -210,18 +209,24 @@ class StoryFriendsList extends StatelessWidget {
                         color: ColorManager.white,
                         child: CustomElevatedButton(
                           label: "Done",
-                          onPressed: () => Navigator.of(context).pop(),
+                          onPressed: () {
+                            context
+                                .read<StoryEditorCubit>()
+                                .setListOfFriendsExcept(
+                                  state.selectedSpecificFriends,
+                                );
+
+                            Navigator.of(context).pop();
+                          },
                           width: MediaQuery.of(context).size.width * 0.7,
                           borderSide: BorderSide(
-                            color: ColorManager.primaryColor.withOpacity(
-                              0.3,
-                            ),
+                            color: ColorManager.primaryColor.withOpacity(0.3),
                           ),
                           backgroundColor: ColorManager.primaryColor
                               .withOpacity(0.3),
                         ),
                       ),
-                    ]
+                    ],
                   ],
                 ),
               );

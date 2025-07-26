@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:sloopify_mobile/features/create_story/domain/entities/poll_entity_option.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/positioned_element_entity.dart';
 import 'package:sloopify_mobile/features/create_story/domain/entities/text_properties_story.dart';
 
@@ -239,7 +240,7 @@ class TemperatureElement extends PositionedElement {
   Map<String, dynamic> toJson() {
     return {
       'value': value,
-      'weather_code': weatherCode,
+      'weather_code': weatherCode.toString(),
       'isDay': isDay,
       ...super.toJson(),
     };
@@ -343,12 +344,10 @@ class AudioElement extends PositionedElement {
 }
 
 class PollElement extends PositionedElement {
-  final String question;
-  final List<String> options;
+ final Poll poll;
 
   PollElement({
-    required this.question,
-    required this.options,
+    required this.poll,
     required super.offset,
     required super.id,
     required super.rotation,
@@ -359,7 +358,7 @@ class PollElement extends PositionedElement {
 
   @override
   Map<String, dynamic> toJson() {
-    return {'question': question, 'options': options, ...super.toJson()};
+    return {'question':poll.question,'poll_options':poll.options.map((e)=>e.toJson()).toList(), ...super.toJson()};
   }
 
   PollElement copyWith({
@@ -368,13 +367,11 @@ class PollElement extends PositionedElement {
     Offset? offset,
     double? rotation,
     Size? size,
-    String? question,
-    List<String>? options,
     double? scale,
+    Poll ? poll
   }) {
     return PollElement(
-      options: options ?? this.options,
-      question: question ?? this.question,
+     poll: poll??this.poll,
       offset: offset ?? this.offset,
       rotation: rotation ?? this.rotation,
       id: id,
@@ -491,8 +488,8 @@ class DrawingElement {
   Map<String, dynamic> toJson() {
     return {
       'points': points.map((p) => {'x': p.dx, 'y': p.dy}).toList(),
-      'color': color.value,
-      'strokeWidth': strokeWidth,
+      'stroke_color': '#${(color.value & 0x00FFFFFF).toRadixString(16).padLeft(6, '0')}',
+      'stroke_width': strokeWidth,
     };
   }
 }

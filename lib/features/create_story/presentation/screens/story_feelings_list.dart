@@ -211,10 +211,6 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
         print(feeling.mobileIcon);
         return InkWell(
           onTap: () {
-            if (context.read<FeelingsActivitiesCubit>().state.selectedFeeling ==
-                feeling.name) {
-              context.read<FeelingsActivitiesCubit>().selectFeelings("");
-            } else {
               context.read<FeelingsActivitiesCubit>().selectFeelings(
                 feeling.name,
               );
@@ -224,7 +220,7 @@ class _StoryFeelingsListState extends State<StoryFeelingsList> {
               context.read<FeelingsActivitiesCubit>().selectFeelingId(
                 feeling.id,
               );
-            }
+
           },
           child: Container(
             padding: EdgeInsets.all(AppPadding.p8),

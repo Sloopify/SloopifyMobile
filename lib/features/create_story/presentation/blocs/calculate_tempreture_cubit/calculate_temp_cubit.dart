@@ -70,9 +70,9 @@ class CalculateTempCubit extends Cubit<CalculateTempState> {
         final TemperatureElement temperatureElement = TemperatureElement(
           value: state.tempC,
           id: Uuid().v4(),
-          weatherCode: state.weatherIcon,
+          weatherCode: state.weatherCode,
           isDay: state.isDay,
-          offset: Offset(500, 500),
+          offset: Offset(200, 200),
           rotation: 0.0,
            scale: 1.0
         );

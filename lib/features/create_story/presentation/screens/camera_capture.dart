@@ -15,6 +15,7 @@ import 'package:sloopify_mobile/features/create_story/domain/entities/media_stor
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/screens/story_editor_screen.dart';
 import 'package:uuid/uuid.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../create_posts/presentation/blocs/add_location_cubit/add_location_cubit.dart';
 import '../../../create_posts/presentation/blocs/feeling_activities_post_cubit/feelings_activities_cubit.dart';
@@ -37,6 +38,18 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
   bool isPhotoCamera = true;
   bool isFlashOn = false;
   File? file;
+  MediaStory? mediaStory;
+  VideoPlayerController? _videoController;
+
+  void _initializeVideoMedia(BuildContext context) async {
+    if (file != null) {
+      _videoController = VideoPlayerController.file(file!);
+      await _videoController!.initialize();
+      _videoController!.setLooping(true);
+      _videoController!.play();
+      if (mounted) setState(() {});
+    }
+  }
 
   @override
   void initState() {
@@ -55,6 +68,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
     }
   }
 
+
   @override
   void dispose() {
     _controller?.dispose();
@@ -67,14 +81,14 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
         final XFile image = await _controller!.takePicture();
         file = File(image.path);
         setState(() {});
-        final MediaStory mediaStory = MediaStory(
+        mediaStory = MediaStory(
           id: Uuid().v4(),
           file: file,
           order: 1,
           isVideoFile: false,
         );
         context.read<StoryEditorCubit>().addCameraPhotoOrVideoToMediaFiles(
-          mediaStory,
+          mediaStory!,
         );
 
         // For now, we'll just navigate back
@@ -93,14 +107,17 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
             _isRecording = false;
           });
           file = File(video.path);
-          final MediaStory mediaStory = MediaStory(
+          mediaStory = MediaStory(
             id: Uuid().v4(),
             file: file,
             order: 1,
             isVideoFile: true,
           );
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _initializeVideoMedia(context);
+          });
           context.read<StoryEditorCubit>().addCameraPhotoOrVideoToMediaFiles(
-            mediaStory,
+            mediaStory!,
           );
         } catch (e) {
           print("Error stopping video recording: $e");
@@ -120,6 +137,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return _isInitialized
         ? Scaffold(
           floatingActionButton: file != null ? _buildDoneCancelBtn() : null,
@@ -128,7 +146,14 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
           body: SafeArea(
             child: Stack(
               children: [
-                Positioned.fill(child: CameraPreview(_controller!)),
+                mediaStory == null
+                    ? Positioned.fill(child: CameraPreview(_controller!))
+                    : Positioned.fill(
+                      child:
+                          mediaStory!.isVideoFile
+                              ? _buildVideoPlayer()
+                              : _buildImageDisplay(mediaStory!.file!),
+                    ),
                 Positioned(
                   top: 20,
                   left: 0,
@@ -245,7 +270,8 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: isSelected ? ColorManager.primaryShade4 : null,
+          color:
+              isSelected ? ColorManager.primaryShade4.withOpacity(0.4) : null,
         ),
         child: Text(
           isPhoto ? "Photo" : "Video",
@@ -265,7 +291,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
         vertical: AppPadding.p10,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           SizedBox(
             height: 40,
@@ -298,6 +324,48 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildImageDisplay(File file) {
+    return Image.file(file, fit: BoxFit.contain);
+  }
+
+  Widget _buildVideoPlayer() {
+    if (_videoController == null || !_videoController!.value.isInitialized) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      );
+    }
+    return Stack(
+      fit: StackFit.passthrough,
+      children: [
+        Positioned.fill(
+          child: AspectRatio(
+            aspectRatio: _videoController!.value.aspectRatio,
+            child: VideoPlayer(_videoController!),
+          ),
+        ),
+        GestureDetector(
+          onTap: () async {
+            print('fffffffffffff');
+            _videoController!.value.isPlaying
+                ? await _videoController!.pause()
+                : await _videoController!.play();
+            setState(() {});
+          },
+          child: Align(
+            alignment: Alignment.center,
+            child: Icon(
+              _videoController!.value.isPlaying
+                  ? Icons.pause
+                  : Icons.play_arrow,
+              size: 50,
+              color: ColorManager.white,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

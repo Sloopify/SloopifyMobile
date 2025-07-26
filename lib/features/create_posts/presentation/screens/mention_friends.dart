@@ -104,8 +104,13 @@ class MentionFriends extends StatelessWidget {
                           itemBuilder: (context, index) {
                             bool isSelcetd =
                                 fromStory
-                                    ? state.selectedMentionFriendId ==
-                                        state.allFriends[index].id
+                                    ? state.mentionFriendsStory.contains(
+                                      MentionFriendStory(
+                                        friendId: state.allFriends[index].id,
+                                        friendName:
+                                            '${state.allFriends[index].firstName} ${state.allFriends[index].lastName}',
+                                      ),
+                                    )
                                     : state.selectedMentionFriends.contains(
                                       state.allFriends[index].id,
                                     );
@@ -126,22 +131,15 @@ class MentionFriends extends StatelessWidget {
                                 } else {
                                   context
                                       .read<PostFriendsCubit>()
-                                      .selectMentionFriends(
-                                        state.allFriends[index].id,
-                                        '${state.allFriends[index].firstName} ${state.allFriends[index].lastName}',
-                                      );
-                                  context
-                                      .read<StoryEditorCubit>()
-                                      .addMentionElement(
-                                        friendId: state.selectedMentionFriendId,
-                                        offset: Offset(
-                                          MediaQuery.of(context).size.width / 2,
-                                          MediaQuery.of(context).size.height /
-                                              2,
+                                      .toggleSelectionMentionStoryFriends(
+                                        MentionFriendStory(
+                                          friendId: state.allFriends[index].id,
+                                          friendName:
+                                              '${state.allFriends[index].firstName} ${state.allFriends[index].lastName}',
                                         ),
-                                        friendName: state.selectedMentionName,
                                       );
                                 }
+                                print(state.mentionFriendsStory);
                               },
                               initValue: isSelcetd,
                             );
@@ -163,7 +161,28 @@ class MentionFriends extends StatelessWidget {
                         child: CustomElevatedButton(
                           label: "Done",
                           onPressed: () {
+                            if (fromStory) {
+                              for (
+                              int i = 0;
+                              i < state.mentionFriendsStory.length;
+                              i++
+                              ) {
+                                context
+                                    .read<StoryEditorCubit>()
+                                    .addMentionElement(
+                                  friendId: state.mentionFriendsStory[i].friendId,
+                                  offset: Offset(
+                                    MediaQuery.of(context).size.width / 2,
+                                    MediaQuery.of(context).size.height / 2,
+                                  ),
+                                  friendName:state.mentionFriendsStory[i].friendName,
+                                );
+                              }
+                              context.read<PostFriendsCubit>().emptyMentionFriends();
+
+                            }
                             Navigator.of(context).pop();
+
                           },
                           width: MediaQuery.of(context).size.width * 0.7,
                           borderSide: BorderSide(

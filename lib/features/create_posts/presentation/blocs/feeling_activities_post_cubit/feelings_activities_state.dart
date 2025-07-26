@@ -107,7 +107,7 @@ class FeelingsActivitiesState extends Equatable {
     bool? fromStory,
   }) {
     return FeelingsActivitiesState(
-      selectedFeelingId: selectedFeelingId??this.selectedFeelingId,
+      selectedFeelingId: selectedFeelingIId??this.selectedFeelingId,
       selectedFeelingIcon: selectedFeelingIcon??this.selectedFeelingIcon,
       fromStory: fromStory??this.fromStory,
       selectedCategoryName: selectedCategoryName ?? this.selectedCategoryName,
