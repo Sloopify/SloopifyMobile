@@ -63,7 +63,13 @@ class _EditAdminsScreenState extends State<EditAdminsScreen> {
           ),
           Expanded(
             child: FriendsList(
-
+              friends: widget.channel.friends,
+              selected: selected,
+              onToggle: (u) {
+                setState(() {
+                  selected.contains(u) ? selected.remove(u) : selected.add(u);
+                });
+              },
             ),
           ),
           Padding(
