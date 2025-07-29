@@ -13,12 +13,39 @@ class PositionedElement extends Equatable {
 
   const PositionedElement({
     required this.id,
-     this.offset,
-     this.positionedElementStoryTheme=PositionedElementStoryTheme.white,
-     this.size,
-     this.rotation,
-     this.scale,
+    this.offset,
+    this.positionedElementStoryTheme = PositionedElementStoryTheme.white,
+    this.size,
+    this.rotation,
+    this.scale,
   });
+
+   PositionedElement fromJson(Map<String, dynamic> json) {
+    return PositionedElement(
+      id: "",
+      rotation:json["rotation"]!=null? double.tryParse(json["rotation"]):0.0,
+      scale: json["scale"]!=null?double.tryParse(json["scale"]):1.0,
+      offset: json["x"]==null && json["y"]==null? Offset.zero:Offset(double.parse(json["x"]), double.parse(json["y"])),
+      size: Size(double.parse(json["size_x"]), double.parse(json["size_h"])),
+      positionedElementStoryTheme:
+         getValuesFromApi(json["theme"]),
+    );
+  }
+
+  static PositionedElementStoryTheme getValuesFromApi(String theme) {
+    switch (theme) {
+      case "theme_1":
+        return PositionedElementStoryTheme.white;
+      case "theme_2":
+        return  PositionedElementStoryTheme.normalWithBorder;
+      case "theme_3" :
+        return PositionedElementStoryTheme.focusedWithPrimaryColor;
+      case "theme_4":
+        return PositionedElementStoryTheme.focusedWithPrimaryShade ;
+      default:
+        return PositionedElementStoryTheme.white;
+    }
+  }
 
   PositionedElement copyWith({
     Offset? offset,

@@ -23,7 +23,7 @@ class TextPropertiesForStory extends Equatable {
 
   factory TextPropertiesForStory.fromJson(Map<String, dynamic> json) {
     return TextPropertiesForStory(
-      fontSize: json["fontSize"],
+      fontSize: double.tryParse(json["font_size"]),
       color: json['color'],
       fontType: json['font_type'],
       bold: json['bold'] ?? false,

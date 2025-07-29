@@ -1814,6 +1814,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.12.1"
+  story_time:
+    dependency: "direct main"
+    description:
+      name: story_time
+      sha256: "58ee62fdc22630f4fcf0b7267d658bf0f64c54b843e07afb40d7f82b5fca207a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.6"
   stream_channel:
     dependency: transitive
     description:

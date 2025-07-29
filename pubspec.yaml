@@ -79,6 +79,8 @@ dependencies:
   icons_launcher:
   matrix_gesture_detector_pro: ^1.0.0
   dashed_rect: ^0.0.4
+  story_time: ^1.0.6
+
 
 
 

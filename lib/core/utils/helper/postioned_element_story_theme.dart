@@ -19,3 +19,19 @@ extension PostionedElementStoryExtension on PositionedElementStoryTheme {
     }
   }
 }
+extension PostionedElementStoryExtensionString on String {
+  PositionedElementStoryTheme getValuesFromApi() {
+    switch (this) {
+      case "theme_1":
+        return PositionedElementStoryTheme.white;
+      case "theme_2":
+        return  PositionedElementStoryTheme.normalWithBorder;
+      case "theme_3" :
+        return PositionedElementStoryTheme.focusedWithPrimaryColor;
+      case "theme_4":
+        return PositionedElementStoryTheme.focusedWithPrimaryShade ;
+      default:
+        return PositionedElementStoryTheme.white;
+    }
+  }
+}
