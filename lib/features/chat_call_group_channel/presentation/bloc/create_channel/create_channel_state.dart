@@ -1,20 +1,22 @@
-import 'dart:io';
-
 class CreateChannelState {
-  final File? imageFile;
   final bool isLoading;
+  final String? imagePath; // Changed from File? imageFile
   final String? inviteLink;
 
-  CreateChannelState({this.imageFile, this.isLoading = false, this.inviteLink});
+  const CreateChannelState({
+    this.isLoading = false,
+    this.imagePath,
+    this.inviteLink,
+  });
 
   CreateChannelState copyWith({
-    File? imageFile,
     bool? isLoading,
+    String? imagePath,
     String? inviteLink,
   }) {
     return CreateChannelState(
-      imageFile: imageFile ?? this.imageFile,
       isLoading: isLoading ?? this.isLoading,
+      imagePath: imagePath ?? this.imagePath,
       inviteLink: inviteLink ?? this.inviteLink,
     );
   }

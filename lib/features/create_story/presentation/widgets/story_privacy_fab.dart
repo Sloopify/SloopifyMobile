@@ -22,12 +22,8 @@ class StoryPrivacyFab extends StatelessWidget {
         CustomSheet.show(
           child: MultiBlocProvider(
             providers: [
-              BlocProvider.value(
-                value: context.read<PostFriendsCubit>(),
-              ),
-              BlocProvider.value(
-                value: context.read<StoryEditorCubit>(),
-              ),
+              BlocProvider.value(value: context.read<PostFriendsCubit>()),
+              BlocProvider.value(value: context.read<StoryEditorCubit>()),
             ],
             child: PrivacySheet(),
           ),
@@ -59,10 +55,12 @@ class PrivacySheet extends StatelessWidget {
         child: InkWell(
           onTap: () {
             Navigator.of(context).pushNamed(
-                StoryAudienceScreen.routeName, arguments: {
-              'post_friends_cubit': context.read<PostFriendsCubit>(),
-              "story_editor_cubit": context.read<StoryEditorCubit>()
-            });
+              StoryAudienceScreen.routeName,
+              arguments: {
+                'post_friends_cubit': context.read<PostFriendsCubit>(),
+                "story_editor_cubit": context.read<StoryEditorCubit>(),
+              },
+            );
           },
           child: Row(
             children: [

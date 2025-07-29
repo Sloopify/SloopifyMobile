@@ -19,7 +19,7 @@ class ActionButton extends StatelessWidget {
       children: [
         InkWell(
           onTap: onTap,
-          child: CircleAvatar(radius: 24.r, child: Icon(icon)),
+          child: CircleAvatar(radius: 12.r, child: Icon(icon)),
         ),
         SizedBox(height: 4.h),
         Text(label),

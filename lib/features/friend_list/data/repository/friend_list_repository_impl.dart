@@ -1,18 +1,32 @@
 import 'package:dio/dio.dart';
+import 'package:sloopify_mobile/core/local_storage/preferene_utils.dart';
+
 import 'package:sloopify_mobile/features/friend_list/data/datasources/friend_list_remote_data_source.dart';
 import 'package:sloopify_mobile/features/friend_list/data/model/friend_model.dart';
 
 class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   final Dio dio;
+  String devToken =
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiODU3MjhjNmMxN2ZhYTRmN2UxMGI5MWUxYTA3MzNmMzhmODc2MjE0MzA2ZGNlNjgwODE1NDUzYWZmMWVkNWQyZmY5MTBiMTIyNWE4NmIxMDciLCJpYXQiOjE3NTM0NjA0MTAuNzY0NjYyLCJuYmYiOjE3NTM0NjA0MTAuNzY0NjY0LCJleHAiOjE3ODQ5OTY0MTAuNzU4Mzk4LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.C0SBy8a_oaldiX22-PClyzxiM3KhhgXRO66aW1CwIApc9azFCOMeXR3dfxOVXOHwW94kHPOkmFWrX3r-S2BQZJtHsAeUQ0l7-OZXaTiV-bEaaS1OFONsJOfXmYXETqWKPyejT0xmUQd_7atsgQw-uAqs86P1figO3W37vK2aOpp8sttcU4e_9Ysqp_jYl-kqxgpJHCiCxeDw8oPFLieda1ixE6cbKKHuu8OVFKcrzvw2POwJKrrsz33PUqqmfqd2YKHcKWGvDfR5mp3tMnoUIFP5GubCuJ8rntwuCV17hQi2Warh3PWMfJVErRtPjbkGwOtoWL6Rpld6GRyLl92DR93zHySlBwozs37INXpqpKHDARsqZNOO1XkM6sr4OMiv-T1ATnS_UkLYd2FLuO50XCwLevx3Fd5eozwl4J5JCeMiRcFeJxwPMWprpCd5vzMALTqGnC2txQGN_DvtaH5KeC9xKLs8K4-RY-ed7BrO7Zw4nCApC3jFTBPVT_wQNhORbungmuEE_LlaXCeyhKbv2q6iMJSCMLOqJQ_qfPbY2jJftrddcRmpxJDpSZ8RWXoKmOSIZpyLKwu9fFmiVzueqxrvIZwNbVPD0U7aiHixUVQWqCxGuQJD8PtyqrGPoXCjSPBcFeJs29azCbf33dSgx648nFT-Wjysu6L3Kmf473I";
 
-  FriendRemoteDataSourceImpl(this.dio);
+  FriendRemoteDataSourceImpl({required this.dio});
+
+  String _getToken() {
+    final token = PreferenceUtils.getString("auth_token");
+    if (token == null || token.isEmpty) {
+      print("❌ No saved token. Using devToken.");
+      return devToken;
+    }
+    print("✅ Got user token: $token");
+    return token;
+  }
 
   @override
   Future<List<FriendModel>> getFriendList({
     required int page,
     required int perPage,
-    required String token,
   }) async {
+    final token = await _getToken();
     final response = await dio.post(
       'https://dev.sloopify.com/api/v1/stories/get-friends',
       data: {"page": page, "per_page": perPage},
@@ -34,8 +48,8 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
     required int perPage,
     required String sortBy,
     required String sortOrder,
-    required String token,
   }) async {
+    final token = await _getToken();
     final response = await dio.post(
       'https://dev.sloopify.com/api/v1/friends/search-friends',
       data: {
@@ -52,7 +66,6 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
         },
       ),
     );
-
     final List<dynamic> data = response.data['data'];
     return data.map((json) => FriendModel.fromJson(json)).toList();
   }
@@ -61,11 +74,11 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   Future<List<FriendModel>> getSentFriendRequest({
     required int page,
     required int perPage,
-    required String token,
     required String sortBy,
     required String sortOrder,
     required String status,
   }) async {
+    final token = await _getToken();
     final response = await dio.post(
       'https://dev.sloopify.com/api/v1/friends/get-sent-requests',
       data: {
@@ -87,10 +100,8 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   }
 
   @override
-  Future<void> cancelFriendRequest({
-    required String token,
-    required String friendId,
-  }) async {
+  Future<void> cancelFriendRequest({required String friendId}) async {
+    final token = await _getToken();
     await dio.post(
       'https://dev.sloopify.com/api/v1/friends/cancel-friend-request',
       data: {"friend_id": friendId},
@@ -104,10 +115,8 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   }
 
   @override
-  Future<void> sendFriendRequest({
-    required String token,
-    required String friendId,
-  }) async {
+  Future<void> sendFriendRequest({required String friendId}) async {
+    final token = await _getToken();
     await dio.post(
       'https://dev.sloopify.com/api/v1/friends/send-request',
       data: {"friend_id": friendId},
@@ -121,10 +130,8 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   }
 
   @override
-  Future<void> acceptFriendRequest({
-    required String token,
-    required String friendshipId,
-  }) async {
+  Future<void> acceptFriendRequest({required String friendshipId}) async {
+    final token = await _getToken();
     await dio.post(
       'https://dev.sloopify.com/api/v1/friends/accept-friend-request',
       data: {"friendship_id": friendshipId},
@@ -141,10 +148,10 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   Future<List<FriendModel>> getReceivedFriendRequests({
     required int page,
     required int perPage,
-    required String token,
     required String sortBy,
     required String sortOrder,
   }) async {
+    final token = await _getToken();
     final response = await dio.post(
       'https://dev.sloopify.com/api/v1/friends/get-received-requests',
       data: {
@@ -165,10 +172,8 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   }
 
   @override
-  Future<void> declineFriendRequest({
-    required String token,
-    required String friendshipId,
-  }) async {
+  Future<void> declineFriendRequest({required String friendshipId}) async {
+    final token = await _getToken();
     await dio.post(
       'https://dev.sloopify.com/api/v1/friends/decline-friend-request',
       data: {"friendship_id": friendshipId},
@@ -183,7 +188,6 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
 
   @override
   Future<List<FriendModel>> searchSentFriendRequests({
-    required String token,
     required String query,
     required int page,
     required int perPage,
@@ -191,6 +195,7 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
     required String sortOrder,
     required String status,
   }) async {
+    final token = await _getToken();
     final response = await dio.post(
       'https://dev.sloopify.com/api/v1/friends/search-sent-requests',
       data: {
@@ -215,12 +220,15 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   @override
   Future<List<FriendModel>> searchReceivedFriendRequests({
     required String token,
+
     required String query,
     required int page,
     required int perPage,
     required String sortBy,
     required String sortOrder,
+    required String status,
   }) async {
+    final token = await _getToken();
     final response = await dio.post(
       'https://dev.sloopify.com/api/v1/friends/search-received-requests',
       data: {
@@ -229,6 +237,7 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
         "per_page": perPage,
         "sort_by": sortBy,
         "sort_order": sortOrder,
+        "status": status,
       },
       options: Options(
         headers: {
@@ -242,10 +251,8 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   }
 
   @override
-  Future<void> deleteFriendship({
-    required String token,
-    required String friendId,
-  }) async {
+  Future<void> deleteFriendship({required String friendId}) async {
+    final token = await _getToken();
     await dio.post(
       'https://dev.sloopify.com/api/v1/friends/delete-friend-ship',
       data: {"friend_id": friendId},
@@ -259,10 +266,8 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
   }
 
   @override
-  Future<void> blockFriend({
-    required String token,
-    required String friendId,
-  }) async {
+  Future<void> blockFriend({required String friendId}) async {
+    final token = await _getToken();
     await dio.post(
       'https://dev.sloopify.com/api/v1/friends/block-friend',
       data: {"friend_id": friendId},
@@ -277,12 +282,12 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
 
   @override
   Future<List<FriendModel>> getFriends({
-    required String token,
     required int page,
     required int perPage,
     required String sortBy,
     required String sortOrder,
   }) async {
+    final token = await _getToken();
     final response = await dio.post(
       'https://dev.sloopify.com/api/v1/friends/get-friends',
       data: {
@@ -304,13 +309,13 @@ class FriendRemoteDataSourceImpl implements FriendRemoteDataSource {
 
   @override
   Future<List<FriendModel>> getSentFriendRequests({
-    required String token,
     required int page,
     required int perPage,
     required String sortBy,
     required String sortOrder,
     required String status,
   }) async {
+    final token = await _getToken();
     final response = await dio.post(
       'https://dev.sloopify.com/api/v1/friends/get-sent-requests',
       data: {

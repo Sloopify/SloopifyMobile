@@ -42,6 +42,7 @@ import 'package:sloopify_mobile/features/friend_list/presentation/screen/myReque
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/myFreinds.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/suggestedFriendListPage.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
+import 'package:sloopify_mobile/features/inbox/presentation/screen/inbox_page.dart';
 import 'package:sloopify_mobile/features/start_up/presenation/screens/splash_screen.dart';
 
 import '../../features/app_wrapper/presentation/screens/app_wrapper.dart';
@@ -82,7 +83,6 @@ import '../../features/create_story/presentation/screens/story_editor_screen.dar
 import '../../features/create_story/presentation/screens/story_feelings_list.dart';
 import '../../features/create_story/presentation/screens/text_story_editor.dart';
 import '../../features/home/presentation/screens/home_navigation_screen.dart';
-import '../../features/inbox/presentation/screen/inbox_page.dart';
 import '../../features/start_up/presenation/screens/on_boarding_screen.dart';
 
 class AppRouter {
@@ -142,12 +142,7 @@ class AppRouter {
             return InboxScreen();
           },
         );
-      case FriendListPage.routeName:
-        return MaterialPageRoute(
-          builder: (context) {
-            return FriendListPage();
-          },
-        );
+
       case MyRequestsPage.routeName:
         return MaterialPageRoute(
           builder: (context) {
@@ -322,7 +317,7 @@ class AppRouter {
                   value: arg["post_friends_cubit"] as PostFriendsCubit,
                 ),
               ],
-              child: FriendsList(),
+              child: FriendsList(friends: [], selected: [], onToggle: (u) {}),
             );
           },
         );

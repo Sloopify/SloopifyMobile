@@ -8,8 +8,41 @@ class FriendLoading extends FriendState {}
 
 class FriendLoaded extends FriendState {
   final List<Friend> friends;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final int currentPage;
+  final int perPage;
+  FriendLoaded({
+    required this.friends,
+    required this.isLoadingMore,
+    required this.hasMore,
+    required this.currentPage,
+    required this.perPage,
+  });
 
-  FriendLoaded(this.friends);
+  FriendLoaded copyWith({
+    List<Friend>? friends,
+    bool? isLoadingMore,
+    bool? hasMore,
+    int? currentPage,
+    int? perPage,
+  }) {
+    return FriendLoaded(
+      friends: friends ?? this.friends,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
+      currentPage: currentPage ?? this.currentPage,
+      perPage: perPage ?? this.perPage,
+    );
+  }
+
+  List<Object?> get props => [
+    friends,
+    isLoadingMore,
+    hasMore,
+    currentPage,
+    perPage,
+  ];
 }
 
 class FriendError extends FriendState {

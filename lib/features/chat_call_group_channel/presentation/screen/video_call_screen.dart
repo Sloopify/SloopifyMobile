@@ -8,19 +8,31 @@ class VideoCallScreen extends StatelessWidget {
   const VideoCallScreen({super.key});
   static const routeName = "video_call_screen";
 
+  static Widget withBloc() {
+    return BlocProvider(
+      create: (context) => CallBloc()..add(InitCall()), // initialize if needed
+      child: const VideoCallScreen(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CallBloc, CallState>(
       builder: (context, state) {
-        final friendView = _buildFriendVideo(context, state);
-        final userView = _buildUserVideo(context, state);
+        final isSwapped = state.isSwapped ?? false;
+        final isMuted = state.isMuted ?? false;
+        final isVideoOn = state.isVideoOn ?? true;
+        final isVideoPaused = state.isVideoPaused ?? false;
+
+        final friendView = _buildFriendVideo(isVideoPaused);
+        final userView = _buildUserVideo(isVideoOn);
 
         return Scaffold(
           backgroundColor: Colors.black,
           body: SafeArea(
             child: Stack(
               children: [
-                Positioned.fill(child: state.isSwapped ? userView : friendView),
+                Positioned.fill(child: isSwapped ? userView : friendView),
                 Positioned(
                   bottom: 120,
                   right: 16,
@@ -29,11 +41,11 @@ class VideoCallScreen extends StatelessWidget {
                     child: SizedBox(
                       width: 100,
                       height: 160,
-                      child: state.isSwapped ? friendView : userView,
+                      child: isSwapped ? friendView : userView,
                     ),
                   ),
                 ),
-                _buildControls(context, state),
+                _buildControls(context, isMuted, isVideoOn, isVideoPaused),
               ],
             ),
           ),
@@ -42,7 +54,7 @@ class VideoCallScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFriendVideo(BuildContext context, CallState state) {
+  Widget _buildFriendVideo(bool isVideoPaused) {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -51,7 +63,7 @@ class VideoCallScreen extends StatelessWidget {
         ),
       ),
       child:
-          state.isVideoPaused
+          isVideoPaused
               ? Center(
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -66,12 +78,12 @@ class VideoCallScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUserVideo(BuildContext context, CallState state) {
+  Widget _buildUserVideo(bool isVideoOn) {
     return Container(
       color: Colors.black,
       child: Center(
         child: Icon(
-          state.isVideoOn ? Icons.videocam : Icons.videocam_off,
+          isVideoOn ? Icons.videocam : Icons.videocam_off,
           color: Colors.white,
           size: 40,
         ),
@@ -79,11 +91,18 @@ class VideoCallScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildControls(BuildContext context, CallState state) {
+  Widget _buildControls(
+    BuildContext context,
+    bool isMuted,
+    bool isVideoOn,
+    bool isVideoPaused,
+  ) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 30.0),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).padding.bottom + 30,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -91,12 +110,12 @@ class VideoCallScreen extends StatelessWidget {
               Navigator.pop(context); // Or trigger end call event
             }),
             _iconButton(
-              state.isMuted ? Icons.mic_off : Icons.mic,
+              isMuted ? Icons.mic_off : Icons.mic,
               Colors.white,
               () => context.read<CallBloc>().add(ToggleMute()),
             ),
             _iconButton(
-              state.isVideoOn ? Icons.videocam : Icons.videocam_off,
+              isVideoOn ? Icons.videocam : Icons.videocam_off,
               Colors.white,
               () => context.read<CallBloc>().add(ToggleVideo()),
             ),
@@ -106,10 +125,10 @@ class VideoCallScreen extends StatelessWidget {
               () => context.read<CallBloc>().add(SwapView()),
             ),
             _iconButton(
-              state.isVideoPaused ? Icons.play_arrow : Icons.pause,
+              isVideoPaused ? Icons.play_arrow : Icons.pause,
               Colors.white,
               () {
-                if (state.isVideoPaused) {
+                if (isVideoPaused) {
                   context.read<CallBloc>().add(ResumeVideo());
                 } else {
                   context.read<CallBloc>().add(PauseVideo());

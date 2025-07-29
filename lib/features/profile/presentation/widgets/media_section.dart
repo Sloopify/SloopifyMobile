@@ -30,12 +30,13 @@ class MediaSection extends StatelessWidget {
                 (_, i) => ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(
-                    media[i],
+                    "assets/images/friendlist/media$i.png",
                     width: 64,
                     height: 64,
                     fit: BoxFit.cover,
                   ),
                 ),
+
             separatorBuilder: (_, __) => const SizedBox(width: 8),
           ),
         ),

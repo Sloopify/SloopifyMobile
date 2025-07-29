@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:sloopify_mobile/features/friend_list/presentation/screen/myFreinds.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_bloc.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_event.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_state.dart';
 import '../widgets/filter_button.dart';
 import '../widgets/interest_card.dart';
 import '../widgets/friend_request_card.dart';
 import '../widgets/section_title.dart';
+import 'myFreinds.dart';
 
 class SuggestedFriendListPage extends StatefulWidget {
   const SuggestedFriendListPage({super.key});
@@ -16,34 +21,23 @@ class SuggestedFriendListPage extends StatefulWidget {
 
 class _SuggestedFriendListPageState extends State<SuggestedFriendListPage> {
   final ScrollController _scrollController = ScrollController();
-  final List<int> _items = List.generate(4, (index) => index);
-  bool _isLoadingMore = false;
 
   @override
   void initState() {
     super.initState();
+    context.read<FriendBloc>().add(LoadFriends(page: 1, perPage: 10));
     _scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
+    final state = context.read<FriendBloc>().state;
+    if (state is FriendLoaded &&
+        _scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 100 &&
-        !_isLoadingMore) {
-      _loadMoreItems();
+        !state.isLoadingMore &&
+        state.hasMore) {
+      context.read<FriendBloc>().add(LoadMoreFriends());
     }
-  }
-
-  Future<void> _loadMoreItems() async {
-    setState(() => _isLoadingMore = true);
-
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 2));
-
-    final nextItems = List.generate(4, (index) => _items.length + index);
-    setState(() {
-      _items.addAll(nextItems);
-      _isLoadingMore = false;
-    });
   }
 
   @override
@@ -87,11 +81,12 @@ class _SuggestedFriendListPageState extends State<SuggestedFriendListPage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
         controller: _scrollController,
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Static Filter Buttons (won't disappear)
             Row(
               children: const [
                 FilterButton("Friendship requests"),
@@ -104,31 +99,61 @@ class _SuggestedFriendListPageState extends State<SuggestedFriendListPage> {
             const SizedBox(height: 24),
             SectionTitle(title: "They sharing you same interests"),
             const SizedBox(height: 12),
-            SizedBox(
-              height: 170,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 5,
-                itemBuilder: (context, index) => const InterestCard(),
-              ),
+            BlocBuilder<FriendBloc, FriendState>(
+              builder: (context, state) {
+                if (state is FriendLoaded) {
+                  return SizedBox(
+                    height: 170,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 5,
+                      itemBuilder: (context, index) {
+                        final friend = state.friends[index];
+                        return InterestCard(friend: friend);
+                      },
+                    ),
+                  );
+                } else if (state is FriendLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is FriendError) {
+                  return Center(child: Text("Error: ${state.message}"));
+                } else {
+                  return const SizedBox();
+                }
+              },
             ),
             const SizedBox(height: 24),
             SectionTitle(title: "Friendship requests"),
             const SizedBox(height: 12),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _items.length + (_isLoadingMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index >= _items.length) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: CircularProgressIndicator(),
-                    ),
+
+            // BlocBuilder for friend requests
+            BlocBuilder<FriendBloc, FriendState>(
+              builder: (context, state) {
+                if (state is FriendLoading && (state is! FriendLoaded)) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is FriendLoaded) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount:
+                        state.friends.length + (state.isLoadingMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= state.friends.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      final friend = state.friends[index];
+                      return FriendRequestCard(friend: friend);
+                    },
                   );
+                } else if (state is FriendError) {
+                  return Center(child: Text("Error: ${state.message}"));
                 }
-                return const FriendRequestCard();
+                return const SizedBox();
               },
             ),
           ],

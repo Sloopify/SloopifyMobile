@@ -16,6 +16,15 @@ abstract class FriendListRepository {
     required String sortOrder,
     required String status,
   });
+  Future<List<Friend>> searchReceivedFriendRequests({
+    required String token,
+    required String query,
+    required int page,
+    required int perPage,
+    required String sortBy,
+    required String sortOrder,
+    required String status, // ✅ Add this
+  });
 
   Future<void> cancelFriendRequest(String token, String friendId);
   Future<void> sendFriendRequest(String token, String friendId);
@@ -26,6 +35,7 @@ abstract class FriendListRepository {
     required String token,
     required String sortBy,
     required String sortOrder,
+    required String status,
   });
 
   Future<void> declineFriendRequest(String token, String friendshipId);

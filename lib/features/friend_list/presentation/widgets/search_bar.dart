@@ -12,7 +12,7 @@ class SearchBarWidget extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Search',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               filled: true,
               fillColor: Colors.white,
