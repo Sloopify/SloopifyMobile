@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/app_gaps.dart';
@@ -6,6 +8,11 @@ import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
 import 'package:sloopify_mobile/core/ui/widgets/general_image.dart';
+import 'package:sloopify_mobile/features/friend_list/data/datasources/FriendListRepositoryImpl.dart';
+import 'package:sloopify_mobile/features/friend_list/data/repository/friend_list_repository_impl.dart';
+import 'package:sloopify_mobile/features/friend_list/domain/repository/friend_list_repository.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_bloc.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_event.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/suggestedFriendListPage.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -143,11 +150,22 @@ class CustomDrawer extends StatelessWidget {
                     itemName: "Friendship",
                     assets: AssetsManager.friendShip,
                     onTap: () {
-                      Navigator.pop(context);
+                      Navigator.pop(context); // Close drawer first
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const SuggestedFriendListPage(),
+                          builder: (_) {
+                            final friendListRepository =
+                                FriendListRepositoryImpl(
+                                  FriendRemoteDataSourceImpl(dio: Dio()),
+                                );
+                            return BlocProvider(
+                              create:
+                                  (_) => FriendBloc(friendListRepository)
+                                    ..add(LoadFriends(page: 1, perPage: 10)),
+                              child: const SuggestedFriendListPage(),
+                            );
+                          },
                         ),
                       );
                     },

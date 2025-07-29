@@ -6,6 +6,9 @@ import 'package:sloopify_mobile/core/managers/app_dimentions.dart';
 import 'package:sloopify_mobile/core/managers/assets_managers.dart';
 import 'package:sloopify_mobile/core/managers/color_manager.dart';
 import 'package:sloopify_mobile/core/managers/theme_manager.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/call/call_bloc.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/group_members/group_detail_screen.dart';
+import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/screen/video_call_screen.dart';
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_state.dart';
 import 'package:sloopify_mobile/features/home/presentation/screens/ai_system_screen.dart';
 import 'package:sloopify_mobile/features/home/presentation/widgets/home_screen.dart';
@@ -34,8 +37,7 @@ class HomeNavigationScreen extends StatelessWidget {
             body: SafeArea(
               child: BlocBuilder<HomeNavigationCubit, HomeNavigationState>(
                 builder:
-                    (context, state) =>
-                    Stack(
+                    (context, state) => Stack(
                       children: [
                         pages[state.selectedIndex],
                         if (state.isFabPanelOpen)
@@ -49,7 +51,8 @@ class HomeNavigationScreen extends StatelessWidget {
                     ),
               ),
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
             floatingActionButton: GestureDetector(
               onTap: () {
                 context.read<HomeNavigationCubit>().toggleFabPanel();
@@ -92,59 +95,87 @@ class HomeNavigationScreen extends StatelessWidget {
                     _buildNavIcon(context, AssetsManager.group, 1, "Group"),
                     SizedBox(width: 50), // FAB space
                     _buildNavIcon(context, AssetsManager.market, 2, "Market"),
-                    _buildNavIcon(context, AssetsManager.videoPlayer, 3, "Video"),
+                    _buildNavIcon(
+                      context,
+                      AssetsManager.videoPlayer,
+                      3,
+                      "Video",
+                    ),
                   ],
                 ),
               ),
             ),
           );
-        }
+        },
       ),
     );
   }
 
-  Widget _buildNavIcon(BuildContext context,
-      String assetName,
-      int index,
-      String text,) {
+  Widget _buildNavIcon(
+    BuildContext context,
+    String assetName,
+    int index,
+    String text,
+  ) {
     final selectedIndex =
-        context
-            .watch<HomeNavigationCubit>()
-            .state
-            .selectedIndex;
+        context.watch<HomeNavigationCubit>().state.selectedIndex;
+
+    void _handleNavigation() {
+      context.read<HomeNavigationCubit>().navigateTo(index);
+      // Add navigation logic based on index
+      if (index == 1) {
+        // Navigate to Group Page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (_) => BlocProvider(
+                  create: (_) => CallBloc(),
+                  child: GroupDetailScreen(),
+                ),
+          ),
+        );
+      } else if (index == 3) {
+        // Navigate to Voice Call Page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (_) => BlocProvider(
+                  create: (_) => CallBloc(),
+                  child: const VideoCallScreen(),
+                ),
+          ),
+        );
+      }
+    }
+
     return selectedIndex != index
-        ? InkWell(
-      child: SvgPicture.asset(assetName),
-      onTap: () {
-        context.read<HomeNavigationCubit>().navigateTo(index);
-      },
-    )
+        ? InkWell(child: SvgPicture.asset(assetName), onTap: _handleNavigation)
         : InkWell(
-      onTap: () {
-        context.read<HomeNavigationCubit>().navigateTo(index);
-      },
-      child: Container(
-        width: 90,
-        height: 35,
-        padding: EdgeInsets.symmetric(horizontal: AppPadding.p8),
-        decoration: BoxDecoration(
-          color: ColorManager.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(assetName, color: ColorManager.primaryColor),
-            Text(
-              text,
-              style: AppTheme.bodyText3.copyWith(
-                color: ColorManager.primaryColor,
-              ),
+          onTap: _handleNavigation,
+          child: Container(
+            width: 90,
+            height: 35,
+            padding: EdgeInsets.symmetric(horizontal: AppPadding.p8),
+            decoration: BoxDecoration(
+              color: ColorManager.white,
+              borderRadius: BorderRadius.circular(10),
             ),
-          ],
-        ),
-      ),
-    );
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(assetName, color: ColorManager.primaryColor),
+                Text(
+                  text,
+                  style: AppTheme.bodyText3.copyWith(
+                    color: ColorManager.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
   }
 }
 
@@ -176,9 +207,9 @@ class RoundedDiamondNotchedShape extends NotchedShape {
           host.left,
           host.top + barCornerRadius,
         )
-        ..lineTo(host.left, host.bottom)..lineTo(
-            host.right, host.bottom)..lineTo(
-            host.right, host.top + barCornerRadius)
+        ..lineTo(host.left, host.bottom)
+        ..lineTo(host.right, host.bottom)
+        ..lineTo(host.right, host.top + barCornerRadius)
         ..quadraticBezierTo(
           host.right,
           host.top,

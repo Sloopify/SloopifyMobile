@@ -4,36 +4,50 @@ import 'call_state.dart';
 
 class CallBloc extends Bloc<CallEvent, CallState> {
   CallBloc() : super(CallState.initial()) {
-    on<RequestVideoCall>((event, emit) {
-      emit(state.copyWith(callType: CallType.video));
-    });
+    on<RequestVideoCall>(_onRequestVideoCall);
+    on<AcceptVideoCall>(_onAcceptVideoCall);
+    on<RejectVideoCall>(_onRejectVideoCall);
+    on<ToggleMute>(_onToggleMute);
+    on<ToggleVideo>(_onToggleVideo);
+    on<SwapView>(_onSwapView);
+    on<PauseVideo>(_onPauseVideo);
+    on<ResumeVideo>(_onResumeVideo);
+    on<EndCall>(_onEndCall);
+  }
 
-    on<AcceptVideoCall>((event, emit) {
-      emit(state.copyWith(callType: CallType.video));
-    });
+  void _onRequestVideoCall(RequestVideoCall event, Emitter<CallState> emit) {
+    emit(state.copyWith(callType: CallType.video));
+  }
 
-    on<RejectVideoCall>((event, emit) {
-      emit(state.copyWith(callType: CallType.voice));
-    });
+  void _onAcceptVideoCall(AcceptVideoCall event, Emitter<CallState> emit) {
+    emit(state.copyWith(callType: CallType.video));
+  }
 
-    on<ToggleMute>((event, emit) {
-      emit(state.copyWith(isMuted: !state.isMuted));
-    });
+  void _onRejectVideoCall(RejectVideoCall event, Emitter<CallState> emit) {
+    emit(CallState.initial());
+  }
 
-    on<ToggleVideo>((event, emit) {
-      emit(state.copyWith(isVideoOn: !state.isVideoOn));
-    });
+  void _onToggleMute(ToggleMute event, Emitter<CallState> emit) {
+    emit(state.copyWith(isMuted: !state.isMuted));
+  }
 
-    on<SwapView>((event, emit) {
-      emit(state.copyWith(isSwapped: !state.isSwapped));
-    });
+  void _onToggleVideo(ToggleVideo event, Emitter<CallState> emit) {
+    emit(state.copyWith(isVideoOn: !state.isVideoOn));
+  }
 
-    on<PauseVideo>((event, emit) {
-      emit(state.copyWith(isVideoPaused: true));
-    });
+  void _onSwapView(SwapView event, Emitter<CallState> emit) {
+    emit(state.copyWith(isSwapped: !state.isSwapped));
+  }
 
-    on<ResumeVideo>((event, emit) {
-      emit(state.copyWith(isVideoPaused: false));
-    });
+  void _onPauseVideo(PauseVideo event, Emitter<CallState> emit) {
+    emit(state.copyWith(isVideoPaused: true));
+  }
+
+  void _onResumeVideo(ResumeVideo event, Emitter<CallState> emit) {
+    emit(state.copyWith(isVideoPaused: false));
+  }
+
+  void _onEndCall(EndCall event, Emitter<CallState> emit) {
+    emit(CallState.initial());
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,7 +22,7 @@ class CreateChannelPage extends StatelessWidget {
         builder: (context, state) {
           final bloc = context.read<CreateChannelBloc>();
           return Scaffold(
-            appBar: getCustomAppBar(title: ('New Channel'), context: context),
+            appBar: getCustomAppBar(title: 'New Channel', context: context),
             body: SingleChildScrollView(
               padding: EdgeInsets.all(16.w),
               child: Column(
@@ -31,11 +32,11 @@ class CreateChannelPage extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 50.r,
                       backgroundImage:
-                          state.imageFile != null
-                              ? FileImage(state.imageFile!)
+                          state.imagePath != null
+                              ? _getImageProvider(state.imagePath!)
                               : null,
                       child:
-                          state.imageFile == null
+                          state.imagePath == null
                               ? Icon(Icons.image, size: 40)
                               : null,
                     ),
@@ -93,6 +94,14 @@ class CreateChannelPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  ImageProvider _getImageProvider(String imagePath) {
+    if (imagePath.startsWith('http')) {
+      return NetworkImage(imagePath);
+    } else {
+      return FileImage(File(imagePath));
+    }
   }
 
   void _showImagePicker(BuildContext context) {

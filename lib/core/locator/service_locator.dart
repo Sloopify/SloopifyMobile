@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:sloopify_mobile/core/api_service/base_api_service.dart';
@@ -64,6 +65,10 @@ import 'package:sloopify_mobile/features/create_story/presentation/blocs/drawing
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/play_audio_cubit/play_audio_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/story_editor_cubit/story_editor_cubit.dart';
 import 'package:sloopify_mobile/features/create_story/presentation/blocs/text_editing_cubit/text_editing_cubit.dart';
+import 'package:sloopify_mobile/features/friend_list/data/datasources/FriendListRepositoryImpl.dart';
+import 'package:sloopify_mobile/features/friend_list/data/datasources/friend_list_remote_data_source.dart';
+import 'package:sloopify_mobile/features/friend_list/data/repository/friend_list_repository_impl.dart';
+import 'package:sloopify_mobile/features/friend_list/domain/repository/friend_list_repository.dart';
 import 'package:sloopify_mobile/features/home/presentation/blocs/home_navigation_cubit/home_navigation_cubit.dart';
 import 'package:sloopify_mobile/features/posts/presentation/blocs/fetch_comments_bloc/fetch_comments_bloc.dart';
 
@@ -91,6 +96,8 @@ final locator = GetIt.I;
 
 Future<void> setupLocator() async {
   ////blocs
+  locator.registerLazySingleton<Dio>(() => Dio());
+
   locator.registerFactory(() => VerifyAccountCubit());
   locator.registerFactory(
     () =>
@@ -109,6 +116,10 @@ Future<void> setupLocator() async {
       optLoginUseCase: locator(),
     ),
   );
+  locator.registerLazySingleton<FriendRemoteDataSource>(
+    () => FriendRemoteDataSourceImpl(dio: locator()),
+  );
+
   locator.registerFactory(
     () => ForgetPasswordCubit(
       changePasswordUseCase: locator(),
@@ -189,22 +200,11 @@ Future<void> setupLocator() async {
     ),
   );
   locator.registerFactory(
-        () => StoryEditorCubit(
-          createMyStoryUseCase: locator()
-    ),
+    () => StoryEditorCubit(createMyStoryUseCase: locator()),
   );
-  locator.registerFactory(
-        () => DrawingStoryCubit(
-    ),
-  );
-  locator.registerFactory(
-        () => CalculateTempCubit(
-    ),
-  );
-  locator.registerFactory(
-        () => TextEditingCubit(
-    ),
-  );
+  locator.registerFactory(() => DrawingStoryCubit());
+  locator.registerFactory(() => CalculateTempCubit());
+  locator.registerFactory(() => TextEditingCubit());
 
   ///
   ///use cases
@@ -334,8 +334,9 @@ Future<void> setupLocator() async {
     () => SearchStoryAudioUseCase(createStoryRepo: locator()),
   );
   locator.registerLazySingleton(
-        () => CreateMyStoryUseCase(createStoryRepo: locator()),
+    () => CreateMyStoryUseCase(createStoryRepo: locator()),
   );
+
   ///
   ///Repositories
   ////////
@@ -348,6 +349,9 @@ Future<void> setupLocator() async {
   );
   locator.registerLazySingleton<CreateStoryRepo>(
     () => CreateStoryRepoImpl(createStoryDataProvider: locator()),
+  );
+  locator.registerLazySingleton<FriendListRepository>(
+    () => FriendListRepositoryImpl(locator()),
   );
   ////
   //////data source

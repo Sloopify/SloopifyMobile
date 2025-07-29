@@ -22,3 +22,7 @@ class SwapView extends CallEvent {}
 class PauseVideo extends CallEvent {}
 
 class ResumeVideo extends CallEvent {}
+
+class EndCall extends CallEvent {}
+
+class InitCall extends CallEvent {}

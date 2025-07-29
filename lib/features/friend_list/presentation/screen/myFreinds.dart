@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sloopify_mobile/features/friend_list/domain/repository/friend_list_repository.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_bloc.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_event.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_state.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/widgets/friend_item.dart';
 
 class MyFriendsPage extends StatefulWidget {
+  static const routeName = "my_friends_screen";
+
   const MyFriendsPage({super.key});
-  static const routeName = "my_friends_requests_screen";
 
   @override
   State<MyFriendsPage> createState() => _MyFriendsPageState();
@@ -51,6 +53,8 @@ class _MyFriendsPageState extends State<MyFriendsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final friendBloc = context.read<FriendListRepository>();
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -140,7 +144,7 @@ class _MyFriendsPageState extends State<MyFriendsPage> {
                       itemCount: friends.length,
                       itemBuilder: (_, index) {
                         final friend = friends[index];
-                        return FriendItem(); // Pass real friend
+                        return FriendItem(friend: friend); // Pass real friend
                       },
                     );
                   }

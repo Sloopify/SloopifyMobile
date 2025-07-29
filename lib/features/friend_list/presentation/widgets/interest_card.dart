@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_bloc.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_event.dart';
+import '../../domain/entities/friend.dart';
 
 class InterestCard extends StatelessWidget {
-  const InterestCard({super.key});
+  final Friend friend;
+
+  const InterestCard({super.key, required this.friend});
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +24,14 @@ class InterestCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              'assets/images/friendlist/3.jpg',
+            child: Image.network(
+              friend.avatarUrl,
               height: 80,
               width: 80,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(Icons.person, size: 80);
+              },
             ),
           ),
           const SizedBox(width: 12),
@@ -30,55 +39,49 @@ class InterestCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Lorem ipsum",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  friend.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: List.generate(4, (index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 4.0),
-                      child: CircleAvatar(
-                        radius: 10,
-                        backgroundImage: AssetImage(
-                          'assets/images/friendlist/${index + 1}.jpg',
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 4),
-                const Text("4 mutual friends", style: TextStyle(fontSize: 12)),
+
+                const Text("Mutual friends: 4", style: TextStyle(fontSize: 12)),
+
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        shape: BoxShape.rectangle,
-                      ),
-                      child: const Icon(Icons.add, size: 20),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        shape: BoxShape.rectangle,
-                      ),
-                      child: const Icon(
-                        Icons.delete_outline_outlined,
-                        size: 20,
-                      ),
-                    ),
+                    _iconButton(Icons.person_add, () {
+                      BlocProvider.of<FriendBloc>(
+                        context,
+                      ).add(SendFriendRequestEvent(friendId: friend.id));
+                    }),
+
+                    _iconButton(Icons.delete_outline_outlined, () {
+                      BlocProvider.of<FriendBloc>(
+                        context,
+                      ).add(CancelFriendRequestEvent(friendId: friend.id));
+                    }),
                   ],
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _iconButton(IconData icon, VoidCallback onPressed) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          shape: BoxShape.rectangle,
+        ),
+        child: Icon(icon, size: 20),
       ),
     );
   }

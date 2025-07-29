@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sloopify_mobile/core/ui/widgets/custom_app_bar.dart';
 import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/group_members/group_members_bloc.dart';
 
 import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bloc/group_members/group_members_event.dart';
@@ -8,6 +9,7 @@ import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/bl
 import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/widgets/group_details/_GroupOptions.dart';
 import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/widgets/group_details/_MemberList.dart';
 import 'package:sloopify_mobile/features/chat_call_group_channel/presentation/widgets/group_details/actionButton.dart';
+import 'package:sloopify_mobile/features/inbox/presentation/screen/inbox_page.dart';
 import 'package:sloopify_mobile/features/profile/presentation/widgets/media_section.dart';
 
 class GroupDetailScreen extends StatelessWidget {
@@ -20,12 +22,13 @@ class GroupDetailScreen extends StatelessWidget {
       child: BlocBuilder<GroupBloc, GroupState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(
-              title: Text(state.groupName),
+            appBar: getCustomAppBar(
+              title: "${state.groupName}",
               actions: [
                 if (state.isAdmin)
                   IconButton(icon: const Icon(Icons.edit), onPressed: () {}),
               ],
+              context: context,
             ),
             body: SingleChildScrollView(
               padding: EdgeInsets.all(16.w),
@@ -57,11 +60,16 @@ class GroupDetailScreen extends StatelessWidget {
 
                       if (state.isAdmin)
                         ActionButton(
-                          icon: Icons.share,
-                          label: "Share",
-                          onTap: () {},
+                          icon: Icons.message,
+                          label: "chat",
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => InboxScreen(),
+                              ),
+                            );
+                          },
                         ),
-                      ActionButton(icon: Icons.add, label: "Add", onTap: () {}),
                     ],
                   ),
                   SizedBox(height: 20.h),

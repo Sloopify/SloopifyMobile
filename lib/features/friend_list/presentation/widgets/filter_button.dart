@@ -1,4 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sloopify_mobile/features/friend_list/data/datasources/FriendListRepositoryImpl.dart';
+import 'package:sloopify_mobile/features/friend_list/data/datasources/friend_list_remote_data_source.dart';
+import 'package:sloopify_mobile/features/friend_list/data/repository/friend_list_repository_impl.dart';
+import 'package:sloopify_mobile/features/friend_list/domain/repository/friend_list_repository.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_bloc.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/blocs/friend_list_event.dart';
+import 'package:sloopify_mobile/features/friend_list/presentation/screen/friendship_request.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/myRequests.dart';
 import 'package:sloopify_mobile/features/friend_list/presentation/screen/youMayKnowScreen.dart';
 
@@ -12,25 +21,59 @@ class FilterButton extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: () {
+          final remoteDataSource = FriendListRepositoryImpl(
+            Dio() as FriendRemoteDataSource,
+          );
+
           switch (text.toLowerCase()) {
             case 'friendship requests':
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => MyRequestsPage()),
+                MaterialPageRoute(
+                  builder:
+                      (_) => BlocProvider(
+                        create:
+                            (_) => FriendBloc(
+                              remoteDataSource as FriendListRepository,
+                            )..add(LoadFriends(page: 1, perPage: 10)),
+                        child: const FriendListPage(),
+                      ),
+                ),
               );
               break;
+
             case 'my requests':
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => MyRequestsPage()),
+                MaterialPageRoute(
+                  builder:
+                      (_) => BlocProvider(
+                        create:
+                            (_) => FriendBloc(
+                              remoteDataSource as FriendListRepository,
+                            )..add(LoadFriends(page: 1, perPage: 10)),
+                        child: const MyRequestsPage(),
+                      ),
+                ),
               );
               break;
+
             case 'you may know':
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const YouMayKnowPage()),
+                MaterialPageRoute(
+                  builder:
+                      (_) => BlocProvider(
+                        create:
+                            (_) => FriendBloc(
+                              remoteDataSource as FriendListRepository,
+                            )..add(LoadFriends(page: 1, perPage: 10)),
+                        child: const YouMayKnowPage(),
+                      ),
+                ),
               );
               break;
+
             default:
               ScaffoldMessenger.of(
                 context,

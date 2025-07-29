@@ -35,7 +35,10 @@ class FriendSearchDelegate extends SearchDelegate {
               state.filteredFriends.map((friend) {
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(friend.avatarUrl as String),
+                    backgroundImage: AssetImage(
+                      "assets/images/friendlist/group.jpg",
+                    ),
+                    // NetworkImage(friend.avatarUrl ),
                   ),
                   title: RichText(
                     text: TextSpan(
